@@ -4,6 +4,8 @@ class DashboardController
 {
     public function index()
     {
-       view('admin/master', []);
+        $content = getContentPath('', 'dashboard');
+
+        view('admin/master', ['content' => $content]);
     }
 }

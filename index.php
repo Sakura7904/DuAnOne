@@ -11,5 +11,7 @@ $act = $_GET['act'] ?? null;
 
 match ($act) {
     'dashboard' => (new DashboardController())->index(),
+
+    'list_products' => (new DashboardController())->list_products(),
     default => die("Không tìm thấy file"),
 };

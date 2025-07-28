@@ -15,12 +15,6 @@
         </header>
         <main class="overflow-x-scroll scrollbar-hide flex flex-col justify-between pt-[42px] px-[23px] pb-[28px]">
             <!-- CONTENT -->
-            <?php
-            $content = 'views/admin/pages/dashboard.php'; // Mặc định
-            if (isset($_GET['page'])) {
-                $content = 'views/admin/pages/' . $_GET['page'] . '.php';
-            }
-            ?>
             <div class="">
                 <?php include $content; ?>
             </div>
