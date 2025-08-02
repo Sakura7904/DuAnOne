@@ -6,9 +6,9 @@ include "commons/helpers.php";
 
 
 if (isset($_GET['page'])) {
-    $content = getContentPath(); 
+    $content = getContentPath();
     include "views/admin/master.php";
-    exit(); 
+    exit();
 }
 
 // ========================= LOAD CONTROLLER =========================

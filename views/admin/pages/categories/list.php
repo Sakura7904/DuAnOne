@@ -1,7 +1,24 @@
 <?php
 $categories = $categories ?? [];
 $allCategories = $allCategories ?? [];
+
+if (isset($_SESSION['msg'])) {
+    $msg = $_SESSION['msg'];
+    $type = $_SESSION['msg_type'] ?? 'info';
+
+    unset($_SESSION['msg'], $_SESSION['msg_type']);
+
+    $bgClass = match ($type) {
+        'success' => 'bg-green-100 border-green-400 text-green-700',
+        'error'   => 'bg-red-100 border-red-400 text-red-700',
+        default   => 'bg-gray-100 border-gray-400 text-gray-700',
+    };
 ?>
+    <div class="px-4 py-3 mb-4 border rounded <?= $bgClass ?>">
+        <?= htmlspecialchars($msg) ?>
+    </div>
+<?php } ?>
+
 
 <div class="p-6 bg-neutral-bg rounded-2xl border border-neutral dark:bg-dark-neutral-bg dark:border-dark-neutral-border">
     <div class="flex justify-between items-center mb-6">
