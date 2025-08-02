@@ -26,38 +26,20 @@
             </div>
         </div>
         <div class="sidemenu-item rounded-xl relative">
-            <input class="sr-only peer" type="checkbox" value="ecommerce" name="sidemenu" id="ecommerce">
-            <label class="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none peer-checked:border-transparent" for="ecommerce">
-                <div class="flex items-center gap-[10px]"><img src="./assets/admin/assets/images/icons/icon-products.svg" alt="side menu icon"><span class="text-normal font-semibold text-gray-500 sidemenu-title dark:text-gray-dark-500">Ecommerce</span></div>
-            </label><img class="absolute right-2 transition-all duration-150 caret-icon pointer-events-none peer-checked:rotate-180 top-[22px]" src="./assets/admin/assets/images/icons/icon-arrow-down.svg" alt="caret icon">
-            <div class="hidden peer-checked:block">
-                <ul class="text-gray-300 child-menu z-10 pl-[53px]">
-                    <li class="pb-2 transition-opacity duration-150 hover:opacity-75"><a class="text-normal" href="index.html">Dashboards</a></li>
-                    <li class="pb-2 transition-opacity duration-150 hover:opacity-75"><a class="text-normal" href="product-list.html">Products List</a></li>
-                    <li class="pb-2 transition-opacity duration-150 hover:opacity-75"><a class="text-normal" href="product-grid.html">Products Grid</a></li>
-                    <li class="pb-2 transition-opacity duration-150 hover:opacity-75"><a class="text-normal" href="product-details.html">Product Details</a></li>
-                    <li class="pb-2 transition-opacity duration-150 hover:opacity-75"><a class="text-normal" href="order-list.html">Order List</a></li>
-                    <li class="pb-2 transition-opacity duration-150 hover:opacity-75"><a class="text-normal" href="order-details.html">Order Details</a></li>
-                    <li class="pb-2 transition-opacity duration-150 hover:opacity-75"><a class="text-normal" href="transactions-list.html">Transactions</a></li>
-                    <li class="pb-2 transition-opacity duration-150 hover:opacity-75"><a class="text-normal" href="customers-lists.html">Customers List</a></li>
-                    <li class="pb-2 transition-opacity duration-150 hover:opacity-75"><a class="text-normal" href="reviews-list.html">Customers Review</a></li>
-                    <li class="pb-2 transition-opacity duration-150 hover:opacity-75"><a class="text-normal" href="seller-details.html">Seller Details</a></li>
-                </ul>
-            </div>
+            <a href="index.php?act=list_categories" class="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none">
+                <div class="flex items-center gap-[10px]">
+                    <img src="./assets/admin/assets/images/icons/icon-products.svg" alt="side menu icon">
+                    <span class="text-normal font-semibold text-gray-500 sidemenu-title dark:text-gray-dark-500">Categories</span>
+                </div>
+            </a>
         </div>
         <div class="sidemenu-item rounded-xl relative">
-            <input class="sr-only peer" type="checkbox" value="finance" name="sidemenu" id="finance">
-            <label class="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none peer-checked:border-transparent" for="finance">
-                <div class="flex items-center gap-[10px]"><img src="./assets/admin/assets/images/icons/icon-wallet.svg" alt="side menu icon"><span class="text-normal font-semibold text-gray-500 sidemenu-title dark:text-gray-dark-500">Photo gallery</span></div>
-            </label><img class="absolute right-2 transition-all duration-150 caret-icon pointer-events-none peer-checked:rotate-180 top-[22px]" src="./assets/admin/assets/images/icons/icon-arrow-down.svg" alt="caret icon">
-            <div class="hidden peer-checked:block">
-                <ul class="text-gray-300 child-menu z-10 pl-[53px]">
-                    <li class="pb-2 transition-opacity duration-150 hover:opacity-75"><a class="text-normal" href="index.php?act=product_images">List Photo gallery</a></li>
-                    <li class="pb-2 transition-opacity duration-150 hover:opacity-75"><a class="text-normal" href="finance-cards.html">Cards</a></li>
-                    <li class="pb-2 transition-opacity duration-150 hover:opacity-75"><a class="text-normal" href="finance-transactions.html">Transactions</a></li>
-                    <li class="pb-2 transition-opacity duration-150 hover:opacity-75"><a class="text-normal" href="#" id="transaction-detail">Transactions Details</a></li>
-                </ul>
-            </div>
+            <a href="index.php?act=product_images" class="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none">
+                <div class="flex items-center gap-[10px]">
+                    <img src="./assets/admin/assets/images/icons/icon-products.svg" alt="side menu icon">
+                    <span class="text-normal font-semibold text-gray-500 sidemenu-title dark:text-gray-dark-500">Photo Gallery</span>
+                </div>
+            </a>
         </div>
         <div class="sidemenu-item rounded-xl relative">
             <input class="sr-only peer" type="checkbox" value="jobs" name="sidemenu" id="jobs">
