@@ -37,46 +37,38 @@ if (isset($_SESSION['msg'])) {
     </div>
 
     <div class="overflow-x-auto">
-        <table class="w-full min-w-[1000px] text-left border border-gray-300 rounded overflow-hidden">
-            <thead class="bg-gray-100 text-sm uppercase text-gray-600">
-                <tr>
-                    <th class="py-3 px-4 border-b">ID</th>
-                    <th class="py-3 px-4 border-b">Tên danh mục</th>
-                    <th class="py-3 px-4 border-b">Danh mục cha</th>
-                    <th class="py-3 px-4 border-b">Ngày tạo</th>
-                    <th class="py-3 px-4 border-b">Cập nhật lần cuối</th>
-                    <th class="py-3 px-4 border-b text-center">Hành động</th>
+        <table class="w-full min-w-[900px]">
+            <thead>
+                <tr class="border-b border-neutral dark:border-dark-neutral-border pb-[15px]">
+                    <th class="text-left text-normal text-gray-400 text-left pb-[15px] dark:text-gray-dark-400"> STT </th>
+                    <th class="font-normal text-normal text-gray-400 text-left pb-[15px] dark:text-gray-dark-400">Tên danh mục</th>
+                    <th class="font-normal text-normal text-gray-400 text-left pb-[15px] dark:text-gray-dark-400">Danh mục cha</th>
+                    <th class="font-normal text-normal text-gray-400 text-left pb-[15px] dark:text-gray-dark-400">Ngày tạo</th>
+                    <th class="font-normal text-normal text-gray-400 text-left pb-[15px] dark:text-gray-dark-400">Cập nhật lần cuối</th>
+                    <th class="font-normal text-normal text-gray-400 text-left pb-[15px] dark:text-gray-dark-400">Actions</th>
                 </tr>
             </thead>
-            <tbody class="text-gray-700 bg-white">
-                <?php if (!empty($categories)): ?>
-                    <?php foreach ($categories as $cat): ?>
-                        <tr class="hover:bg-gray-50 transition">
-                            <td class="py-2 px-4 border-b"><?= $cat['id'] ?></td>
-                            <td class="py-2 px-4 border-b"><?= htmlspecialchars($cat['name']) ?></td>
-                            <td class="py-2 px-4 border-b">
-                                <?= !empty($cat['parent_id']) && isset($allCategories[$cat['parent_id']])
-                                    ? $allCategories[$cat['parent_id']]
-                                    : 'Không có' ?>
-                            </td>
-                            <td class="py-2 px-4 border-b">
-                                <?= !empty($cat['created_at']) ? date('d/m/Y H:i:s', strtotime($cat['created_at'])) : '-' ?>
-                            </td>
-                            <td class="py-2 px-4 border-b">
-                                <?= !empty($cat['updated_at']) ? date('d/m/Y H:i:s', strtotime($cat['updated_at'])) : '-' ?>
-                            </td>
-                            <td class="py-2 px-4 border-b text-center">
-                                <a href="index.php?act=edit_category&id=<?= $cat['id'] ?>" class="text-blue-600 hover:underline">✏️ Sửa</a>
-                                |
-                                <a href="index.php?act=delete_category&id=<?= $cat['id'] ?>" class="text-red-600 hover:underline" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">🗑️ Xóa</a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="6" class="py-4 px-4 text-center text-gray-500">Không có danh mục nào.</td>
+            <tbody>
+                <?php foreach ($categories as $key => $cat): ?>
+                    <tr class="border-b text-normal text-gray-1100 border-neutral dark:border-dark-neutral-border dark:text-gray-dark-1100">
+                        <td class="text-left"><?= $key + 1 ?> </td>
+                        <td class="py-[25px]"><?= $cat['name'] ?> </td>
+                        <td class="max-w-[196px]">
+                            <?= !empty($cat['parent_id']) && isset($allCategories[$cat['parent_id']])
+                                ? $allCategories[$cat['parent_id']]
+                                : 'Không có' ?>
+                        </td>
+                        <td class="max-w-[196px]"><?= !empty($cat['created_at']) ? date('d/m/Y H:i:s', strtotime($cat['created_at'])) : '-' ?></td>
+                        <td class="max-w-[196px]">
+                            <?= !empty($cat['updated_at']) ? date('d/m/Y H:i:s', strtotime($cat['updated_at'])) : '-' ?>
+                        </td>
+                        <td class="max-w-[196px]">
+                            <a href="index.php?act=edit_category&id=<?= $cat['id'] ?>" class="text-blue-600 hover:underline">✏️ Sửa</a>
+                            |
+                            <a href="index.php?act=delete_category&id=<?= $cat['id'] ?>" class="text-red-600 hover:underline" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">🗑️ Xóa</a>
+                        </td>
                     </tr>
-                <?php endif; ?>
+                <?php endforeach; ?>
             </tbody>
         </table>
     </div>
