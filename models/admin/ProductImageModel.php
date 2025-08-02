@@ -11,23 +11,36 @@ class ProductImageModel
     // Lấy tất cả ảnh sản phẩm với thông tin variant và product
     public function getAllImages()
     {
-        $sql = "SELECT 
-                    pi.id,
-                    pi.variant_id,
-                    pi.image_url,
-                    pi.created_at, 
-                    pv.product_id,
-                    p.name as product_name,
-                    pv.price,
-                    pv.sale_price
-                FROM productimages pi
-                LEFT JOIN productvariants pv ON pi.variant_id = pv.id
-                LEFT JOIN products p ON pv.product_id = p.id
-                ORDER BY pi.id DESC";
+        $sql = "SELECT
+                pi.id,
+                pi.variant_id,
+                pi.image_url,
+                pi.created_at,
+                pv.product_id,
+                p.name as product_name,
+                pv.price,
+                pv.sale_price,
+                pv.quantity,
+                -- Lấy thông tin attributes của variant
+                GROUP_CONCAT(
+                    CONCAT(a.name, ': ', av.value) 
+                    ORDER BY a.name ASC 
+                    SEPARATOR ', '
+                ) as variant_attributes
+            FROM productimages pi
+            LEFT JOIN productvariants pv ON pi.variant_id = pv.id
+            LEFT JOIN products p ON pv.product_id = p.id
+            LEFT JOIN productvariantvalues pvv ON pv.id = pvv.variant_id
+            LEFT JOIN attributevalues av ON pvv.value_id = av.id
+            LEFT JOIN attributes a ON av.attribute_id = a.id
+            GROUP BY pi.id, pi.variant_id, pi.image_url, pi.created_at, 
+                     pv.product_id, p.name, pv.price, pv.sale_price, pv.quantity
+            ORDER BY pi.id DESC";
 
         $stmt = $this->db->pdo->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     // Lấy ảnh theo variant_id
     public function getImagesByVariantId($variant_id)
@@ -95,6 +108,15 @@ class ProductImageModel
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->bindParam(':image_url', $image_url, PDO::PARAM_STR);
         return $stmt->execute();
+    }
+
+    public function updateImageVariant($id, $variantId)
+    {
+        $sql = "UPDATE productimages SET variant_id = ? WHERE id = ?";
+        $stmt = $this->db->pdo->prepare($sql);
+        $result = $stmt->execute([$variantId, $id]);
+
+        return $result;
     }
 
     // Xóa ảnh theo ID
@@ -170,20 +192,63 @@ class ProductImageModel
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Tìm kiếm ảnh theo tên file
-    public function searchImagesByName($search_term)
+    /**
+     * Lấy tổng số ảnh
+     */
+    public function getTotalImages()
     {
-        $sql = "SELECT pi.*, pv.product_id, p.name as product_name
+        try {
+            $sql = "SELECT COUNT(*) as total FROM productimages";
+            $stmt = $this->db->pdo->query($sql);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return (int)$result['total'];
+        } catch (Exception $e) {
+            error_log("ProductImageModel::getTotalImages() Error: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Lấy ảnh theo phân trang
+     */
+    public function getImagesPaginated($offset, $limit)
+    {
+        try {
+            $sql = "SELECT
+                    pi.id,
+                    pi.variant_id,
+                    pi.image_url,
+                    pi.created_at,
+                    pv.product_id,
+                    p.name as product_name,
+                    pv.price,
+                    pv.sale_price,
+                    pv.quantity,
+                    GROUP_CONCAT(
+                        CONCAT(a.name, ': ', av.value) 
+                        ORDER BY a.name ASC 
+                        SEPARATOR ', '
+                    ) as variant_attributes
                 FROM productimages pi
                 LEFT JOIN productvariants pv ON pi.variant_id = pv.id
                 LEFT JOIN products p ON pv.product_id = p.id
-                WHERE pi.image_url LIKE :search_term
-                ORDER BY pi.id DESC";
+                LEFT JOIN productvariantvalues pvv ON pv.id = pvv.variant_id
+                LEFT JOIN attributevalues av ON pvv.value_id = av.id
+                LEFT JOIN attributes a ON av.attribute_id = a.id
+                GROUP BY pi.id, pi.variant_id, pi.image_url, pi.created_at, 
+                         pv.product_id, p.name, pv.price, pv.sale_price, pv.quantity
+                ORDER BY pi.id DESC
+                LIMIT ?, ?";
 
-        $stmt = $this->db->pdo->prepare($sql);
-        $search_param = '%' . $search_term . '%';
-        $stmt->bindParam(':search_term', $search_param, PDO::PARAM_STR);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt = $this->db->pdo->prepare($sql);
+            $stmt->bindParam(1, $offset, PDO::PARAM_INT);
+            $stmt->bindParam(2, $limit, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("ProductImageModel::getImagesPaginated() Error: " . $e->getMessage());
+            return [];
+        }
     }
 }

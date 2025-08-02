@@ -17,24 +17,48 @@ class ProductImageController
     }
 
     // Hiển thị trang danh sách ảnh (thư viện)
+    // Sửa method index() trong ProductImageController.php
     public function index()
     {
         try {
-            // Lấy tất cả ảnh với thông tin sản phẩm
-            $images = $this->productImageModel->getAllImages();
+            // Lấy trang hiện tại từ URL (tránh conflict với routing)
+            $current_page = isset($_GET['p']) ? (int)$_GET['p'] : 1; // Dùng 'p' thay vì 'page'
+            if ($current_page < 1) $current_page = 1;
 
-            // Lấy danh sách sản phẩm để filter
+            // Cấu hình phân trang
+            $items_per_page = 10; // Số ảnh mỗi trang
+            $offset = ($current_page - 1) * $items_per_page;
+
+            // Lấy tổng số ảnh
+            $total_images = $this->productImageModel->getTotalImages();
+            $total_pages = ceil($total_images / $items_per_page);
+
+            // Lấy ảnh theo phân trang
+            $images = $this->productImageModel->getImagesPaginated($offset, $items_per_page);
+
+            // Lấy danh sách sản phẩm
             $products = $this->productModel->getAllProducts();
 
-            // Thống kê
-            $totalImages = count($images);
+            // Thông tin phân trang
+            $pagination = [
+                'current_page' => $current_page,
+                'total_pages' => $total_pages,
+                'total_images' => $total_images,
+                'items_per_page' => $items_per_page,
+                'has_previous' => $current_page > 1,
+                'has_next' => $current_page < $total_pages,
+                'previous_page' => $current_page - 1,
+                'next_page' => $current_page + 1,
+            ];
 
             // Load view
             $content = getContentPath('Product_Images', 'listProductImages');
-            //Nếu để trong thư mục ví dụ: views/admin/pages/products/list_products.php
-            //Thì phải truyền tham số trùng với tên thư mục vào getContentPath('products, 'list_products')
-
-            view('admin/master', ['content' => $content, 'images' => $images, 'products' => $products, 'totalImages' => $totalImages]);
+            view('admin/master', [
+                'content' => $content,
+                'images' => $images,
+                'products' => $products,
+                'pagination' => $pagination
+            ]);
         } catch (Exception $e) {
             $_SESSION['error'] = "Lỗi khi tải danh sách ảnh: " . $e->getMessage();
             header('Location: ?act=dashboard');
@@ -42,21 +66,6 @@ class ProductImageController
         }
     }
 
-    // Hiển thị form thêm ảnh
-    public function create()
-    {
-        try {
-            // Lấy danh sách sản phẩm và variants
-            $products = $this->productModel->getAllProducts();
-            $variants = $this->productVariantModel->getAllVariants();
-
-            include 'views/admin/product-images/addProductImage.php';
-        } catch (Exception $e) {
-            $_SESSION['error'] = "Lỗi khi tải form thêm ảnh: " . $e->getMessage();
-            header('Location: ?act=product_images');
-            exit;
-        }
-    }
 
     // Xử lý thêm ảnh
     public function store()
@@ -138,7 +147,8 @@ class ProductImageController
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
-                $id = $_POST['id'] ?? '';
+                // Nhận ID từ modal (edit_image_id) hoặc từ form thường (id)
+                $id = $_POST['edit_image_id'] ?? $_POST['id'] ?? '';
 
                 if (empty($id)) {
                     throw new Exception("ID ảnh không hợp lệ");
@@ -149,38 +159,61 @@ class ProductImageController
                     throw new Exception("Không tìm thấy ảnh");
                 }
 
-                // Xử lý upload ảnh mới (nếu có)
-                if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                    $newImagePath = $this->handleSingleImageUpload($_FILES['image'], $currentImage['variant_id']);
+                // Cho phép thay đổi variant (từ modal form)
+                $variant_id = $_POST['variant_id'] ?? $currentImage['variant_id'];
 
-                    if ($newImagePath) {
-                        // Xóa ảnh cũ
-                        if (file_exists($currentImage['image_url'])) {
-                            unlink($currentImage['image_url']);
-                        }
+                // Xử lý upload ảnh mới - hỗ trợ cả 2 format
+                $hasNewImage = false;
 
-                        // Cập nhật đường dẫn ảnh mới
-                        $result = $this->productImageModel->updateImage($id, $newImagePath);
+                // Từ modal: images[] array
+                if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
+                    $newImagePath = $this->handleSingleImageUpload($_FILES['images'], $variant_id);
+                    $hasNewImage = true;
+                }
+                // Từ form thường: image single
+                elseif (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                    $newImagePath = $this->handleSingleImageUpload($_FILES['image'], $variant_id);
+                    $hasNewImage = true;
+                }
 
-                        if ($result) {
-                            $_SESSION['success'] = "Cập nhật ảnh thành công!";
-                        } else {
-                            throw new Exception("Lỗi khi cập nhật ảnh");
-                        }
+                if ($hasNewImage && isset($newImagePath)) {
+                    // Xóa ảnh cũ
+                    if (file_exists($currentImage['image_url'])) {
+                        unlink($currentImage['image_url']);
+                    }
+
+                    // Cập nhật đường dẫn ảnh mới
+                    $result = $this->productImageModel->updateImage($id, $newImagePath);
+
+                    if ($result) {
+                        $_SESSION['success'] = "✅ Cập nhật ảnh thành công!";
+                    } else {
+                        throw new Exception("Lỗi khi cập nhật ảnh");
                     }
                 } else {
-                    $_SESSION['info'] = "Không có ảnh mới được upload";
+                    // Không có ảnh mới - kiểm tra có thay đổi variant không
+                    if ($variant_id != $currentImage['variant_id']) {
+                        $result = $this->productImageModel->updateImageVariant($id, $variant_id);
+                        if ($result) {
+                            $_SESSION['success'] = "✅ Cập nhật thông tin ảnh thành công!";
+                        } else {
+                            throw new Exception("Lỗi khi cập nhật thông tin ảnh");
+                        }
+                    } else {
+                        $_SESSION['info'] = "ℹ️ Không có thay đổi nào được thực hiện";
+                    }
                 }
 
                 header('Location: ?act=product_images');
                 exit;
             } catch (Exception $e) {
-                $_SESSION['error'] = $e->getMessage();
-                header('Location: ?act=product_images&action=edit&id=' . ($_POST['id'] ?? ''));
+                $_SESSION['error'] = "❌ " . $e->getMessage();
+                header('Location: ?act=product_images');
                 exit;
             }
         }
     }
+
 
     // Xóa ảnh
     public function delete()
@@ -201,6 +234,32 @@ class ProductImageController
             }
         } catch (Exception $e) {
             $_SESSION['error'] = $e->getMessage();
+        }
+
+        header('Location: ?act=product_images');
+        exit;
+    }
+
+    public function bulkDelete()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                $imageIds = $_POST['image_ids'] ?? [];
+
+                if (empty($imageIds)) {
+                    $_SESSION['error'] = "Vui lòng chọn ít nhất một ảnh để xóa";
+                } else {
+                    $deletedCount = 0;
+                    foreach ($imageIds as $id) {
+                        if ($this->productImageModel->deleteImage($id)) {
+                            $deletedCount++;
+                        }
+                    }
+                    $_SESSION['success'] = "Đã xóa thành công {$deletedCount} ảnh!";
+                }
+            } catch (Exception $e) {
+                $_SESSION['error'] = $e->getMessage();
+            }
         }
 
         header('Location: ?act=product_images');
@@ -322,28 +381,5 @@ class ProductImageController
         }
 
         return $uploadedFiles;
-    }
-
-    // Tìm kiếm ảnh
-    public function search()
-    {
-        try {
-            $searchTerm = $_GET['search'] ?? '';
-
-            if (empty($searchTerm)) {
-                header('Location: ?act=product_images');
-                exit;
-            }
-
-            $images = $this->productImageModel->searchImagesByName($searchTerm);
-            $products = $this->productModel->getAllProducts();
-            $totalImages = count($images);
-
-            include 'views/admin/product-images/listProductImages.php';
-        } catch (Exception $e) {
-            $_SESSION['error'] = "Lỗi khi tìm kiếm: " . $e->getMessage();
-            header('Location: ?act=product_images');
-            exit;
-        }
     }
 }

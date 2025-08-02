@@ -20,11 +20,11 @@ match ($act) {
 
         return match ($action) {
             'index'                => $controller->index(),
-            'create'               => $controller->create(),
             'store'                => $controller->store(),
             'edit'                 => $controller->edit(),
             'update'               => $controller->update(),
             'delete'               => $controller->delete(),
+            'bulkDelete'           => $controller->bulkDelete(),
             'getVariantsByProduct' => $controller->getVariantsByProduct(),
             default                => $controller->index(),
         };
