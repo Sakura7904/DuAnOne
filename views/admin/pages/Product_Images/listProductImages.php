@@ -3,7 +3,7 @@
     <div class="flex items-center text-xs text-gray-500 gap-x-[11px] mb-[37px]">
         <div class="flex items-center gap-x-1">
             <img src="./assets/admin/assets/images/icons/icon-home-2.svg" alt="home icon">
-            <a class="capitalize" href="index.php?act=dashboard">home</a>
+            <a class="capitalize" href="index.php?admin=dashboard">home</a>
         </div>
         <img src="./assets/admin/assets/images/icons/icon-arrow-right.svg" alt="arrow right icon">
         <span class="capitalize text-color-brands">Photo gallery</span>
@@ -15,7 +15,7 @@
                 <div class="border bg-neutral-bg border-neutral dark:bg-dark-neutral-bg dark:border-dark-neutral-border rounded-2xl pb-5 flex-1 px-[28px] pt-[35px]">
 
                     <!-- Form thêm ảnh -->
-                    <form action="?act=product_images&action=store" method="POST" enctype="multipart/form-data" id="addImageForm">
+                    <form action="?admin=product_images&action=store" method="POST" enctype="multipart/form-data" id="addImageForm">
                         <!-- Hidden field để xác định edit mode -->
                         <input type="hidden" id="editMode" name="edit_mode" value="false">
                         <input type="hidden" id="editImageId" name="edit_image_id" value="">
@@ -89,7 +89,7 @@
                     <p class="text-gray-1100 text-base leading-4 font-medium capitalize mb-[10px] dark:text-gray-dark-1100">Thư viện ảnh</p>
                 </div>
                 <div class="w-full bg-neutral h-[1px] mb-[10px] dark:bg-dark-neutral-border"></div>
-                <form method="POST" action="?act=product_images&action=bulkDelete">
+                <form method="POST" action="?admin=product_images&action=bulkDelete">
                     <table class="w-full min-w-[800px] lg:min-w-fit">
                         <thead>
                             <tr class="text-gray-1100 dark:text-gray-dark-1100">
@@ -136,7 +136,7 @@
                                             title="Sửa ảnh này">
                                             Sửa
                                         </label>
-                                        <a href="?act=product_images&action=delete&id=<?= $image['id'] ?>" onclick="return confirm('Bạn có chắc muốn xóa ảnh này không?')"
+                                        <a href="?admin=product_images&action=delete&id=<?= $image['id'] ?>" onclick="return confirm('Bạn có chắc muốn xóa ảnh này không?')"
                                             class="btn normal-case h-fit min-h-fit transition-all duration-300 px-6 border-0 text-white bg-[#E23738] hover:!bg-[#ef6364] hover:text-white py-[14px]">
                                             Xóa
                                         </a>
@@ -172,7 +172,7 @@
                             }
 
                             for ($i = $start_page; $i <= $end_page; $i++):
-                                $page_url = '?act=product_images&p=' . $i; // Dùng 'p' thay vì 'page'
+                                $page_url = '?admin=product_images&p=' . $i; // Dùng 'p' thay vì 'page'
                             ?>
                                 <?php if ($i == $current_page): ?>
                                     <!-- Current page - Active state -->
@@ -192,7 +192,7 @@
                         <!-- Next button -->
                         <?php if ($pagination['has_next']): ?>
                             <a class="items-center justify-center border rounded-lg border-neutral flex gap-x-[10px] px-[18px] py-[11px] dark:border-dark-neutral-border hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                                href="?act=product_images&p=<?= $pagination['next_page'] ?>">
+                                href="?admin=product_images&p=<?= $pagination['next_page'] ?>">
                                 <span class="text-gray-400 text-xs font-semibold leading-[18px] dark:text-gray-dark-400">Next</span>
                                 <img src="./assets/admin/assets/images/icons/icon-arrow-right-long.svg" alt="arrow right icon">
                             </a>
@@ -232,7 +232,7 @@
                 </h6>
 
                 <!-- Form chỉnh sửa -->
-                <form action="?act=product_images&action=update" method="POST" enctype="multipart/form-data" id="editImageForm" class="w-full flex flex-col max-w-[531px] gap-[30px] mb-[60px] lg:mb-[166px]">
+                <form action="?admin=product_images&action=update" method="POST" enctype="multipart/form-data" id="editImageForm" class="w-full flex flex-col max-w-[531px] gap-[30px] mb-[60px] lg:mb-[166px]">
 
                     <!-- Hidden fields -->
                     <input type="hidden" name="edit_mode" value="true">
@@ -366,7 +366,7 @@
         variantSelect.innerHTML = '<option value="">Đang tải...</option>';
 
         // Gửi AJAX request
-        fetch('?act=product_images&action=getVariantsByProduct', {
+        fetch('?admin=product_images&action=getVariantsByProduct', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -566,7 +566,7 @@
         variantSelect.disabled = true;
         variantSelect.innerHTML = '<option value="">⏳ Đang tải...</option>';
 
-        return fetch('?act=product_images&action=getVariantsByProduct', {
+        return fetch('?admin=product_images&action=getVariantsByProduct', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
