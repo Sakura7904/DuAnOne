@@ -61,7 +61,7 @@ class ProductImageController
             ]);
         } catch (Exception $e) {
             $_SESSION['error'] = "Lỗi khi tải danh sách ảnh: " . $e->getMessage();
-            header('Location: ?act=dashboard');
+            header('Location: ?admin=dashboard');
             exit;
         }
     }
@@ -105,11 +105,11 @@ class ProductImageController
                     throw new Exception("Vui lòng chọn ít nhất một ảnh");
                 }
 
-                header('Location: ?act=product_images');
+                header('Location: ?admin=product_images');
                 exit;
             } catch (Exception $e) {
                 $_SESSION['error'] = $e->getMessage();
-                header('Location: ?act=product_images&action=create');
+                header('Location: ?admin=product_images&action=create');
                 exit;
             }
         }
@@ -137,7 +137,7 @@ class ProductImageController
             include 'views/admin/product-images/editProductImage.php';
         } catch (Exception $e) {
             $_SESSION['error'] = $e->getMessage();
-            header('Location: ?act=product_images');
+            header('Location: ?admin=product_images');
             exit;
         }
     }
@@ -204,11 +204,11 @@ class ProductImageController
                     }
                 }
 
-                header('Location: ?act=product_images');
+                header('Location: ?admin=product_images');
                 exit;
             } catch (Exception $e) {
                 $_SESSION['error'] = "❌ " . $e->getMessage();
-                header('Location: ?act=product_images');
+                header('Location: ?admin=product_images');
                 exit;
             }
         }
@@ -236,7 +236,7 @@ class ProductImageController
             $_SESSION['error'] = $e->getMessage();
         }
 
-        header('Location: ?act=product_images');
+        header('Location: ?admin=product_images');
         exit;
     }
 
@@ -262,7 +262,7 @@ class ProductImageController
             }
         }
 
-        header('Location: ?act=product_images');
+        header('Location: ?admin=product_images');
         exit;
     }
 
@@ -283,7 +283,7 @@ class ProductImageController
             include 'views/admin/product-images/viewVariantImages.php';
         } catch (Exception $e) {
             $_SESSION['error'] = $e->getMessage();
-            header('Location: ?act=product_images');
+            header('Location: ?admin=product_images');
             exit;
         }
     }

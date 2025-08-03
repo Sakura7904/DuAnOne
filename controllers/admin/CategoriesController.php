@@ -42,7 +42,7 @@ class CategoriesController
         $parent_id = ($parent_id === '') ? null : $parent_id;
 
         $this->model->insert($name, $parent_id);
-        header('Location: index.php?act=list_categories');
+        header('Location: index.php?admin=list_categories');
         exit;
     }
 
@@ -67,7 +67,7 @@ class CategoriesController
         $parent_id = ($parent_id === '') ? null : $parent_id;
 
         $this->model->update($id, $name, $parent_id);
-        header('Location: index.php?act=list_categories');
+        header('Location: index.php?admin=list_categories');
         exit;
     }
 
@@ -78,14 +78,14 @@ class CategoriesController
     if (!$id || !is_numeric($id)) {
         $_SESSION['msg'] = '❌ Thiếu hoặc sai ID danh mục';
         $_SESSION['msg_type'] = 'error';
-        header('Location: index.php?act=list_categories');
+        header('Location: index.php?admin=list_categories');
         exit;
     }
 
     if ($this->model->hasProducts($id)) {
         $_SESSION['msg'] = '❌ Không thể xóa! Danh mục đang có sản phẩm còn tồn kho.';
         $_SESSION['msg_type'] = 'error';
-        header('Location: index.php?act=list_categories');
+        header('Location: index.php?admin=list_categories');
         exit;
     }
 
@@ -93,7 +93,7 @@ class CategoriesController
     $this->model->deleteCategoryCascade($id);
     $_SESSION['msg'] = '✅ Xóa danh mục và toàn bộ dữ liệu liên quan thành công!';
     $_SESSION['msg_type'] = 'success';
-    header('Location: index.php?act=list_categories');
+    header('Location: index.php?admin=list_categories');
     exit;
 }
 

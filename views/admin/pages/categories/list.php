@@ -23,7 +23,7 @@ if (isset($_SESSION['msg'])) {
 <div class="flex items-center text-xs text-gray-500 gap-x-[11px] mb-[37px]">
     <div class="flex items-center gap-x-1">
         <img src="./assets/admin/assets/images/icons/icon-home-2.svg" alt="home icon">
-        <a class="capitalize" href="index.php?act=dashboard">home</a>
+        <a class="capitalize" href="index.php?admin=dashboard">home</a>
     </div>
     <img src="./assets/admin/assets/images/icons/icon-arrow-right.svg" alt="arrow right icon">
     <span class="capitalize text-color-brands">Danh mục</span>
@@ -31,7 +31,7 @@ if (isset($_SESSION['msg'])) {
 <div class="p-6 bg-neutral-bg rounded-2xl border border-neutral dark:bg-dark-neutral-bg dark:border-dark-neutral-border">
     <div class="flex justify-between items-center mb-6">
         <h2 class="capitalize text-gray-1100 font-bold text-[20px] leading-[35px] dark:text-gray-dark-1100 mb-[13px]">Danh sách danh mục</h2>
-        <a href="index.php?act=create_category" class="btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow">
+        <a href="index.php?admin=create_category" class="btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow">
             ➕ Thêm danh mục
         </a>
     </div>
@@ -63,9 +63,9 @@ if (isset($_SESSION['msg'])) {
                             <?= !empty($cat['updated_at']) ? date('d/m/Y H:i:s', strtotime($cat['updated_at'])) : '-' ?>
                         </td>
                         <td class="max-w-[196px]">
-                            <a href="index.php?act=edit_category&id=<?= $cat['id'] ?>" class="text-blue-600 hover:underline">✏️ Sửa</a>
+                            <a href="index.php?admin=edit_category&id=<?= $cat['id'] ?>" class="text-blue-600 hover:underline">✏️ Sửa</a>
                             |
-                            <a href="index.php?act=delete_category&id=<?= $cat['id'] ?>" class="text-red-600 hover:underline" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">🗑️ Xóa</a>
+                            <a href="index.php?admin=delete_category&id=<?= $cat['id'] ?>" class="text-red-600 hover:underline" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">🗑️ Xóa</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

@@ -26,7 +26,7 @@
             </div>
         </div>
         <div class="sidemenu-item rounded-xl relative">
-            <a href="index.php?act=list_categories" class="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none">
+            <a href="index.php?admin=list_categories" class="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none">
                 <div class="flex items-center gap-[10px]">
                     <img src="./assets/admin/assets/images/icons/icon-products.svg" alt="side menu icon">
                     <span class="text-normal font-semibold text-gray-500 sidemenu-title dark:text-gray-dark-500">Categories</span>
@@ -34,7 +34,7 @@
             </a>
         </div>
         <div class="sidemenu-item rounded-xl relative">
-            <a href="index.php?act=product_images" class="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none">
+            <a href="index.php?admin=product_images" class="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none">
                 <div class="flex items-center gap-[10px]">
                     <img src="./assets/admin/assets/images/icons/icon-products.svg" alt="side menu icon">
                     <span class="text-normal font-semibold text-gray-500 sidemenu-title dark:text-gray-dark-500">Photo Gallery</span>

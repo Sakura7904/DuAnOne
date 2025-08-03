@@ -15,15 +15,23 @@ if (isset($_GET['page'])) {
 include "controllers/admin/DashboardController.php";
 include "controllers/admin/ProductImageController.php";
 include "controllers/admin/CategoriesController.php";
+include "controllers/admin/AuthController.php";
 
-$act = $_GET['act'] ?? null;
+$admin = $_GET['admin'] ?? "";
 $action = $_GET['action'] ?? 'index';
 
-match ($act) {
-    'dashboard' => (new DashboardController())->index(),
-    //Tên file trùng với tên act, ví dụ dashboard thì tên file sẽ là dashboard.php
+// =========================Check đăng nhập =========================
+if (!empty($admin) && !in_array($admin, ['login', 'loginForm'])) {
+    if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+        header('location: index.php?admin=loginForm');
+        exit();
+    }
+}
 
-// ===== Product Image =====
+match ($admin) {
+    'dashboard' => (new DashboardController())->index(),
+
+    // ===== Product Image =====
     'product_images' => (function () use ($action) {
         $controller = new ProductImageController();
 
@@ -47,6 +55,12 @@ match ($act) {
     'update_category'   => (new CategoriesController())->update($_GET['id']),
     'delete_category'   => (new CategoriesController())->delete($_GET['id']),
 
-    // ===== MẶC ĐỊNH =====
-    default             => die("Không tìm thấy hành động phù hợp"),
+
+    // ===== Đâng nhập (admin) =====
+    'loginForm' => (new AuthController())->loginForm(),
+    'login'      => (new AuthController())->login(),
+    'logout'     => (new AuthController())->logout(),
+
+    // ===== Mặc định không tìm thấy =====
+    default => die("Không tìm thấy hành động phù hợp."),
 };

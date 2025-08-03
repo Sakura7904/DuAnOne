@@ -169,7 +169,7 @@
                 <li class="text-gray-500 hover:text-gray-1100 hover:bg-gray-100 dark:text-gray-dark-500 dark:hover:text-gray-dark-1100 dark:hover:bg-gray-dark-100 rounded-lg group p-[15px] pl-[21px]"><a class="flex items-center bg-transparent p-0 gap-[7px]" href="#"> <i class="w-4 h-4 grid place-items-center"><img class="group-hover:filter-black dark:group-hover:filter-white" src="./assets/admin/assets/images/icons/icon-sun.svg" alt="icon"></i><span>Settings</span></a>
                 </li>
                 <div class="w-full bg-neutral h-[1px] my-[7px] dark:bg-dark-neutral-border"></div>
-                <li class="text-gray-500 hover:text-gray-1100 hover:bg-gray-100 dark:text-gray-dark-500 dark:hover:text-gray-dark-1100 dark:hover:bg-gray-dark-100 rounded-lg group p-[15px] pl-[21px]"><a class="flex items-center bg-transparent p-0 gap-[7px]" href="#"> <i class="w-4 h-4 grid place-items-center"><img class="group-hover:filter-black dark:group-hover:filter-white" src="./assets/admin/assets/images/icons/icon-logout.svg" alt="icon"></i><span>Log out</span></a>
+                <li class="text-gray-500 hover:text-gray-1100 hover:bg-gray-100 dark:text-gray-dark-500 dark:hover:text-gray-dark-1100 dark:hover:bg-gray-dark-100 rounded-lg group p-[15px] pl-[21px]"><a class="flex items-center bg-transparent p-0 gap-[7px]" href="?admin=logout"> <i class="w-4 h-4 grid place-items-center"><img class="group-hover:filter-black dark:group-hover:filter-white" src="./assets/admin/assets/images/icons/icon-logout.svg" alt="icon"></i><span>Log out</span></a>
                 </li>
             </div>
         </ul>
