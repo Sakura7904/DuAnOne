@@ -16,6 +16,7 @@ include "controllers/admin/DashboardController.php";
 include "controllers/admin/ProductImageController.php";
 include "controllers/admin/CategoriesController.php";
 include "controllers/admin/AuthController.php";
+include "controllers/admin/AccountsController.php";
 include "controllers/admin/ProductController.php";
 
 $admin = $_GET['admin'] ?? "";
@@ -70,6 +71,12 @@ match ($admin) {
     'show_product'    => (new ProductController())->show($_GET['id'] ?? 0),
     'delete_product' => (new ProductController())->delete($_GET['id'] ?? 0),
     'delete_product_gallery' => (new ProductController())->deleteProductGallery(),
+
+
+    // ===== QUẢN LÝ USERS =====
+    'list_accounts'         => (new AccountsController())->index(),
+   'change_status_accounts' => (new AccountsController())->changeStatus($_POST['id']),
+   'promote_accounts_role'    => (new AccountsController())->changeRole($_POST['id']),
 
 
     // ===== Mặc định không tìm thấy =====
