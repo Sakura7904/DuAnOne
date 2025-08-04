@@ -16,6 +16,7 @@ include "controllers/admin/DashboardController.php";
 include "controllers/admin/ProductImageController.php";
 include "controllers/admin/CategoriesController.php";
 include "controllers/admin/AuthController.php";
+include "controllers/admin/ProductController.php";
 
 $admin = $_GET['admin'] ?? "";
 $action = $_GET['action'] ?? 'index';
@@ -30,6 +31,11 @@ if (!empty($admin) && !in_array($admin, ['login', 'loginForm'])) {
 
 match ($admin) {
     'dashboard' => (new DashboardController())->index(),
+
+    // ===== Đâng nhập (admin) =====
+    'loginForm' => (new AuthController())->loginForm(),
+    'login'      => (new AuthController())->login(),
+    'logout'     => (new AuthController())->logout(),
 
     // ===== Product Image =====
     'product_images' => (function () use ($action) {
@@ -55,11 +61,16 @@ match ($admin) {
     'update_category'   => (new CategoriesController())->update($_GET['id']),
     'delete_category'   => (new CategoriesController())->delete($_GET['id']),
 
+    // ===== PRODUCTS =====
+    'list_products'   => (new ProductController())->index(),
+    'add_products'   => (new ProductController())->create(),
+    'store_products'   => (new ProductController())->store(),
+    'update_product'  => (new ProductController())->update(),
+    'edit_product'    => (new ProductController())->edit($_GET['id'] ?? 0),
+    'show_product'    => (new ProductController())->show($_GET['id'] ?? 0),
+    'delete_product' => (new ProductController())->delete($_GET['id'] ?? 0),
+    'delete_product_gallery' => (new ProductController())->deleteProductGallery(),
 
-    // ===== Đâng nhập (admin) =====
-    'loginForm' => (new AuthController())->loginForm(),
-    'login'      => (new AuthController())->login(),
-    'logout'     => (new AuthController())->logout(),
 
     // ===== Mặc định không tìm thấy =====
     default => die("Không tìm thấy hành động phù hợp."),
