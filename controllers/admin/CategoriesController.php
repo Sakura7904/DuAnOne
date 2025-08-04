@@ -1,5 +1,5 @@
 <?php
-require_once 'models/categories/CategoriesModel.php';
+require_once 'models/admin/CategoryModel.php';
 require_once 'database/function.php';
 
 class CategoriesController
@@ -9,7 +9,7 @@ class CategoriesController
     public function __construct()
     {
         $db = new Database();
-        $this->model = new CategoriesModel();
+        $this->model = new CategoryModel();
     }
 
     // Danh sách

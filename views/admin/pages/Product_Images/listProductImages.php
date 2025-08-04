@@ -114,7 +114,7 @@
                                             <div class="flex flex-col gap-y-[5px]">
                                                 <h4 class="font-semibold leading-4 text-gray-1100 text-[14px] dark:text-gray-dark-1100"><?= $image['product_name'] ?></h4>
                                                 <time class="text-xs text-gray-400 dark:text-gray-dark-400">
-                                                    <?= htmlspecialchars($image['variant_attributes']) ?>
+                                                    <?= $image['variant_attributes'] ?? 'Chưa có biến thể'?>
                                                 </time>
                                                 <time class="text-xs text-gray-400 dark:text-gray-dark-400">
                                                     on <?= date('d/m/Y \\a\\t g:i a', strtotime($image['created_at'])) ?>
