@@ -32,8 +32,16 @@
                     <td class="px-4 py-3"><?= htmlspecialchars($user['id']) ?></td>
                     <td class="px-4 py-3"><?= htmlspecialchars($user['full_name']) ?></td>
                     <td class="px-4 py-3"><?= htmlspecialchars($user['email']) ?></td>
-                    <td class="px-4 py-3"><?= htmlspecialchars($user['phone_number']) ?></td>
-                    <td class="px-4 py-3"><?= htmlspecialchars($user['address']) ?></td>
+                    <td class="px-4 py-3">
+                        <?= !empty($user['phone_number'])
+                            ? htmlspecialchars($user['phone_number'])
+                            : '<span class="italic text-gray-400">Chưa có số điện thoại</span>' ?>
+                    </td>
+                    <td class="px-4 py-3">
+                        <?= !empty($user['address'])
+                            ? htmlspecialchars($user['address'])
+                            : '<span class="italic text-gray-400">Chưa có địa chỉ</span>' ?>
+                    </td>
                     <td class="px-4 py-3"><?= htmlspecialchars($user['role']) ?></td>
 
                     <td class="px-4 py-3">
