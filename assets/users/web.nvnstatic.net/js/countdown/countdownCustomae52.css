@@ -1,0 +1,42 @@
+
+.clock-canvas{
+    border: 1px solid #e02727;
+}
+.text{
+    margin-top: -35px;
+    color: #e02727;
+}
+.text .val{
+    color: #e02727;
+    font-size: 30px;
+}
+.text .type-time{
+    font-size: 15px;
+}
+.clock{
+    display: inline-block;
+    width: 65%;
+}
+.countdown-container{
+    text-align: center;
+}
+.clock .clock-item{
+    /*width: 15%;*/
+    /*margin-bottom: 0;*/
+}
+
+@media screen and (max-width: 767px) {
+    .clock{
+        width: 100%;
+    }
+
+    .text .val {
+        font-size: 17px;
+    }
+    .text {
+        margin-top: -40%;
+    }
+    .text .type-time {
+        font-size: 12px;
+    }
+}

@@ -1,0 +1,92 @@
+/*--------------- Roboto */
+@font-face {
+    font-family: 'Roboto';
+    font-display: block;
+    font-style: normal;
+    font-weight: bold;
+    src: url('https://web.nvnstatic.net/fonts/Roboto/bold.woff') format('woff');
+}
+@font-face {
+    font-family: 'Roboto';
+    font-display: block;
+    font-style: italic;
+    font-weight: bold;
+    src: url('https://web.nvnstatic.net/fonts/Roboto/bold-italic.woff') format('woff');
+}
+@font-face {
+    font-family: 'Roboto';
+    font-display: block;
+    font-style: normal;
+    font-weight: normal;
+    src: url('https://web.nvnstatic.net/fonts/Roboto/regular.woff') format('woff');
+}
+@font-face {
+    font-family: 'Roboto';
+    font-display: block;
+    font-style: italic;
+    font-weight: normal;
+    src: url('https://web.nvnstatic.net/fonts/Roboto/italic.woff') format('woff');
+}
+@font-face {
+    font-family: 'Roboto';
+    font-display: block;
+    font-style: normal;
+    font-weight: 200;
+    src: url('https://web.nvnstatic.net/fonts/Roboto/light.woff') format('woff');
+}
+@font-face {
+    font-family: 'Roboto';
+    font-display: block;
+    font-style: italic;
+    font-weight: 200;
+    src: url('https://web.nvnstatic.net/fonts/Roboto/light-italic.woff') format('woff');
+}
+
+/*-------------------------- Roboto Condensed */
+@font-face {
+    font-family: 'Roboto Condensed';
+    font-display: block;
+    font-style: normal;
+    font-weight: 300;
+    src: local('Roboto Condensed Light'), local('RobotoCondensed-Light'),
+    url(https://themes.googleusercontent.com/static/fonts/robotocondensed/v8/b9QBgL0iMZfDSpmcXcE8nFgFMY7EK8ynABYD_ZHMS7s.woff) format('woff');
+}
+@font-face {
+    font-family: 'Roboto Condensed';
+    font-display: block;
+    font-style: normal;
+    font-weight: 400;
+    src: local('Roboto Condensed Regular'), local('RobotoCondensed-Regular'),
+    url(https://themes.googleusercontent.com/static/fonts/robotocondensed/v8/Zd2E9abXLFGSr9G3YK2MsNIjcMYHK_OhdqQKvz8_Eqo.woff) format('woff');
+}
+@font-face {
+    font-family: 'Roboto Condensed';
+    font-display: block;
+    font-style: normal;
+    font-weight: 700;
+    src: local('Roboto Condensed Bold'), local('RobotoCondensed-Bold'),
+    url(https://themes.googleusercontent.com/static/fonts/robotocondensed/v8/b9QBgL0iMZfDSpmcXcE8nMSqxGqx1BqHsIjxNL4q2HQ.woff) format('woff');
+}
+@font-face {
+    font-family: 'Roboto Condensed';
+    font-display: block;
+    font-style: italic;
+    font-weight: 300;
+    src: local('Roboto Condensed Light Italic'), local('RobotoCondensed-LightItalic'),
+    url(https://themes.googleusercontent.com/static/fonts/robotocondensed/v8/mg0cGfGRUERshzBlvqxeAALJ2z5ZyH4OGzxaAobx77I.woff) format('woff');
+}
+@font-face {
+    font-family: 'Roboto Condensed';
+    font-display: block;
+    font-style: italic;
+    font-weight: 400;
+    src: local('Roboto Condensed Italic'), local('RobotoCondensed-Italic'),
+    url(https://themes.googleusercontent.com/static/fonts/robotocondensed/v8/BP5K8ZAJv9qEbmuFp8RpJaZHp5Ygr-TRGz22M2CAQPE.woff) format('woff');
+}
+@font-face {
+    font-family:"BAHNSCHRIFT";
+    src: url('https://web.nvnstatic.net/fonts/BAHNSCHRIFT/BAHNSCHRIFT.woff2') format('woff2');
+    font-weight:normal;
+    font-style:normal;
+    font-display: block;
+}

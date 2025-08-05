@@ -1,0 +1,954 @@
+window.fundiin = {};fundiin.enable = 1;fundiin.min_price = 0;fundiin.max_price = 100000000;fundiin.max_price_off = 999999999;fundiin.groups = JSON.parse(`["8","4","5","6"]`);fundiin.widgets = [];fundiin.custom_fields = {};fundiin.banned_products = [];fundiin.promotions = [];fundiin.promotions.push({"rule_constraint":"<p>Dành cho khách hàng lần đầu thanh toán Fundiin</p>","code":"XINCHAO20","coupon_description":"Giảm 20% tối đa 30K","widget_description":"Giảm 20% tối đa 30K cho khách hàng lần đầu thanh toán Fundiin\n\nTrong mọi trường hợp xảy ra tranh chấp liên quan đến chương trình khuyến mãi, Fundiin sẽ giải quyết trên cơ sở các quy định và điều kiện của chương trình. Quyết định của Fundiin sẽ là quyết định sau cùng và dựa trên các nguyên tắc minh bạch, công bằng và tuân thủ pháp luật.","checkout_description":"<p>Giảm 20% tối đa <strong>30K</strong> cho kh&aacute;ch h&agrave;ng lần đầu thanh to&aacute;n Fundiin</p>","banner_description":"<p><span style=\"color:#fafafa;\">Giảm đến</span><span style=\"color:#212121;\"> </span><span style=\"color:#ffb300;\"><strong>50K</strong></span><span style=\"color:#212121;\"> </span><span style=\"color:#fafafa;\">khi thanh toán qua Fundiin.</span></p>","thumbnail":"","short_description":"<p>Dành cho khách hàng lần đầu thanh toán Fundiin</p>"});fundiin.promotions.push({"rule_constraint":"<p>D&agrave;nh cho kh&aacute;ch h&agrave;ng lần đầu thanh to&aacute;n Fundiin</p>","code":"XINCHAO3","coupon_description":"Giảm 3% tối đa 50K","widget_description":"Giảm 3% tối đa 50K\n- Áp dụng cho đơn hàng thành công đầu tiên tại Fundiin\n- Áp dụng cho đến khi có thông báo mới\n\nTrong mọi trường hợp xảy ra tranh chấp liên quan đến chương trình khuyến mãi, Fundiin sẽ giải quyết trên cơ sở các quy định và điều kiện của chương trình. Quyết định của Fundiin sẽ là quyết định sau cùng và dựa trên các nguyên tắc minh bạch, công bằng và tuân thủ pháp luật.","checkout_description":"<p>Giảm 3% tối đa <strong>50K</strong> cho kh&aacute;ch h&agrave;ng lần đầu thanh to&aacute;n Fundiin</p>","banner_description":"","thumbnail":"","short_description":"<p>D&agrave;nh cho kh&aacute;ch h&agrave;ng lần đầu thanh to&aacute;n Fundiin</p>"});fundiin.widgets[0] = {};fundiin.widgets[0].libraries = [];fundiin.widgets[0].trigger_html = false;fundiin.widgets[0].trigger_orientation = false;fundiin.widgets[0].trigger_selector = false;fundiin.widgets[0].widget_html = false;fundiin.widgets[0].widget_css = false;fundiin.widgets[0].widget_js = `if(typeof price == 'string' ){
+    price=parseFloat(price);
+}
+if (location.origin == 'https://khonemtonghop.com') {
+    var tableVariations = document.querySelector("table.variations");
+    var topStyle = tableVariations == null ? "0" : "81px";
+    document.querySelector("div#script-product-detail").style.top = topStyle;
+    document.querySelector("div#script-product-detail").style.position = 'relative';
+}
+if (location.origin == 'https://matviet.vn') {
+    var priceElement = document.querySelector('.pro-price[itemprop="price"]');
+    var matvietValue = priceElement.getAttribute('content');
+    var price = parseInt(matvietValue, 10);
+}
+if (location.origin == 'https://thanhhungfutsal.com') {
+   const logos = document.querySelectorAll('.fundiin__logo');
+    logos.forEach(logo => {
+      logo.style.display = 'ruby';
+    });
+}
+
+`;fundiin.widgets[0].widget_orientation = false;fundiin.widgets[0].widget_selector = false;fundiin.widgets[1] = {};fundiin.widgets[1].libraries = [];fundiin.widgets[1].trigger_html = false;fundiin.widgets[1].trigger_orientation = false;fundiin.widgets[1].trigger_selector = false;fundiin.widgets[1].widget_html = `<div class="fundiin__wrapper" id="fundiin__wrapper-identity">
+    <div data-min-panel class="">
+      <span class="fundiin__panel">
+      </span>
+        <a class="fundiin__action">
+          <img src="https://assets.fundiin.vn/merchant/logo_transparent.png" width="70" height="40" style="object-fit: contain"/>
+        </a>
+    </div>
+  
+    <div data-max-panel class="">
+      <span class="fundiin__panel">
+      </span>
+        <a class="fundiin__action">
+          <img src="https://assets.fundiin.vn/merchant/logo_transparent.png" width="70" height="40" style="object-fit: contain"/>
+        </a>
+    </div>
+  
+    <div data-origin-panel class="">
+      <span class="fundiin__panel">
+      </span>
+        <a class="fundiin__action">
+           <img src="https://assets.fundiin.vn/merchant/logo_transparent.png" width="70" height="40" style="object-fit: contain"/>
+        </a>
+    </div>
+  </div>`;fundiin.widgets[1].widget_css = `.hidden {
+  display: none;
+}
+
+a.fdn-guide-url, svg.fdn-long-logo{
+  cursor: pointer;
+}
+
+a.fdn-guide-url {
+  display: inline-flex;
+  /*align-self: center;*/
+}
+
+.fdn-text {
+  background-image: linear-gradient(#06DECD, #744DEF);
+  font-weight:700;
+  padding: 2px 5px;
+  border-radius: 3px;
+  display:inline-flex;
+}
+.fundiin__action {
+  vertical-align: middle !important;
+  align-items: center !important;
+  display: flex !important;
+  column-gap: 5px;
+  margin-left:6px;
+}
+
+[data-origin-price],
+[data-min-price] {
+ background: -webkit-linear-gradient(#06DECD, #744DEF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+[data-min-panel],
+[data-origin-panel],
+[data-max-panel] {
+  display:inline-flex;
+}
+.fdn-text-logo {
+  color: #fff !important;
+}
+
+span.fundiin__panel {
+  font-family:inherit !important;
+  font-size: 17px;
+  font-weight: 500px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem;
+}`;fundiin.widgets[1].widget_js = `function generateTextOriginPanel(price,programs,two_phase,three_phase){
+    var text;
+    if (two_phase.some(element => programs.includes(element))) {
+      var innerText = (Math.round(price / 2)).toLocaleString("vi") + "đ";
+      text = "Trả sau <span data-origin-price>" + innerText + "</span> x2 kỳ với ";
+      
+    }
+    else if (three_phase.some(element => programs.includes(element))){
+      var innerText = (Math.round(price / 3)).toLocaleString("vi") + "đ";
+      text = "Trả sau <span data-origin-price>" + innerText + "</span> x3 kỳ với ";
+    }
+    else {
+      text = "Trả sau đến 12 tháng với ";
+    }
+    return text;
+  }
+  function generateTextMaxPanel(price,programs,two_phase,bnpl_plus){
+    var text;
+    if (bnpl_plus.some(element => programs.includes(element))) {
+      text = "Trả sau đến 12 tháng với"
+    }
+    else if (two_phase.some(element => programs.includes(element))) {
+      var innerText = (Math.round(price / 2)).toLocaleString("vi") + "đ";
+      text = "Trả sau <span data-origin-price>" + innerText + "</span> x2 kỳ với";
+    }
+    else {
+       var innerText = (Math.round(price / 3)).toLocaleString("vi") + "đ";
+       text = "Trả sau <span data-origin-price>" + innerText + "</span> x3 kỳ với";
+    }
+    return text;
+  }
+  function generateTextPanel(inPrice, programs, pay_later, two_phase, three_phase, bnpl_plus, option,website_minimum_suggest_fundiin){
+    if (option==1){
+      var fundiinMinPanel = document.querySelector('[data-min-panel] .fundiin__panel');
+      if (inPrice > 1000000) {
+        var innerText = Number((website_minimum_suggest_fundiin - inPrice).toFixed(1)).toLocaleString("vi") + "đ";
+        fundiinMinPanel.innerHTML = "Mua thêm <span data-min-price>" + innerText + "</span> để được trả sau với";
+      }
+      else if (pay_later.some(element => programs.includes(element))){
+          fundiinMinPanel.innerHTML = "Mua trả sau <span data-min-price>0đ</span> với";
+      }
+      else {
+        var innerText = Number((website_minimum_suggest_fundiin - inPrice).toFixed(1)).toLocaleString("vi") + "đ";
+        fundiinMinPanel.innerHTML = "Mua thêm <span data-min-price>" + innerText + "</span> để được trả sau với";
+      }
+    }
+    else if (option ==2){
+      /*--Origin--*/
+      var fundiinOriginPanel = document.querySelector('[data-origin-panel] .fundiin__panel');
+      if (inPrice > 200000){
+        fundiinOriginPanel.innerHTML = generateTextOriginPanel(inPrice,programs,two_phase,three_phase);
+      }
+      else if (pay_later.some(element => programs.includes(element))){
+        fundiinOriginPanel.innerHTML = "Trả sau <span data-min-price>0đ</span> với";
+      }
+      else {
+        fundiinOriginPanel.innerHTML = generateTextOriginPanel(inPrice,programs,two_phase,three_phase);
+      }
+    }
+    else {
+       /*--Max--*/
+      var fundiinMaxPanel = document.querySelector('[data-max-panel] .fundiin__panel');
+      fundiinMaxPanel.innerHTML = generateTextMaxPanel(inPrice,programs,two_phase,bnpl_plus);
+    }
+    
+   
+  }
+  function generateVisibility(price){
+    var website_enable_suggest_fundiin = typeof fundiin != 'undefined' && fundiin.enable != 'undefined' ? fundiin.enable : true;
+    var website_minimum_suggest_fundiin = typeof fundiin != 'undefined' && fundiin.min_price != 'undefined' ? fundiin.min_price : 1400000;
+    var website_maximum_suggest_fundiin = typeof fundiin != 'undefined' && fundiin.max_price != 'undefined' ? fundiin.max_price : 9000000;
+    var website_maximum_suggest_fundiin_with_prediction = typeof fundiin != 'undefined' && fundiin.max_price_off != 'undefined' ? fundiin.max_price_off : 999999999;
+    var programs= typeof fundiin.groups != 'undefined' ? fundiin.groups : ['1','2','3','9'];
+    var inPrice = typeof price != 'undefined' ? parseFloat(price) : undefined;
+    var bnpl_plus=['3','4','5','6'];
+    var pay_later=['2','7','8'];
+    var two_phase=['9'];
+    var three_phase=['1'];
+    /*--Min--*/
+    
+    if ( website_enable_suggest_fundiin == true ) {
+      if ( price < website_minimum_suggest_fundiin ) {
+        generateTextPanel(price,programs,pay_later,two_phase,three_phase,bnpl_plus,1,website_minimum_suggest_fundiin);
+        document.querySelector("[data-max-panel]").remove();
+        document.querySelector("[data-origin-panel]").remove();
+      }
+      else if ( price >= website_minimum_suggest_fundiin && price <= website_maximum_suggest_fundiin ) {
+       generateTextPanel(price,programs,pay_later,two_phase,three_phase,bnpl_plus,2);
+        document.querySelector("[data-max-panel]").remove();
+        document.querySelector("[data-min-panel]").remove();
+      }
+      else if ( price >= website_maximum_suggest_fundiin && price <= website_maximum_suggest_fundiin_with_prediction ) {
+        generateTextPanel(price,programs,pay_later,two_phase,three_phase,bnpl_plus,3);
+        document.querySelector("[data-origin-panel]").remove();
+        document.querySelector("[data-min-panel]").remove();
+      }
+      else {
+        document.querySelector("[data-origin-panel]").remove();
+        document.querySelector("[data-min-panel]").remove();
+        document.querySelector("[data-max-panel]").remove();
+      }
+    }
+    else {
+      document.querySelector("div.fundiin__wrapper").remove(); 
+    }
+  }
+  if (typeof price == 'undefined' && typeof cartPrice == 'undefined' && typeof fundiinDetailConfig != 'undefined'){
+    generateVisibility(fundiinDetailConfig.data.amount);
+  }
+  else if (typeof price !== 'undefined' && price != null){
+    generateVisibility(price);
+  }
+  else if (typeof cartPrice != 'undefined'){
+    generateVisibility(cartPrice);
+  }
+  else{
+    generateVisibility(0);
+  }
+  
+  `;fundiin.widgets[1].widget_orientation = `beforeend`;fundiin.widgets[1].widget_selector = `#script-general-container`;fundiin.widgets[2] = {};fundiin.widgets[2].libraries = [];fundiin.widgets[2].trigger_html = false;fundiin.widgets[2].trigger_orientation = false;fundiin.widgets[2].trigger_selector = false;fundiin.widgets[2].widget_html = `<div class="fundiin-promotion__panel" id="fundiin__promotion-panel__identity">
+  <div class="fundiin_promotion__panel-inner">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 66.71 66.71" width="55" height="55" >
+      <defs>
+        <style>.promo-cls-1{fill:#fff;}</style>
+      </defs>
+      <g id="Layer_2" data-name="Layer 2">
+        <g id="Layer_1-2" data-name="Layer 1">
+          <path class="promo-cls-1" d="M41.46,40.39a3.4,3.4,0,0,0-2.76,1.26,4.86,4.86,0,0,0-1,3.25,5,5,0,0,0,1,3.31,3.4,3.4,0,0,0,2.76,1.26,3.48,3.48,0,0,0,2.79-1.26,4.86,4.86,0,0,0,1.07-3.31,4.77,4.77,0,0,0-1.07-3.25A3.48,3.48,0,0,0,41.46,40.39Z"/>
+          <path class="promo-cls-1" d="M23.89,26.77a3.51,3.51,0,0,0,2.79-1.23,4.81,4.81,0,0,0,1.07-3.28A4.91,4.91,0,0,0,26.68,19a3.47,3.47,0,0,0-2.79-1.25A3.42,3.42,0,0,0,21.12,19a5,5,0,0,0-1,3.31,4.9,4.9,0,0,0,1,3.28A3.46,3.46,0,0,0,23.89,26.77Z"/>
+          <path class="promo-cls-1" d="M65.23,29.78,58.42,23V13.35a5.05,5.05,0,0,0-5.05-5.06H43.74L36.93,1.48a5.06,5.06,0,0,0-7.15,0L23,8.29H13.35a5.05,5.05,0,0,0-5.06,5.06V23L1.48,29.78a5.06,5.06,0,0,0,0,7.15l6.81,6.81v9.63a5.06,5.06,0,0,0,5.06,5.06H23l6.81,6.8a5,5,0,0,0,7.15,0l6.81-6.8h9.63a5.06,5.06,0,0,0,5.05-5.06V43.74l6.81-6.81A5,5,0,0,0,65.23,29.78Zm-48.62-4a9.62,9.62,0,0,1-.6-3.5,9.83,9.83,0,0,1,.6-3.53,7.15,7.15,0,0,1,4.18-4.27,8.61,8.61,0,0,1,3.15-.57,7.72,7.72,0,0,1,5.66,2.2,8.31,8.31,0,0,1,2.21,6.17,8.23,8.23,0,0,1-2.21,6.11,7.72,7.72,0,0,1-5.66,2.2A8.41,8.41,0,0,1,20.79,30a7.21,7.21,0,0,1-4.18-4.24Zm8.58,27H19.35l20.86-38.4H46Zm22-1.71a7.82,7.82,0,0,1-5.69,2.2,8.14,8.14,0,0,1-3.1-.58,7.39,7.39,0,0,1-2.5-1.62,7.27,7.27,0,0,1-1.67-2.64,9.83,9.83,0,0,1-.6-3.53,9.62,9.62,0,0,1,.6-3.5,7.18,7.18,0,0,1,4.17-4.23,8.14,8.14,0,0,1,3.1-.58,7.82,7.82,0,0,1,5.69,2.2,8.2,8.2,0,0,1,2.24,6.11A8.27,8.27,0,0,1,47.15,51.07Z"/>
+        </g>
+      </g>
+    </svg>
+    <span class="promotion-panel__description" data-fundiin-promotion>
+      
+    </span>
+  </div>
+</div>
+<br/>`;fundiin.widgets[2].widget_css = `.fundiin-promotion__panel {
+  margin-top:5px;
+  padding:3px 8px;
+  width: fit-content;
+  max-width: 370px;
+  background: linear-gradient(to right, #06DECD, #744DEF);
+  color: #fff;
+  font-family: 'League Spartan',sans-serif;
+  font-size: 17px;
+  border-radius: 5px;
+  font-weight: 500;
+  line-height: 24px;
+}
+.fundiin_promotion__panel-inner {
+  display: flex;
+  column-gap: 10px;
+  align-items: center;
+}
+
+.promotion-panel__description p {
+  display: inline;
+}
+.promotion-panel__description strong {
+  font-weight: 600;
+  color: #FFFDC3;
+}
+
+.fundiin__promotion-trigger {
+  color: #fff;
+  cursor: pointer;
+  text-decoration: underline !important;
+}`;fundiin.widgets[2].widget_js = `function generate(price){
+  var keyQMKS3Muyx3ivg5 = "demo_promotion_panel";
+  var website_enable_suggest_fundiin = typeof fundiin != 'undefined'  && fundiin.enable != 'undefined' ? fundiin.enable : true;
+    var website_minimum_suggest_fundiin = typeof fundiin != 'undefined' && fundiin.min_price != 'undefined' ? fundiin.min_price : 1400000;
+  var website_maximum_suggest_fundiin_with_prediction = typeof fundiin != 'undefined'  && fundiin.max_price_off != 'undefined' ? fundiin.max_price_off : 999999999;
+  var promotion = typeof fundiin != 'undefined'  && fundiin.promotions != 'undefined' && fundiin.promotions.length != 0
+  ? fundiin.promotions[0] 
+  : {"banner_description": "Giảm giá ngay <strong>15%</strong> khi thanh toán qua Fundiin. "};
+
+  if ( website_enable_suggest_fundiin == true ) {
+      var promtionDescription=promotion !=null && promotion.banner_description ? promotion.banner_description : "Giảm giá ngay <strong>15%</strong> khi thanh toán qua Fundiin";
+      document.querySelector("[data-fundiin-promotion]").innerHTML = promtionDescription;
+  }
+  else {
+    document.querySelector(".fundiin-promotion__panel").remove();
+  }
+}
+  if (typeof price == 'undefined' && typeof cartPrice == 'undefined' && typeof fundiinDetailConfig != 'undefined'){
+    generate(fundiinDetailConfig.data.amount);
+  }
+  else if (typeof price !== 'undefined' && price != null){
+    generate(price);
+  }
+  else if (typeof cartPrice != 'undefined'){
+    generate(cartPrice);
+  }
+  else{
+    generate(0);
+  }
+
+
+
+`;fundiin.widgets[2].widget_orientation = `beforeend`;fundiin.widgets[2].widget_selector = `#script-general-container`;fundiin.custom_fields['demo_promotion_panel'] = {};fundiin.widgets[3] = {};fundiin.widgets[3].libraries = [];fundiin.widgets[3].trigger_html = `<a class="fundiin__promotion-trigger">xem thêm</a>`;fundiin.widgets[3].trigger_orientation = `beforeend`;fundiin.widgets[3].trigger_selector = `.promotion-panel__description`;fundiin.widgets[3].widget_html = `<div class="fundiin_promo__modl fundiin_promo__fade" id="fundiin__promotion--modal__identity">
+    <div class="fundiin_promo__modal-dialog fundiin_promo__modal-dialog-centered">
+      <div class="fundiin_promo__modal-content">
+        <div class="fundiin_promo__modal-body">
+          <h3 class="fundiin_promo__modal-body-title">Mã giảm giá khi thanh toán qua Fundiin</h3>
+
+          <button type="button" class="fundiin_promo__close" data-dismiss="modal" aria-label="Close">
+            <svg width="20" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 2L22 22M22 2L2 22" stroke="#C0C0C0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="group-promotion"></div>
+        </div>
+      </div>
+    </div>
+  </div>`;fundiin.widgets[3].widget_css = `.fundiin_promo__modl {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100000;
+  display: none;
+  width: 100%;
+  font-size: 13px;
+  height: 100%;
+  overflow: hidden;
+  background-color: rgba(0,0,0,0.5);
+  outline: 0;
+  overflow-y: auto;
+}
+.fundiin__month-repeat__impress {
+  font-weight: bold;
+  color: #ff2800;
+}
+.fundiin__month-repeat {
+  display: none;
+}
+
+.fundiin_promo__modal-body {
+  height:100%;
+}
+.fundiin_promo__fade {
+  transition: opacity .15s linear;
+}
+
+.fundiin_promo__fade:not(.fundiin_promo__show) {
+  opacity: 0;
+}
+
+.fundiin_promo__modl.fundiin__fade .fundiin_promo__modal-dialog {
+  transition: -webkit-transform .3s ease-out;
+  transition: transform .3s ease-out;
+  transition: transform .3s ease-out,-webkit-transform .3s ease-out;
+  -webkit-transform: translate(0,-50px);
+  transform: translate(0,-50px);
+}
+
+.fundiin_promo__modal-dialog-centered {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.fundiin_promo__modal-dialog {
+  position: relative;
+  width: auto;
+  height: 100%;
+  margin: 0.5rem;
+  pointer-events: none;
+}
+
+.fundiin_promo__modal-content {
+  position: relative;
+  display: -ms-flexbox;
+  margin-top: 50px;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  /* width: calc(100vh - 5%); */
+  /* height: calc(100vh - 5%); */
+  width: 430px;
+  height: fit-content;
+  pointer-events: auto;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(0,0,0,.2);
+  border-radius: 1rem;
+  outline: 0;
+  
+}
+
+button.fundiin_promo__close {
+  cursor: pointer;
+  padding: 0;
+  background-color: transparent;
+  border: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+.fundiin_promo__close {
+  float: right;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+  opacity: .5;
+  width: 10px;
+  right: 20px;
+  top: 10px;
+  position: absolute;
+}
+
+.fundiin__public-text p {
+  display: inline-block;
+    width: 298px;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+}
+
+@media (min-width: 576px) {
+  .fundiin_promo__modal-dialog-centered {
+    min-height: calc(100% - 3.5rem);
+  }
+  .fundiin_promo__modal-dialog {
+    width: 500px;
+    margin: 1.75rem auto;
+  }
+}
+
+.fundiin_promo__modal-body-title {
+    text-align: center; 
+    font-size: 16px;
+    margin-top:30px; 
+    font-weight: 500;
+}
+.fundiin__block-promotion {
+    width: calc(100% - 40px);
+    margin: auto;
+    padding-bottom: 30px;
+}
+.fundiin__promotion-panel {
+    position: relative;
+    margin: auto;
+    box-shadow: 6px 2px 6px rgba(0, 0, 0, 0.1);
+    display:flex;
+    height: 70px;
+    margin-bottom: 10px;
+    z-index: 1;
+}
+
+.fundiin__promotion-trigger {
+  color: #fff;
+  cursor: pointer;
+  text-decoration: underline;
+    margin-left:3px;
+  font-style: italic;
+
+}
+
+.fundiin__promotion-panel:after {
+  top: 0;
+  left: -10px;
+  content: '';
+  width: 10px;
+  height: 100%;
+  position: absolute;
+  background-color: #fff;
+  background: linear-gradient(-137deg, #fff 6px, transparent 0) 0 5px, 
+                linear-gradient(320deg, #fff 5px, transparent 0) 0 5px;
+  background-position: left;
+  background-repeat: repeat-y;
+  background-size:10px 10px;
+}
+
+.fundiin__promotion-panel:after {
+  left: auto;
+  right: -10px;
+  top: 0;
+  transform: scaleX(-1);
+}
+.fundiin__logo-img {
+    position: relative;
+    left: -5px;
+}
+.bold-text {
+  font-weight: 600;
+}
+.font-weight-500 {
+  font-weight: 500;
+}
+.fundiin__logo-description {
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+}
+.fundiin__promotion-code, .fundiin__promotion-code1 {
+    padding: 3px 5px; 
+    position: relative;
+	  border: 5px solid transparent;
+    background: #fff;
+    background-clip: padding-box;
+    font-weight: 500;
+    border-radius: 10px;
+    margin: 5rem auto;
+}
+.fundiin__promotion-code::after, .fundiin__promotion-code1::after  {
+    content: '';
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    left: -2px;
+    right: -2px;
+    background: linear-gradient(to right, #F2AF36, #F44233);
+    z-index: -1;
+    border-radius: 6px;
+}
+
+.fundiin__promotion-condition {
+    position: relative;
+}
+
+.fundiin__promotion-condition::before {
+    content: '';
+    position: absolute;
+    width: 4px;
+    left: -5px;
+    display: inline-block;
+    border-radius: 2px;
+    height: 100%;
+    background-color: #f5f5f5;
+}
+.fundiin__promotion-condition__description {
+    position: relative;
+    padding-left: 10px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-evenly;
+}
+
+@media (max-width: 430px) {
+  .fundiin_promo__modal-content {
+    width: calc(100vw - 5%);
+  }
+
+  .fundiin_promo__modal-dialog-centered {
+    align-items: center;
+  }
+  .fundiin__logo-description {
+    padding: 7px;
+  }
+
+  .fundiin__logo-description > div:first-child {
+    margin-bottom: 5px;
+  }
+
+  .fundiin__promotion-code {
+    padding: 3px;
+    line-height: 13px;
+    font-size: 13px;
+  }
+}
+@media (max-width: 390px) {
+  .fundiin_promo__modl {
+    font-size: 12px;
+  }
+  .fundiin_promo__modal-body-title {
+    font-size: 15px;
+  }
+  
+}
+@media (max-width: 360px) {
+  .fundiin_promo__modal-body-title {
+    font-size: 14px;
+  }
+  
+}
+@media (max-width: 330px) {
+  .fundiin_promo__modl {
+    font-size: 12px;
+  }
+}`;fundiin.widgets[3].widget_js = `/* update month repeat */
+var newBlockPromotion = "";
+var groupPromotionCondition = document.querySelectorAll(".group-promotion");
+var groupPromotions =
+  typeof fundiin != "undefined" && typeof fundiin.promotions != "undefined" && fundiin.promotions.length > 0
+    ? fundiin.promotions
+    : [
+        {
+          code: "XINCHAO",
+          coupon_description: "Giảm <strong>15%</strong> tối đa 30K",
+          rule_constraint: "<span>Dành cho khách hàng <span>lần đầu thanh toán</span> qua Fundiin</span>",
+          created_date: "2023-05-15",
+          expired_date: "2024-07-15",
+          public_text_html: "Giảm <strong>15%</strong> tối đa 30K",
+          constraint: "new_user",
+          widget_text_html: "Giảm đến <strong>15%</strong> khi thanh toán qua Fundiin",
+        },
+        {
+          code: "FUNDAY",
+          coupon_description: "Giảm <strong>10%</strong> tối đa 15K",
+          rule_constraint: "<span>Dành cho khách hàng <span>đã từng thanh toán</span> qua Fundiin</span>",
+          created_date: "2023-05-15",
+          expired_date: "2024-07-15",
+          public_text_html: "Giảm <b>10%</b> tối đa 15K",
+          constraint: "old_user",
+          widget_text_html: "Giảm đến <strong>10%</strong> khi thanh toán qua Fundiin",
+        },
+      ];
+
+for (var i = 0; i < groupPromotions.length; i++) {
+  var groupPromotion = groupPromotions[i];
+  newBlockPromotion +=
+    '<div class="fundiin__block-promotion">' +
+    '<div class="fundiin__promotion-panel">' +
+    '<div class="fundiin__logo-img" style="position: relative;left: -5px">' +
+    '<img src="https://assets.fundiin.vn/merchant/fundiin_voucher_logo.svg?20230509" width="70">' +
+    "</div>" +
+    '<div class="fundiin__logo-description">' +
+    '<div>Nhập mã <span class="fundiin__promotion-code">' +
+    groupPromotion.code +
+    "</span></div>" +
+    '<div class="fundiin__public-text">' +
+    groupPromotion.coupon_description +
+    "</div>" +
+    "</div>" +
+    "</div>" +
+    '<div class="fundiin__promotion-condition">' +
+    '<div class="fundiin__promotion-condition__description">' +
+    groupPromotion.rule_constraint +
+    "</div>" +
+    "</div>" +
+    "</div>";
+}
+groupPromotionCondition[0].innerHTML += newBlockPromotion;
+
+var promotionTrigger = document.querySelector("a.fundiin__promotion-trigger");
+var modalElement = document.querySelector(".fundiin_promo__modl");
+var modalContentElement = document.querySelector(".fundiin_promo__modal-content");
+var fundiinShow = undefined;
+
+promotionTrigger.addEventListener("click", function (event) {
+  modalElement.style.display = "block";
+  modalElement.classList.add("fundiin_promo__show");
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    event: "click_see_more",
+    event_category: "mx_site",
+    event_action: "click",
+    event_label: "mx_see_more",
+  });
+});
+
+modalElement.addEventListener("click", function (event) {
+  fundiinShow = document.querySelector(".fundiin_promo__show");
+  var buttonClose = document.querySelector("button.fundiin_promo__close");
+
+  if (!modalContentElement.contains(event.target) && !!fundiinShow) {
+    modalElement.style.display = "";
+    modalElement.classList.remove("fundiin_promo__show");
+  } else if (buttonClose.contains(event.target) && !!fundiinShow) {
+    modalElement.style.display = "";
+    modalElement.classList.remove("fundiin_promo__show");
+  }
+});
+`;fundiin.widgets[3].widget_orientation = `beforeend`;fundiin.widgets[3].widget_selector = `body`;fundiin.custom_fields['demo_promotion_detail'] = {};fundiin.widgets[4] = {};fundiin.widgets[4].libraries = [];fundiin.widgets[4].trigger_html = `<a class="fdn-guide-url" target="_blank">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 5 25 17" width="20" height="40">
+    <defs>
+      <style>.cls-1{fill:#212121;}.cls-2{fill:#fff;}</style>
+    </defs>
+    <g id="Layer_2" data-name="Layer 2">
+      <g id="Layer_1-2" data-name="Layer 1">
+        <circle class="cls-1" cx="11.27" cy="11.27" r="11.27"/>
+        <path class="cls-2" d="M11.64,4.27a4.91,4.91,0,0,1,1.62.26,3.45,3.45,0,0,1,1.26.74,3.51,3.51,0,0,1,.82,1.2,4.4,4.4,0,0,1,.29,1.64,4.41,4.41,0,0,1-.32,1.75,3.24,3.24,0,0,1-.89,1.22,3.65,3.65,0,0,1-1.38.73,6.21,6.21,0,0,1-1.78.27v2.07H9.31v-3.5h.87a8.85,8.85,0,0,0,1.28-.1,2.83,2.83,0,0,0,1.08-.38,2,2,0,0,0,.74-.77,2.53,2.53,0,0,0,.28-1.28A2.12,2.12,0,0,0,13,6.57,2,2,0,0,0,11.55,6,2.14,2.14,0,0,0,10,6.61a2.07,2.07,0,0,0-.59,1.53h-2a4,4,0,0,1,.27-1.57,3.44,3.44,0,0,1,.83-1.22,4,4,0,0,1,1.34-.79A5.21,5.21,0,0,1,11.64,4.27Zm-.16,11.56v2.38H9.13V15.83Z" />
+      </g>
+    </g>
+  </svg>
+</a>`;fundiin.widgets[4].trigger_orientation = `beforeend`;fundiin.widgets[4].trigger_selector = `.fundiin__action`;fundiin.widgets[4].widget_html = `<div class="fundiin__modl fundiin__fade" id="fundiin__popup--modal__identity">
+  <div class="fundiin__modal-dialog fundiin__modal-dialog-centered">
+    <div class="fundiin__modal-content">
+      <div class="fundiin__modal-body">
+        <button type="button" class="fundiin__close" data-dismiss="modal" aria-label="Close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 2L22 22M22 2L2 22" stroke="#C0C0C0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <img class="fundiin-popup-image" id="fdn-popup-image" />
+      </div>
+    </div>
+  </div>
+</div>`;fundiin.widgets[4].widget_css = `.fundiin__modl {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000000;
+  display: none;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: rgba(0,0,0,0.5);
+  outline: 0;
+  overflow-y: auto;
+}
+.fundiin__modal-body {
+  height:100%;
+}
+.fundiin__fade {
+  transition: opacity .15s linear;
+}
+
+.fundiin__fade:not(.fundiin__show) {
+  opacity: 0;
+}
+
+.fundiin__modl.fundiin__fade .fundiin__modal-dialog {
+  transition: -webkit-transform .3s ease-out;
+  transition: transform .3s ease-out;
+  transition: transform .3s ease-out,-webkit-transform .3s ease-out;
+  -webkit-transform: translate(0,-50px);
+  transform: translate(0,-50px);
+}
+
+.fundiin__modal-dialog-centered {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.fundiin__modal-dialog {
+  position: relative;
+  width: auto;
+  margin: 0.5rem;
+  pointer-events: none;
+}
+
+.fundiin__modal-content {
+  position: relative;
+  display: -ms-flexbox;
+  margin-top: 50px;
+  display: flex;
+  -ms-flex-direction: column;
+  box-shadow: 2px 3px 1px lightgrey;
+  flex-direction: column;
+  width: calc(100vh - 5%);
+  pointer-events: auto;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(0,0,0,.2);
+  border-radius: 1rem;
+  outline: 0;
+}
+
+a.fdn-guide-url, .fdn-text{
+  cursor: pointer;
+}
+.fdn-guide-url {
+  text-decoration: underline; 
+}
+
+
+button.fundiin__close {
+  cursor: pointer;
+  padding: 0;
+  background-color: transparent;
+  border: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+.fundiin__close {
+  float: right;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+  opacity: .5;
+  width:20px;
+  right: 27px;
+  top: 23px;
+  position:absolute;
+}
+.fundiin-popup-image {
+  width: 100%;
+  border-radius: 10px;
+}
+
+@media (min-width: 576px) {
+  .fundiin__modal-dialog {
+    -width: 500px;
+    margin: 1.75rem auto;
+  }
+}`;fundiin.widgets[4].widget_js = `var keym8i3tmtAGpDbXa = "demo_popup";
+var customFields =
+  typeof fundiin != "undefined" && Object.keys(fundiin.custom_fields)
+    ? fundiin.custom_fields[keym8i3tmtAGpDbXa]
+    : { mobile: "https://assets.fundiin.vn/merchant/bnpl_plus_mobile.png?20230511", desktop: "https://assets.fundiin.vn/merchant/bnpl_plus_desktop.png?20230511" };
+
+var fundiinActions = document.querySelectorAll("a.fundiin__action");
+var fundiinGuideUrls = document.querySelectorAll("a.fdn-guide-url");
+
+var fundiinPopupImages = document.querySelectorAll(".fundiin-popup-image");
+Array.from(fundiinPopupImages).forEach(ele => {
+  ele.setAttribute("src", customFields["desktop"]);
+});
+
+if (window.innerWidth / window.innerHeight <= 0.6) {
+  document.querySelector(".fundiin__modal-content").style.width = "calc(100vw - 5%)";
+  document.querySelector(".fundiin__modal-content").style.height = "90vh";
+
+  Array.from(fundiinPopupImages).forEach(ele => {
+    ele.setAttribute("src", customFields["mobile"]);
+  });
+}
+var fdn_close = document.querySelector("button.fundiin__close");
+var fdn_modal = document.querySelector(".fundiin__modl");
+var fdn_modal_content = document.querySelector(".fundiin__modal-content");
+var fundiinShow = document.querySelector(".fundiin__show");
+
+if (fundiinActions.length != 0) {
+  for (var fundiinAction of fundiinActions) {
+    fundiinAction.addEventListener("click", function (event) {
+      if (window.innerWidth / window.innerHeight <= 0.6) {
+        Array.from(fundiinPopupImages).forEach(ele => {
+          ele.setAttribute("src", customFields["mobile"]);
+        });
+      } else {
+        Array.from(fundiinPopupImages).forEach(ele => {
+          ele.setAttribute("src", customFields["desktop"]);
+        });
+      }
+
+      fdn_modal.style.display = "block";
+      fdn_modal.classList.add("fundiin__show");
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "click_detail_logo",
+        event_category: "mx_site",
+        event_action: "click",
+        event_label: "mx_detail_logo",
+      });
+    });
+  }
+}
+
+if (fundiinGuideUrls.length != 0) {
+  for (var fundiinGuideUrl of fundiinGuideUrls) {
+    fundiinGuideUrl.addEventListener("click", function (event) {
+      if (window.innerWidth / window.innerHeight <= 0.6) {
+        Array.from(fundiinPopupImages).forEach(ele => {
+          ele.setAttribute("src", customFields["mobile"]);
+        });
+      } else {
+        Array.from(fundiinPopupImages).forEach(ele => {
+          ele.setAttribute("src", customFields["desktop"]);
+        });
+      }
+      fdn_modal.style.display = "block";
+      fdn_modal.classList.add("fundiin__show");
+    });
+  }
+}
+
+if (fundiinShow) {
+  fdn_modal_content.addEventListener("click", function (event) {
+    event.stopPropagation();
+  });
+}
+
+fdn_close.addEventListener("click", function () {
+  fdn_modal.style.display = "";
+  fdn_modal.classList.remove("fundiin__show");
+});
+
+fdn_modal.addEventListener("click", function (event) {
+  fdn_modal.style.display = "";
+  fdn_modal.classList.remove("fundiin__show");
+  window.dataLayer.push({
+    event: "click_detail_banner",
+    event_category: "mx_site",
+    event_action: "click",
+    event_label: "mx_detail_banner",
+  });
+});
+`;fundiin.widgets[4].widget_orientation = `beforeend`;fundiin.widgets[4].widget_selector = `body`;fundiin.custom_fields['demo_popup'] = {};fundiin.custom_fields['demo_popup']['desktop'] = 'https://assets.fundiin.vn/merchant/UI_POP-UP_DESKTOP_VER1.png';fundiin.custom_fields['demo_popup']['mobile'] = 'https://assets.fundiin.vn/merchant/UI_POP-UP_MOBILE_VER1.png';function setupWidgets() {
+    
+    if ( fundiin.widgets.length ) {
+        for ( var widget of fundiin.widgets ) {
+            if (widget && widget.trigger_selector) {
+                var triggerElements = document.querySelectorAll(widget.trigger_selector);
+                if ( triggerElements != null ) {
+                    for ( var triggerElement of Array.from(triggerElements)) {
+                        triggerElement.insertAdjacentHTML( widget.trigger_orientation, widget.trigger_html);
+                    }
+                }
+            }
+            
+           if (widget && widget.widget_selector) {
+                var widgetElements = document.querySelector(widget.widget_selector);
+                var widgetElementsV2 = document.querySelector("#script-product-detail");
+                if (widgetElements != null && !!widget.widget_html ) {
+                    widgetElements.insertAdjacentHTML( widget.widget_orientation, widget.widget_html );
+                   
+                    
+                }
+                else if (widgetElementsV2 != null && !!widget.widget_html ) {
+                    widgetElementsV2.insertAdjacentHTML( widget.widget_orientation, widget.widget_html );
+                   
+                }
+            }
+            
+            /* add style for widget */
+            if ( widget && widget.widget_css ) {
+                document.head.insertAdjacentHTML('beforeend', '<style>' + widget.widget_css + '</style>' );
+            }
+        
+            if (widget && widget.libraries.length ) {
+                /* add libs for widget */
+                for ( var lib of widget.libraries ) {
+                    var element = document.createElement( lib.lib_type );
+                    if (!lib.lib_source.trim().length) {
+                        continue;
+                    }
+                    if ( lib.lib_type == "script" ) {
+                        
+                        element.src = lib.lib_source;
+                        element[lib.lib_mode] = true;
+                        document.body.appendChild( element );
+                    }
+                    else { /* style */
+                        element.rel = "stylesheet";
+                        element.href = lib.lib_source;
+                        document.head.appendChild( element );
+                    }
+                }
+            }
+            
+            if (widget && widget.widget_js) {
+                /* add script for widget*/
+                var widgetJs = document.createElement("script");
+                widgetJs.innerHTML = widget.widget_js;
+                document.body.appendChild( widgetJs );
+            }
+        }
+        var healthCheck = document.createElement('script');
+        healthCheck.setAttribute('src','https://storage.googleapis.com/dev-merchant-gtm/healthcheck.js');
+        document.head.appendChild(healthCheck);
+    }
+}
+setupWidgets();

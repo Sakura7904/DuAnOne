@@ -1,0 +1,71 @@
+.pageAlbum .title-page {
+    font-size: 24px;
+    margin: 32px 0 10px;
+    text-align: center;
+    text-transform: uppercase;
+    line-height: 32px;
+    color: #c61b1b;
+    font-weight: 700;
+}
+.pageAlbum .custom-padding-left {
+    text-align: center;
+    margin-bottom: 32px;
+}
+.listAlbum figure {
+    margin-bottom: 30px;
+}
+.listAlbum figure a img {
+    width: 100%;
+}
+.listAlbum figcaption h3 {
+    border: 1px solid #e6e6e6;
+    margin: 0;
+    font-weight: 600;
+    font-size: 20px;
+    padding: 20px 20px 15px;
+}
+.pageAlbum .title-page {
+    font-size: 24px;
+    margin: 32px 0 10px;
+    text-align: center;
+    text-transform: uppercase;
+    line-height: 32px;
+    color: #c61b1b;
+    font-weight: 700;
+}
+.post-meta-info {
+    margin: 15px 0;
+}
+.post-meta-info .post-meta-item.date {
+    padding: 5px 10px;
+    background-color: #f9f9f9;
+    display: inline-block;
+}
+.post-meta-info .post-meta-item.date span i {
+    color: #aaa;
+    margin-right: 5px;
+}
+.post-meta-info .post-meta-item.date span a {
+    color: #aaa;
+}
+.album-images {
+    margin: 20px 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+.pageAlbum .listAlbum {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px){
+    .breadcrumb-shop .wrapBoxSearch{
+        display: none;
+    }
+    .breadcrumb-shop .breadcrumbCate{
+        display: none;
+    }
+}
+.album-images .list-img-a-view{
+    padding-bottom: 30px;
+}

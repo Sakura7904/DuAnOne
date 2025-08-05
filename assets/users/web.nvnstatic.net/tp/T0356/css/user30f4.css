@@ -1,0 +1,344 @@
+.full.pb-20{
+    text-align: center;
+}
+.section-content.block{
+    width: 490px;
+    display: inline-block;
+}
+.section-title{
+    font-size: 18px;
+    line-height: 21px;
+    color: #303030;
+    font-weight: 600;
+    text-align: left;
+}
+.form-group{
+    margin-bottom: 24px;
+    text-align: left;
+}
+.form-group label{
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 17px;
+    color: #303030;
+    margin-bottom: 8px;
+}
+.section-content.block .section-title{
+    font-size: 36px;
+    line-height: 48px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    text-align: center;
+}
+.getPass .section-content.block{
+    padding: 0;
+}
+.getPass #newpassword{
+    width: 100%;
+    margin-bottom: 15px;
+    background: 0 0;
+    box-shadow: none;
+    border-radius: unset;
+    border: 1px solid #d9d9d9;
+    color: #656565;
+    padding: 13px 16px;
+    height: auto;
+    line-height: 14px;
+    font-size: 14px;
+    font-weight: 300;
+}
+.getPass #btnSubmit{
+    display: block;
+    background: #303030;
+    color: #fff;
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: 600;
+    padding: 9px;
+    text-transform: uppercase;
+    border-radius: 0;
+    margin-bottom: 20px;
+}
+.section-content.block .block p{
+    font-size: 15px;
+    line-height: 28px;
+}
+#formAcount,
+#formAcountSignup{
+    margin-top: 30px;
+}
+#formAcount .inputAccount,
+#formAcountSignup .inputAccount{
+    width: 100%;
+    margin-bottom: 24px;
+    background: 0 0;
+    box-shadow: none;
+    border-radius: unset;
+    border: 1px solid #D9D9D9;
+    color: #656565;
+    padding: 13px 16px;
+    height: auto;
+    line-height: 14px;
+    font-size: 14px;
+    font-weight: 300;
+}
+#password{
+    margin-bottom: 12px;
+}
+.wrapperBtnSignin{
+    margin-top: 24px;
+}
+.btnSiginByGoogle{
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 16px;
+    color: #303030;
+    display: block;
+    padding: 9px 16px;
+    border: 1px solid #C4C4C4;
+    margin: 15px 0;
+}
+.btnSiginByGoogle img{
+    margin-right: 25px;
+}
+.wrapperBtnSignin #btnSignIn{
+    display: block;
+    background: #303030;
+    color: #fff;
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: 600;
+    padding: 9px;
+    text-transform: uppercase;
+    border-radius: 0;
+}
+.wrapperBtnSignin .btnSiginByFacebook{
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 16px;
+    color: #303030;
+    padding: 9px 16px;
+    border: 1px solid #C4C4C4;
+}
+.wrapperBtnSignin .btnSiginByFacebook i{
+    background: linear-gradient(
+            180deg, #00B2FF 0%, #006AFF 100%);
+    border-radius: 50%;
+    color: #fff;
+    font-size: 14px;
+    padding: 6px 9px 6px 10px;
+    margin-right: 25px;
+}
+#btnSingup{
+    display: block;
+    background: #303030;
+    color: #fff;
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: 600;
+    padding: 9px;
+    text-transform: uppercase;
+    border-radius: 0;
+}
+/*.getPass ul{*/
+/*    padding: 0;*/
+/*    list-style: none;*/
+/*    margin-bottom: 0;*/
+/*}*/
+.getPass ul li label{
+    display: none;
+}
+.btn.btnAcess{
+    width: 100%;
+    display: block;
+    background: #185137;
+    color: #fff;
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: 600;
+    padding: 13px;
+    text-transform: uppercase;
+    border-radius: 4px;
+}
+.minimal{
+    width: 100%;
+    color: #2d2d29;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    border-bottom: 1px solid #ababab;
+    margin-bottom: 24px;
+    font-size: 15px;
+    line-height: 28px;
+    padding: 8px 0;
+    background: 0 0;
+    box-shadow: none;
+    border-radius: unset;
+}
+.btn.historyBack{
+    border-bottom: 1px solid;
+    padding: 0 0 5px;
+    border-radius: unset;
+    margin-top: 16px
+}
+.btn.btnUpdate{
+    color: #fff;
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: #303030;
+    width: 108px;
+    display: inline-block;
+    border-radius: unset;
+    padding: 9px 15px;
+}
+.bannerPromotion{
+    margin: 30px 0 0;
+}
+#formAcountEdit .form-group{
+    display: flex;
+    align-items: center;
+}
+#formAcountEdit .form-group label{
+    color: #656565;
+    width: 108px;
+    margin: 0;
+}
+#formAcountEdit .form-group input{
+    width: 100%;
+    background: 0 0;
+    box-shadow: none;
+    border-radius: unset;
+    border: 1px solid #d9d9d9;
+    color: #656565;
+    padding: 13px 16px;
+    height: auto;
+    line-height: 14px;
+    font-size: 14px;
+    font-weight: 300;
+}
+#formAcountEdit .buttonBot{
+    justify-content: center;
+}
+#formAcountEdit .buttonBot{
+    justify-content: center;
+}
+.avata img{
+    width: 56px;
+}
+.avata .infoUser{
+    margin-left: 16px;
+}
+.avata .infoUser span{
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+}
+.avata .infoUser a{
+    font-size: 12px;
+    line-height: 14px;
+    text-decoration: underline;
+    color: #D40404;
+}
+.changePass .section-content.block{
+    padding: 0;
+}
+.changePass .section-content.block .form-group{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.changePass .section-content.block .form-group label{
+    width: 215px;
+}
+.changePass .section-content.block #formAcount .form-group input{
+    margin: 0;
+}
+.changePass .btn.btnAcess{
+    background: #303030;
+    display: inline-block;
+    width: 108px;
+    border-radius: 0;
+    height: 44px;
+    padding: 0;
+    line-height: 44px;
+}
+.changePass .section-content.block .section-title{
+    font-size: 20px;
+    line-height: 20px;
+    text-align: left;
+}
+.changePass .section-content .block{
+    text-align: left;
+}
+.fogetPass{
+    font-size: 12px;
+    line-height: 14px;
+    color: #D40404;
+    text-decoration: underline;
+}
+@media (min-width: 1200px) {
+    .section-content{
+        padding: 0 80px;
+    }
+    .leftBox{
+        border-right: 1px solid #DCDCDC;
+    }
+}
+@media (max-width: 768px) {
+    .changePass .section-content.block{
+        padding: 0 15px;
+    }
+    .getPass .section-content.block{
+        padding: 0 15px;
+        text-align: center;
+    }
+    .section-content.block{
+        width: 100%;
+    }
+    .section-content.block .block{
+        text-align: left;
+    }
+    .full.pb-20 .breadcrumbCate{
+        text-align: left;
+        padding: 0;
+    }
+    .formError{
+        left: 0!important;
+    }
+    .section-content.block .section-title{
+        margin: 50px 0 10px;
+    }
+    .full .container{
+        padding: 0;
+    }
+    .section-content{
+        display: none;
+    }
+    .section-content.open{
+        display: block;
+    }
+    .titleTab .section-title{
+        font-size: 16px;
+        line-height: 19px;
+        display: inline-block;
+        margin: 30px 12px 0 12px;
+        opacity: 0.5;
+        border-bottom: 2px solid #FFF;
+        padding-bottom: 10px;
+    }
+    .titleTab .section-title.open{
+        opacity: 1;
+        border-bottom: 2px solid #303030;
+    }
+    .boxUser{
+        padding-top: 30px;
+    }
+}
+.btnSiginByGoogle img{
+    width: 25px;
+}
