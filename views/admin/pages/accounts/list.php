@@ -8,8 +8,8 @@
     <span class="capitalize text-color-brands">Accounts</span>
 </div>
 
-<div class="rounded-2xl border border-neutral bg-neutral-bg dark:border-dark-neutral-border dark:bg-dark-neutral-bg overflow-scroll scrollbar-hide p-6 mb-8">
-    <div class="flex items-center justify-between pb-4 border-b border-neutral dark:border-dark-neutral-border mb-5">
+<div class="rounded-2xl border border-neutral bg-neutral-bg dark:border-dark-neutral-border dark:bg-dark-neutral-bg overflow-scroll scrollbar-hide p-[25px] mb-[33px]">
+    <div class="flex items-center justify-between pb-4 border-neutral border-b mb-5 dark:border-dark-neutral-border">
         <p class="text-xl font-semibold text-gray-1100 dark:text-gray-dark-1100">Danh sách người dùng</p>
     </div>
     <table class="w-full min-w-[1100px] table-auto text-sm">
@@ -32,8 +32,16 @@
                     <td class="px-4 py-3"><?= htmlspecialchars($user['id']) ?></td>
                     <td class="px-4 py-3"><?= htmlspecialchars($user['full_name']) ?></td>
                     <td class="px-4 py-3"><?= htmlspecialchars($user['email']) ?></td>
-                    <td class="px-4 py-3"><?= htmlspecialchars($user['phone_number']) ?></td>
-                    <td class="px-4 py-3"><?= htmlspecialchars($user['address']) ?></td>
+                    <td class="px-4 py-3">
+                        <?= !empty($user['phone_number'])
+                            ? htmlspecialchars($user['phone_number'])
+                            : '<span class="italic text-gray-500">Chưa có số điện thoại</span>' ?>
+                    </td>
+                    <td class="px-4 py-3">
+                        <?= !empty($user['address'])
+                            ? htmlspecialchars($user['address'])
+                            : '<span class="italic text-gray-500">Chưa có địa chỉ</span>' ?>
+                    </td>
                     <td class="px-4 py-3"><?= htmlspecialchars($user['role']) ?></td>
 
                     <td class="px-4 py-3">
