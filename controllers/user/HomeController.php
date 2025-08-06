@@ -1,12 +1,22 @@
 <?php
+include_once "models/user/UserProductModel.php";
+
 class HomeController
 {
     public function home()
     {
-        $content = getContentPathClient('', 'home');
-        //Nếu để trong thư mục ví dụ: views/admin/pages/products/list_products.php
-        //Thì phải truyền tham số trùng với tên thư mục vào getContentPath('products, 'list_products')
+        $productModel = new UserProductModel();
+        $latestProducts = $productModel->getLatest(8);
 
-        view('user/index', ['content' => $content]);
+        // Gắn màu sắc cho từng sản phẩm
+        foreach ($latestProducts as &$product) {
+            $product['colors'] = $productModel->getProductColors($product['id']);
+        }
+        unset($product);
+        $content = getContentPathClient('', 'home');
+        view('user/index', [
+            'content' => $content,
+            'latestProducts' => $latestProducts
+        ]);
     }
 }
