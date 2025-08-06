@@ -12,8 +12,9 @@
                     <li class="title_lv1">
                         <a aria-label="menu" class="tp_menu_item style_32323"
                             href="khOi-nguOn-thanh-lIch-(-web)-pm128511.html" title="SALE CHÀO HÈ">
-                            SALE CHÀO HÈ<i class="fal fa-angle-down" aria-hidden="true"></i><span
-                                class="saleTick">Sale</span>
+                            SALE CHÀO HÈ
+                            <i class="fal fa-angle-down" aria-hidden="true"></i>
+                            <span class="saleTick">Sale</span>
                         </a>
                         <ul class="mainChild levlup_2">
                             <li class="title_lv2">

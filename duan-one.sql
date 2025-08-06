@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Aug 04, 2025 at 08:08 AM
+-- Generation Time: Aug 06, 2025 at 01:53 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.2.12
 
@@ -49,20 +49,21 @@ INSERT INTO `attributes` (`id`, `name`) VALUES
 CREATE TABLE `attributevalues` (
   `id` int UNSIGNED NOT NULL,
   `attribute_id` int UNSIGNED NOT NULL,
-  `value` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
+  `value` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `color_code` varchar(7) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `attributevalues`
 --
 
-INSERT INTO `attributevalues` (`id`, `attribute_id`, `value`) VALUES
-(1, 1, 'Trắng'),
-(2, 1, 'Đen'),
-(3, 1, 'Be'),
-(4, 2, 'S'),
-(5, 2, 'M'),
-(6, 2, 'L');
+INSERT INTO `attributevalues` (`id`, `attribute_id`, `value`, `color_code`) VALUES
+(1, 1, 'Trắng', NULL),
+(2, 1, 'Đen', NULL),
+(3, 1, 'Be', NULL),
+(4, 2, 'S', NULL),
+(5, 2, 'M', NULL),
+(6, 2, 'L', NULL);
 
 -- --------------------------------------------------------
 
@@ -241,13 +242,20 @@ INSERT INTO `productimages` (`id`, `variant_id`, `image_url`, `created_at`) VALU
 (8, 105, 'images/product_images/variant_105_1754149106_688e30f294d73.jpg', '2025-08-02 15:38:26'),
 (11, 103, 'images/product_images/variant_103_1754156030_688e4bfe44b98.jpg', '2025-08-02 17:33:50'),
 (12, 103, 'images/product_images/variant_103_1754156030_688e4bfe44f4b.jpg', '2025-08-02 17:33:50'),
-(14, 101, 'images/product_images/variant_101_1754290681_689059f9421e6.jpg', '2025-08-04 06:58:01'),
 (15, 105, 'images/product_images/variant_105_1754292012_68905f2ca3bc4.jpg', '2025-08-04 07:20:12'),
 (16, 104, 'images/product_images/variant_104_1754292042_68905f4a4039d.jpg', '2025-08-04 07:20:42'),
 (17, 104, 'images/product_images/variant_104_1754292042_68905f4a4079a.jpg', '2025-08-04 07:20:42'),
 (18, 104, 'images/product_images/variant_104_1754292042_68905f4a409b7.jpg', '2025-08-04 07:20:42'),
 (19, 104, 'images/product_images/variant_104_1754292042_68905f4a40bbf.jpg', '2025-08-04 07:20:42'),
-(20, 104, 'images/product_images/variant_104_1754292051_68905f5376b44.jpg', '2025-08-04 07:20:51');
+(20, 104, 'images/product_images/variant_104_1754292051_68905f5376b44.jpg', '2025-08-04 07:20:51'),
+(32, 101, 'images/product_images/variant_101_1754322522_6890d65a9d344.jpg', '2025-08-04 15:48:42'),
+(33, 101, 'images/product_images/variant_101_1754322522_6890d65a9d614.jpg', '2025-08-04 15:48:42'),
+(34, 101, 'images/product_images/variant_101_1754322522_6890d65a9d811.jpg', '2025-08-04 15:48:42'),
+(35, 115, 'images/product_images/variant_115_1754322621_6890d6bd3a1c6.jpg', '2025-08-04 15:50:21'),
+(36, 115, 'images/product_images/variant_115_1754322621_6890d6bd3a484.jpg', '2025-08-04 15:50:21'),
+(37, 115, 'images/product_images/variant_115_1754322621_6890d6bd3a6cb.jpg', '2025-08-04 15:50:21'),
+(38, 115, 'images/product_images/variant_115_1754322621_6890d6bd3a8f3.jpg', '2025-08-04 15:50:21'),
+(39, 115, 'images/product_images/variant_115_1754322621_6890d6bd3abb3.jpg', '2025-08-04 15:50:21');
 
 -- --------------------------------------------------------
 
@@ -270,11 +278,11 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `description`, `image_thumbnail`, `category_id`, `created_at`, `updated_at`) VALUES
-(1, 'Váy Lụa Tay Phồng Cổ Vuông', 'Chiếc váy lụa mềm mại với thiết kế tay phồng và cổ vuông thanh lịch, phù hợp cho các buổi tiệc nhẹ hoặc dạo phố.', NULL, 2, '2025-07-25 03:33:52', '2025-07-25 03:33:52'),
-(2, 'Áo Sơ Mi Lụa Satin Tay Dài', 'Áo sơ mi công sở cao cấp, chất liệu lụa satin thoáng mát, dễ phối đồ.', NULL, 3, '2025-07-25 03:33:52', '2025-07-25 03:33:52'),
-(3, 'Chân Váy Chữ A Xếp Ly', 'Chân váy chữ A ngắn với chi tiết xếp ly trẻ trung, năng động.', NULL, 4, '2025-07-25 03:33:52', '2025-07-25 03:33:52'),
-(4, 'Đầm Maxi Hoa Nhí Vintage', 'Đầm maxi voan in họa tiết hoa nhí theo phong cách vintage, thích hợp cho những chuyến du lịch.', NULL, 2, '2025-07-25 03:33:52', '2025-07-25 03:33:52'),
-(5, 'Quần Culottes Ống Rộng', 'Quần culottes vải đũi, ống rộng thoải mái, item không thể thiếu trong tủ đồ mùa hè.', NULL, 4, '2025-07-25 03:33:52', '2025-07-25 03:33:52');
+(1, 'Váy Lụa Tay Phồng Cổ Vuông', '', 'images/products_thumbnail/6890d3006956b_1754321664.jpg', 2, '2025-07-25 03:33:52', '2025-08-04 15:49:31'),
+(2, 'Áo Sơ Mi Lụa Satin Tay Dài', 'Áo sơ mi công sở cao cấp, chất liệu lụa satin thoáng mát, dễ phối đồ.', 'images/products_thumbnail/6890e83330281_1754327091.jpg', 3, '2025-07-25 03:33:52', '2025-08-04 17:04:51'),
+(3, 'Chân Váy Chữ A Xếp Ly', '', 'images/products_thumbnail/6890cd677e7b7_1754320231.jpg', 4, '2025-07-25 03:33:52', '2025-08-04 15:10:31'),
+(5, 'Quần Culottes Ống Rộng', 'Quần culottes vải đũi, ống rộng thoải mái, item không thể thiếu trong tủ đồ mùa hè.', 'images/products_thumbnail/6890e83ae1c17_1754327098.jpg', 4, '2025-07-25 03:33:52', '2025-08-04 17:04:58'),
+(16, 'aaa', 'aaa', 'images/products_thumbnail/6890d6bd393d7_1754322621.jpg', 5, '2025-08-04 13:41:43', '2025-08-04 16:23:51');
 
 -- --------------------------------------------------------
 
@@ -298,11 +306,12 @@ CREATE TABLE `productvariants` (
 --
 
 INSERT INTO `productvariants` (`id`, `product_id`, `price`, `sale_price`, `quantity`, `image_url`, `created_at`, `updated_at`) VALUES
-(101, 1, '890000.00', '750000.00', 50, 'images/vay-lua-trang.jpg', '2025-07-25 03:33:52', '2025-07-25 03:33:52'),
-(102, 1, '890000.00', NULL, 40, 'images/vay-lua-den.jpg', '2025-07-25 03:33:52', '2025-07-25 03:33:52'),
-(103, 2, '550000.00', NULL, 80, 'images/ao-somi-be.jpg', '2025-07-25 03:33:52', '2025-07-25 03:33:52'),
-(104, 3, '420000.00', '399000.00', 60, 'images/chan-vay-xeply-den.jpg', '2025-07-25 03:33:52', '2025-07-25 03:33:52'),
-(105, 5, '480000.00', NULL, 75, 'images/quan-culottes-trang.jpg', '2025-07-25 03:33:52', '2025-07-25 03:33:52');
+(101, 1, '890000.00', '750000.00', 50, 'images/vay-lua-trang.jpg', '2025-07-25 03:33:52', '2025-08-04 15:49:31'),
+(102, 1, '890000.00', '123000.00', 40, 'images/vay-lua-den.jpg', '2025-07-25 03:33:52', '2025-08-04 08:39:33'),
+(103, 2, '550000.00', '312000.00', 80, 'images/ao-somi-be.jpg', '2025-07-25 03:33:52', '2025-08-04 17:04:51'),
+(104, 3, '420000.00', '399000.00', 60, 'images/chan-vay-xeply-den.jpg', '2025-07-25 03:33:52', '2025-08-04 15:10:31'),
+(105, 5, '480000.00', '435600.00', 75, 'images/quan-culottes-trang.jpg', '2025-07-25 03:33:52', '2025-08-04 17:04:58'),
+(115, 16, '123123.00', NULL, 0, NULL, '2025-08-04 13:41:43', '2025-08-04 16:23:51');
 
 -- --------------------------------------------------------
 
@@ -356,8 +365,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `full_name`, `email`, `phone_number`, `password_hash`, `address`, `role`, `status`, `created_at`, `updated_at`) VALUES
 (1, 'Trần An Nhiên', 'annhien.tran@example.com', '0912345671', 'hashed_password_placeholder_1', '123 Đường Xuân Thủy, Cầu Giấy, Hà Nội', 'customer', 'active', '2025-07-25 03:33:52', '2025-07-25 03:33:52'),
-(2, 'Lê Minh Thư', 'minhthu.le@example.com', '0912345672', 'hashed_password_placeholder_2', '456 Đường Lê Lợi, Quận 1, TP. HCM', 'customer', 'active', '2025-07-25 03:33:52', '2025-07-25 03:33:52'),
-(3, 'Nguyễn Phương Chi', 'phuongchi.nguyen@example.com', '0912345673', 'hashed_password_placeholder_3', '789 Đường Hùng Vương, Hải Châu, Đà Nẵng', 'customer', 'active', '2025-07-25 03:33:52', '2025-07-25 03:33:52'),
+(2, 'Lê Minh Thư', 'minhthu.le@example.com', '0912345672', 'hashed_password_placeholder_2', '456 Đường Lê Lợi, Quận 1, TP. HCM', 'customer', 'inactive', '2025-07-25 03:33:52', '2025-08-04 17:47:20'),
+(3, 'Nguyễn Phương Chi', 'phuongchi.nguyen@example.com', '0912345673', 'hashed_password_placeholder_3', '789 Đường Hùng Vương, Hải Châu, Đà Nẵng', 'admin', 'active', '2025-07-25 03:33:52', '2025-08-05 09:52:35'),
 (4, 'Phạm Khánh Vy', 'khanhvy.pham@example.com', '0912345674', 'hashed_password_placeholder_4', '101 Đường Bà Triệu, Hoàn Kiếm, Hà Nội', 'customer', 'active', '2025-07-25 03:33:52', '2025-07-25 03:33:52'),
 (5, 'Vũ Thảo My', 'thaomy.vu@example.com', '0912345675', 'hashed_password_placeholder_5', '212 Đường 3/2, Quận 10, TP. HCM', 'customer', 'active', '2025-07-25 03:33:52', '2025-07-25 03:33:52'),
 (6, 'Ha lô', 'a@a.a', NULL, '123a', NULL, 'admin', 'active', '2025-08-04 06:57:15', '2025-08-04 06:57:15');
@@ -547,19 +556,19 @@ ALTER TABLE `orders`
 -- AUTO_INCREMENT for table `productimages`
 --
 ALTER TABLE `productimages`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `productvariants`
 --
 ALTER TABLE `productvariants`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
 
 --
 -- AUTO_INCREMENT for table `users`

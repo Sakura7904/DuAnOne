@@ -21,8 +21,9 @@ include "controllers/admin/ProductController.php";
 
 
 
-// ========================= Controller admin =========================
+// ========================= Controller client =========================
 include "controllers/user/HomeController.php";
+include "controllers/user/DetailProductController.php";
 
 $admin = $_GET['admin'] ?? "";
 $user = $_GET['user'] ?? "";
@@ -93,6 +94,7 @@ if (!empty($admin)) {
 if (!empty($user) || (empty($admin) && empty($user))) {
     match ($user) {
         'home' => (new HomeController())->home(),
+        'detailProduct' => (new DetailProductController())->detailProduct(),
         default => die("Không tìm thấy file nào như thế cả!!!"),
     };
 }
