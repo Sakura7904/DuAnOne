@@ -57,30 +57,39 @@
                 <div class="imgZoom clearfix">
                     <div class="zoomImageBox">
                         <div class="zoomer">
-                            <?php foreach ($imagesByVariant[$defaultVariant['id']] as $index => $image): ?>
-                                <a href="<?= $image['image_url'] ?>"
-                                    class="image-frame">
-                                    <img width="100%" class="z cloudzoom"
-                                        src="<?= $image['image_url'] ?>"
-                                        data-cloudzoom="zoomImage: '<?= $image['image_url'] ?>'" />
-                                </a>
-                            <?php endforeach; ?>
+                            <?php if (isset($imagesByVariant[$defaultVariant['id']])) : ?>
+                                <?php foreach ($imagesByVariant[$defaultVariant['id']] as $index => $image): ?>
+                                    <a href="<?= $image['image_url'] ?>"
+                                        class="image-frame">
+                                        <img width="100%" class="z cloudzoom"
+                                            src="<?= $image['image_url'] ?>"
+                                            data-cloudzoom="zoomImage: '<?= $image['image_url'] ?>'" />
+                                    </a>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <p>Chưa có ảnh con</p>
+                            <?php endif; ?>
                         </div>
                     </div>
 
                     <div class="zoomSlide">
                         <ul class="listImgZoom">
-                            <?php foreach ($imagesByVariant[$defaultVariant['id']] as $index => $image): ?>
-                                <li class="thumbnailImage"
-                                    data-src="<?= $image['image_url'] ?>">
-                                    <a>
-                                        <img class='cloudzoom-gallery'
-                                            src="<?= $image['image_url'] ?>"
-                                            data-cloudzoom="useZoom: '.cloudzoom', image: '<?= $image['image_url'] ?>',
+                            <?php if (isset($imagesByVariant[$defaultVariant['id']])) : ?>
+
+                                <?php foreach ($imagesByVariant[$defaultVariant['id']] as $index => $image): ?>
+                                    <li class="thumbnailImage"
+                                        data-src="<?= $image['image_url'] ?>">
+                                        <a>
+                                            <img class='cloudzoom-gallery'
+                                                src="<?= $image['image_url'] ?>"
+                                                data-cloudzoom="useZoom: '.cloudzoom', image: '<?= $image['image_url'] ?>',
                                                  zoomImage: '<?= $image['image_url'] ?>'">
-                                    </a>
-                                </li>
-                            <?php endforeach; ?>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <p>Chưa có ảnh con</p>
+                            <?php endif; ?>
                         </ul>
                         <!--                        <a href="javascript:void(0)" id="prevSlideZ" class="spriteIcon"></a>-->
                         <!--                        <a href="javascript:void(0)" id="nextSlideZ" class="spriteIcon"></a>-->
@@ -120,8 +129,12 @@
                             </div>
                         </div>
                         <div class="price-box">
-                            <span class="discountPrice tp_product_detail_price"><?= number_format($defaultVariant['sale_price']) ?>đ</span>
-                            <del class="product-price-old tp_product_detail_price_old"><?= number_format($defaultVariant['price']) ?>đ</del>
+                            <?php if ($defaultVariant['sale_price'] && $defaultVariant['sale_price'] > 0): ?>
+                                <span class="discountPrice tp_product_detail_price"><?= number_format($defaultVariant['sale_price']) ?>đ</span>
+                                <del class="product-price-old tp_product_detail_price_old"><?= number_format($defaultVariant['price']) ?>đ</del>
+                            <?php else: ?>
+                                <span class="discountPrice tp_product_detail_price"><?= number_format($defaultVariant['price']) ?>đ</span>
+                            <?php endif; ?>
                         </div>
                         <input type="hidden" id="prdInfo" data-category="Thu Đông 1F" data-id="40768009"
                             data-name="Đầm sát nách dáng ôm dài buộc nơ" data-price="995,000">
@@ -158,31 +171,40 @@
                     <div class="attr">
                         <div class="colorPicker clearfix">
                             <label class="control-label options-title">Màu sắc: </label>
-                            <?php foreach ($colorAttribute['values'] as $value): ?>
-                                <p class="color req" column="i1">
-                                    <span class="itemColor">
-                                        <a rel="nofollow" href="javascript:"
-                                            data-cloudzoom="useZoom: '.cloudzoom', image: 'https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg', zoomImage: 'https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg'"
-                                            class="cloudzoom-gallery " value="1755477" title="<?= $value['value'] ?>"
-                                            data-pIds="40768010,40768011,40768012,40768013"
-                                            selid="40768010,40768011,40768012,40768013"
-                                            data-src="https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg"
-                                            style="background-color: <?= $value['color_code'] ?>">
-                                            <img
-                                                src="https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg"
-                                                alt="" />
-                                        </a>
-                                    </span>
-                                </p>
-                            <?php endforeach; ?>
+                            <?php if (isset($colorAttribute['values'])) : ?>
+                                <?php foreach ($colorAttribute['values'] as $value): ?>
+                                    <p class="color req" column="i1">
+                                        <span class="itemColor">
+                                            <a rel="nofollow" href="javascript:"
+                                                data-cloudzoom="useZoom: '.cloudzoom', image: 'https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg', zoomImage: 'https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg'"
+                                                class="cloudzoom-gallery " value="1755477" title="<?= $value['value'] ?>"
+                                                data-pIds="40768010,40768011,40768012,40768013"
+                                                selid="40768010,40768011,40768012,40768013"
+                                                data-src="https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg"
+                                                style="background-color: <?= $value['color_code'] ?>">
+                                                <img
+                                                    src="https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg"
+                                                    alt="" />
+                                            </a>
+                                        </span>
+                                    </p>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <p>Chưa có màu sắc</p>
+                            <?php endif; ?>
                         </div>
                         <div class="sizePicker clearfix">
                             <label class="control-label options-title">Size: </label>
-                            <?php foreach ($sizeAttribute['values'] as $value): ?>
-                                <p class="size req" column="i2">
-                                    <a value="1747441" href="javascript:void(0)" class=""><?= $value['value'] ?></a>
-                                </p>
-                            <?php endforeach; ?>
+                            <?php if (isset($sizeAttribute['values'])) : ?>
+
+                                <?php foreach ($sizeAttribute['values'] as $value): ?>
+                                    <p class="size req" column="i2">
+                                        <a value="1747441" href="javascript:void(0)" class=""><?= $value['value'] ?></a>
+                                    </p>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <p>Chưa có size</p>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="form-product">
