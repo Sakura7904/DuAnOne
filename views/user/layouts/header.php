@@ -2,7 +2,7 @@
     <div class="botHeader hidden-xs hidden-sm">
         <div class="container">
             <div class="logoHeader col-lg-1 col-md-1">
-                <a aria-label="logo" href="index.html">
+                <a aria-label="logo" href="?user=home">
                     <img width="77" height="48" alt="logo"
                         src="../assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
                 </a>
@@ -83,11 +83,36 @@
                     </div>
 
                 </div>
-                <div class="userBtn btnIcon">
-                    <a aria-label="signin" href="user/signin.html">
-                        <i class="far fa-user"></i>
-                    </a>
-                </div>
+
+                <?php if (isset($_SESSION['user'])): ?>
+                    <!-- Hiển thị khi đã đăng nhập -->
+                    <div class="userBtn btnIcon">
+                        <a aria-label="user" class="userBtnOpen" href="javascript:void(0)" title="<?= htmlspecialchars($_SESSION['user']['full_name']) ?>">
+                            <i class="far fa-user"></i>
+                        </a>
+                        <div class="userBox">
+                            <?php if ($_SESSION['user']['role'] === 'admin'): ?>
+                                <a href="?admin=dashboard">
+                                    Xin chào admin <?= htmlspecialchars($_SESSION['user']['full_name']) ?>
+                                </a>
+                            <?php endif; ?>
+                            <a aria-label="profile" href="?user=profile" title="<?= htmlspecialchars($_SESSION['user']['full_name']) ?>">
+                                Tài khoản của tôi
+                            </a>
+                            <a aria-label="logout" href="?user=logout">
+                                Đăng xuất
+                            </a>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <!-- Hiển thị khi chưa đăng nhập -->
+                    <div class="userBtn btnIcon">
+                        <a aria-label="?user=login" href="?user=login">
+                            <i class="far fa-user"></i>
+                        </a>
+                    </div>
+                <?php endif; ?>
+
             </div>
         </div>
     </div>
@@ -128,7 +153,7 @@
                 </div>
             </div>
             <div class="logoHeader col-xs-4 col-sm-4">
-                <a aria-label="logo" href="index.html">
+                <a aria-label="logo" href="?user=home">
                     <img alt="logo" src="../assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
                 </a>
             </div>
