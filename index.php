@@ -5,11 +5,12 @@ include "database/function.php";
 include "commons/helpers.php";
 
 
-if (isset($_GET['page'])) {
+if (isset($_GET['page']) && isset($_GET['admin'])) {
     $content = getContentPath();
     include "views/admin/master.php";
     exit();
 }
+
 
 // ========================= Controller admin =========================
 include "controllers/admin/DashboardController.php";
@@ -24,6 +25,7 @@ include "controllers/admin/ProductController.php";
 // ========================= Controller client =========================
 include "controllers/user/HomeController.php";
 include "controllers/user/DetailProductController.php";
+include "controllers/user/ProductByCategoryController.php";
 
 $admin = $_GET['admin'] ?? "";
 $user = $_GET['user'] ?? "";
@@ -95,6 +97,8 @@ if (!empty($user) || (empty($admin) && empty($user))) {
     match ($user) {
         'home' => (new HomeController())->home(),
         'detailProduct' => (new DetailProductController())->detailProduct(),
+        'productsByCategory' => (new ProductByCategoryController())->showByCategory(),
+
         default => die("Không tìm thấy file nào như thế cả!!!"),
     };
 }
