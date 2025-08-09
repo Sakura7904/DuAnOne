@@ -18,7 +18,7 @@ class HomeController
 
         // Lấy danh sách danh mục
         $categories = $productModel->getAllCategories();
-        $categories = $productModel->getCategoriesWithChildren();
+     
 
 
         $content = getContentPathClient('', 'home');

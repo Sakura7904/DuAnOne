@@ -98,7 +98,6 @@ if (!empty($user) || (empty($admin) && empty($user))) {
         'home' => (new HomeController())->home(),
         'detailProduct' => (new DetailProductController())->detailProduct(),
         'productsByCategory' => (new ProductByCategoryController())->showByCategory(),
-
         default => die("Không tìm thấy file nào như thế cả!!!"),
     };
 }

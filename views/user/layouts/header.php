@@ -1,8 +1,19 @@
+<?php
+// Guard để không văng lỗi khi $categories thiếu / sai định dạng
+if (!isset($categories) || !is_array($categories)) {
+    $categories = [];
+}
+function e($v)
+{
+    return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+}
+?>
 <header class="main_nav_header">
     <div class="botHeader hidden-xs hidden-sm">
         <div class="container">
+            
             <div class="logoHeader col-lg-1 col-md-1">
-                <a aria-label="logo" href="index.html">
+                <a aria-label="logo" href="index.php?user=home">
                     <img width="77" height="48" alt="logo"
                         src="../assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
                 </a>
@@ -12,22 +23,32 @@
 
                     <!-- Hiển thị menu cha (Trang phục nữ) và các danh mục con bên trong dropdown -->
                     <?php foreach ($categories as $cat): ?>
-                        <?php if ($cat['parent_id'] === null): ?>
+                        <?php
+                        $catId    = (int)($cat['id'] ?? 0);
+                        $catName  = $cat['name'] ?? '';
+                        $parentId = $cat['parent_id'] ?? null;
+                        ?>
+                        <?php if ($parentId === null): ?>
                             <li class="title_lv1">
                                 <a aria-label="menu" class="tp_menu_item"
-                                    href="index.php?user=productsByCategory&category_id=<?= $cat['id'] ?>"
-                                    title="<?= htmlspecialchars($cat['name']) ?>">
-                                    <?= htmlspecialchars(mb_strtoupper($cat['name'])) ?>
+                                    href="index.php?user=productsByCategory&category_id=<?= $catId ?>"
+                                    title="<?= e($catName) ?>">
+                                    <?= e(mb_strtoupper((string)$catName, 'UTF-8')) ?>
                                     <i class="fal fa-angle-down" aria-hidden="true"></i>
                                 </a>
                                 <ul class="mainChild levlup_2">
                                     <?php foreach ($categories as $sub): ?>
-                                        <?php if ($sub['parent_id'] == $cat['id']): ?>
+                                        <?php
+                                        $subId     = (int)($sub['id'] ?? 0);
+                                        $subName   = $sub['name'] ?? '';
+                                        $subParent = $sub['parent_id'] ?? null;
+                                        ?>
+                                        <?php if ($subParent == $catId): ?>
                                             <li class="title_lv2">
                                                 <a aria-label="menu"
-                                                    href="index.php?user=productsByCategory&category_id=<?= $sub['id'] ?>"
-                                                    title="<?= htmlspecialchars($sub['name']) ?>">
-                                                    <?= htmlspecialchars($sub['name']) ?>
+                                                    href="index.php?user=productsByCategory&category_id=<?= $subId ?>"
+                                                    title="<?= e($subName) ?>">
+                                                    <?= e($subName) ?>
                                                 </a>
                                             </li>
                                         <?php endif; ?>
@@ -37,14 +58,19 @@
                         <?php endif; ?>
                     <?php endforeach; ?>
 
-                    <!-- Vẫn hiển thị tất cả các danh mục con như menu độc lập -->
+                    <!-- Vẫn hiển thị tất cả các danh mục con như menu độc lập (GIỮ NGUYÊN LOGIC) -->
                     <?php foreach ($categories as $cat): ?>
-                        <?php if ($cat['parent_id'] != null): ?>
+                        <?php
+                        $catId    = (int)($cat['id'] ?? 0);
+                        $catName  = $cat['name'] ?? '';
+                        $parentId = $cat['parent_id'] ?? null;
+                        ?>
+                        <?php if ($parentId != null): ?>
                             <li class="title_lv1">
                                 <a aria-label="menu" class="tp_menu_item"
-                                    href="index.php?user=productsByCategory&category_id=<?= $cat['id'] ?>"
-                                    title="<?= htmlspecialchars($cat['name']) ?>">
-                                    <?= htmlspecialchars(mb_strtoupper($cat['name'])) ?>
+                                    href="index.php?user=productsByCategory&category_id=<?= $catId ?>"
+                                    title="<?= e($catName) ?>">
+                                    <?= e(mb_strtoupper((string)$catName, 'UTF-8')) ?>
                                 </a>
                             </li>
                         <?php endif; ?>
@@ -57,8 +83,7 @@
                 <div class="wishlistBtn btnIcon">
                     <a aria-label="wishlist" href="wishlist.html">
                         <i class="far fa-heart"></i>
-                        <span class="wishlistCount">
-                            0 </span>
+                        <span class="wishlistCount">0</span>
                     </a>
                 </div>
                 <div class="cartBtn btnIcon">
@@ -69,7 +94,6 @@
                     <div class="cartHeaderContent" style="display: none">
                         <div class="cartReload"></div>
                     </div>
-
                 </div>
                 <div class="userBtn btnIcon">
                     <a aria-label="signin" href="user/signin.html">
@@ -116,10 +140,11 @@
                 </div>
             </div>
             <div class="logoHeader col-xs-4 col-sm-4">
-                <a aria-label="logo" href="index.html">
+                <a aria-label="logo" href="index.php?user=home">
                     <img alt="logo" src="../assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
                 </a>
             </div>
+           
             <div class="iconRight col-xs-4 col-sm-4">
                 <div class="searchBtn btnIcon">
                     <a aria-label="searchmobile" class="openSearchMobile" href="javascript:void(0)"><i
@@ -128,8 +153,7 @@
                 <div class="wishlistBtn btnIcon">
                     <a aria-label="wishlist" href="wishlist.html">
                         <i class="far fa-heart"></i>
-                        <span class="wishlistCount">
-                            0 </span>
+                        <span class="wishlistCount">0</span>
                     </a>
                 </div>
                 <div class="cartBtn btnIcon">
@@ -155,7 +179,7 @@
             </form>
         </div>
         <div class="logoSearchBox">
-            <a aria-label="logosearch" href="index.html">
+            <a aria-label="logosearch" href="index.php?user=home">
                 <img alt="logo" src="../assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
             </a>
         </div>

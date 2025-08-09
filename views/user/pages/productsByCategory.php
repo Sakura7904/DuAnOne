@@ -4,13 +4,18 @@
     <div class="headCategory hidden-xs hidden-sm"
         style="background: linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url(https://pos.nvncdn.com/4ef0bf-108661/bn/20240701_6Xk1iXAr.gif);">
     </div>
-    <div class="wrapBoxSearch">
-        <form class="bigSearchBar" action="/search" method="get">
-            <input type="text" class="search-box" aria-label="Search" name="q" placeholder="Bạn muốn tìm sản phẩm gì ?">
-            <input class="hidden" name="rating" value="true">
-            <button type="submit" class="search__btn">Tìm kiếm ngay</button>
-        </form>
-    </div>
+<div class="wrapBoxSearch">
+  <form class="bigSearchBar" action="index.php" method="get">
+    <input type="hidden" name="user" value="productsByCategory">
+    <input type="hidden" name="category_id" value="<?= (int)($_GET['category_id'] ?? 0) ?>">
+    <input type="text" class="search-box" name="keyword"
+           placeholder="Bạn muốn tìm sản phẩm gì ?"
+           value="<?= htmlspecialchars($keyword ?? ($_GET['keyword'] ?? ''), ENT_QUOTES) ?>">
+    <button type="submit" class="search__btn">Tìm kiếm ngay</button>
+  </form>
+</div>
+
+
     <ul class="breadcrumbCate">
         <li><a href="index.php?user=home">Trang chủ</a></li>
         <li>

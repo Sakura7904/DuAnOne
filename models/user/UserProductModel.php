@@ -213,4 +213,48 @@ class UserProductModel
 
         return $tree;
     }
+   public function searchProduct(string $keyword, int $limit = 100, int $offset = 0): array
+{
+    $sql = "
+        SELECT 
+            p.id, 
+            p.name,
+            p.description,
+            p.category_id,
+            COALESCE(
+                p.image_thumbnail,
+                (
+                    SELECT v.image_url 
+                    FROM productvariants v 
+                    WHERE v.product_id = p.id 
+                      AND v.image_url IS NOT NULL 
+                      AND v.image_url <> '' 
+                    ORDER BY v.id ASC
+                    LIMIT 1
+                )
+            ) AS image_url,
+            (
+                SELECT MIN(v.price)
+                FROM productvariants v
+                WHERE v.product_id = p.id
+            ) AS price,
+            (
+                SELECT MIN(v.sale_price)
+                FROM productvariants v
+                WHERE v.product_id = p.id AND v.sale_price IS NOT NULL
+            ) AS sale_price,
+            p.created_at
+        FROM products p
+        WHERE p.name LIKE :kw
+        ORDER BY p.created_at DESC
+        LIMIT :limit OFFSET :offset
+    ";
+    $stmt = $this->db->pdo->prepare($sql);
+    $stmt->bindValue(':kw', '%' . trim($keyword) . '%', PDO::PARAM_STR);
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 }
