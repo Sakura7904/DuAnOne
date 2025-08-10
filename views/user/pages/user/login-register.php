@@ -241,3 +241,21 @@
             });
         });
     </script>
+
+    <?php if (isset($_SESSION['alert'])): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: '<?= $_SESSION['alert']['type'] ?>',
+                    title: '<?= $_SESSION['alert']['type'] == 'success' ? 'Thành công!' : ($_SESSION['alert']['type'] == 'error' ? 'Lỗi!' : 'Thông báo!') ?>',
+                    text: '<?= htmlspecialchars($_SESSION['alert']['message']) ?>',
+                    confirmButtonText: 'OK',
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            });
+        </script>
+    <?php
+        unset($_SESSION['alert']);
+    endif;
+    ?>
