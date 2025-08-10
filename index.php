@@ -5,12 +5,11 @@ include "database/function.php";
 include "commons/helpers.php";
 
 
-if (isset($_GET['page']) && isset($_GET['admin'])) {
+if (isset($_GET['page'])) {
     $content = getContentPath();
     include "views/admin/master.php";
     exit();
 }
-
 
 // ========================= Controller admin =========================
 include "controllers/admin/DashboardController.php";
@@ -25,10 +24,8 @@ include "controllers/admin/ProductController.php";
 // ========================= Controller client =========================
 include "controllers/user/HomeController.php";
 include "controllers/user/DetailProductController.php";
-include "controllers/user/ProductByCategoryController.php";
 include "controllers/user/AuthClientController.php";
 include "controllers/user/CartController.php";
-
 
 $admin = $_GET['admin'] ?? "";
 $user = $_GET['user'] ?? "";
@@ -106,9 +103,6 @@ if (!empty($user) || (empty($admin) && empty($user))) {
         'getSizesByColor' => (new DetailProductController())->getSizesByColor(),
         'getVariantByColorAndSize' => (new DetailProductController())->getVariantByColorAndSize(),
 
-        // ===== Trang sản phẩm theo danh mục =====
-        'productsByCategory' => (new ProductByCategoryController())->showByCategory(),
-
         // ===== Trang đăng ký đăng nhập =====
         'login' => (new AuthClientController())->login(),
         'handleLogin' => (new AuthClientController())->handleLogin(),
@@ -130,7 +124,6 @@ if (!empty($user) || (empty($admin) && empty($user))) {
 
 
         // ===== Mặc định không tìm thấy =====
-
         default => die("Không tìm thấy file nào như thế cả!!!"),
     };
 }

@@ -34,7 +34,14 @@
             <a aria-label="menu" href="ao-khoac-pc542082.html" title="ÁO KHOÁC" class=" current">
                 ÁO KHOÁC </a>
         </li>
-       
+        <li class="mobile_child">
+            <a aria-label="menu" href="lookbook-ac2153.html" title="LOOKBOOK" class=" current">
+                LOOKBOOK </a>
+        </li>
+        <li class="mobile_child">
+            <a aria-label="menu" href="campaign/4698/JASMINE-COLLECTION.html" title="BST MỚI" class=" current">
+                BST MỚI </a>
+        </li>
     </ul>
     <div class="mobileItem">
         <h5 class="mobileTitle">

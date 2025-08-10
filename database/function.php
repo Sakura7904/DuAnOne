@@ -52,13 +52,13 @@ function getContentPath($folder = '', $defaultPage = 'dashboard')
         return 'views/admin/pages/' . $page . '.php';
     }
 }
-function getContentPathClient($folder = '', $defaultPage = 'home') {
-    // Dùng 'view' hoặc 'file' hoặc tên mặc định thay vì 'page'
-    $view = $_GET['view'] ?? $defaultPage;
+function getContentPathClient($folder = '', $defaultPage = 'home')
+{
+    $page = isset($_GET['page']) ? $_GET['page'] : $defaultPage;
 
     if (!empty($folder)) {
-        return "views/user/pages/$folder/$view.php";
+        return 'views/user/pages/' . $folder . '/' . $page . '.php';
     } else {
-        return "views/user/pages/$view.php";
+        return 'views/user/pages/' . $page . '.php';
     }
 }

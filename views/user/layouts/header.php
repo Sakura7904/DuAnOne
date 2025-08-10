@@ -9,50 +9,62 @@
             </div>
             <div class="menuMain col-lg-9 col-md-9">
                 <ul class="tp_menu nav-navbar clearfix">
-
-                    <!-- Hiển thị menu cha (Trang phục nữ) và các danh mục con bên trong dropdown -->
-                    <?php foreach ($categories as $cat): ?>
-                        <?php if ($cat['parent_id'] === null): ?>
-                            <li class="title_lv1">
-                                <a aria-label="menu" class="tp_menu_item"
-                                    href="index.php?user=productsByCategory&category_id=<?= $cat['id'] ?>"
-                                    title="<?= htmlspecialchars($cat['name']) ?>">
-                                    <?= htmlspecialchars(mb_strtoupper($cat['name'])) ?>
-                                    <i class="fal fa-angle-down" aria-hidden="true"></i>
-                                </a>
-                                <ul class="mainChild levlup_2">
-                                    <?php foreach ($categories as $sub): ?>
-                                        <?php if ($sub['parent_id'] == $cat['id']): ?>
-                                            <li class="title_lv2">
-                                                <a aria-label="menu"
-                                                    href="index.php?user=productsByCategory&category_id=<?= $sub['id'] ?>"
-                                                    title="<?= htmlspecialchars($sub['name']) ?>">
-                                                    <?= htmlspecialchars($sub['name']) ?>
-                                                </a>
-                                            </li>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                </ul>
+                    <li class="title_lv1">
+                        <a aria-label="menu" class="tp_menu_item style_32323"
+                            href="khOi-nguOn-thanh-lIch-(-web)-pm128511.html" title="SALE CHÀO HÈ">
+                            SALE CHÀO HÈ
+                            <i class="fal fa-angle-down" aria-hidden="true"></i>
+                            <span class="saleTick">Sale</span>
+                        </a>
+                        <ul class="mainChild levlup_2">
+                            <li class="title_lv2">
+                                <a aria-label="menu" href="khOi-nguOn-thanh-lIch-(-web)-pm128511.html"
+                                    title="Khuyến mại theo từng sản phẩm">Khuyến mại theo từng sản phẩm</a>
                             </li>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-
-                    <!-- Vẫn hiển thị tất cả các danh mục con như menu độc lập -->
-                    <?php foreach ($categories as $cat): ?>
-                        <?php if ($cat['parent_id'] != null): ?>
-                            <li class="title_lv1">
-                                <a aria-label="menu" class="tp_menu_item"
-                                    href="index.php?user=productsByCategory&category_id=<?= $cat['id'] ?>"
-                                    title="<?= htmlspecialchars($cat['name']) ?>">
-                                    <?= htmlspecialchars(mb_strtoupper($cat['name'])) ?>
-                                </a>
-                            </li>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-
+                        </ul>
+                    </li>
+                    <li class="title_lv1">
+                        <a aria-label="menu" class="tp_menu_item style_32261" href="dam-pc542064.html" title="ĐẦM">
+                            ĐẦM
+                        </a>
+                    </li>
+                    <li class="title_lv1">
+                        <a aria-label="menu" class="tp_menu_item style_32268" href="ao-pc542071.html" title="ÁO">
+                            ÁO
+                        </a>
+                    </li>
+                    <li class="title_lv1">
+                        <a aria-label="menu" class="tp_menu_item style_32269" href="quan-pc542075.html"
+                            title="QUẦN">
+                            QUẦN
+                        </a>
+                    </li>
+                    <li class="title_lv1">
+                        <a aria-label="menu" class="tp_menu_item style_32270" href="chan-vay-pc542079.html"
+                            title="CHÂN VÁY">
+                            CHÂN VÁY
+                        </a>
+                    </li>
+                    <li class="title_lv1">
+                        <a aria-label="menu" class="tp_menu_item style_32271" href="ao-khoac-pc542082.html"
+                            title="ÁO KHOÁC">
+                            ÁO KHOÁC
+                        </a>
+                    </li>
+                    <li class="title_lv1">
+                        <a aria-label="menu" class="tp_menu_item style_2153" href="lookbook-ac2153.html"
+                            title="LOOKBOOK">
+                            LOOKBOOK
+                        </a>
+                    </li>
+                    <li class="title_lv1">
+                        <a aria-label="menu" class="tp_menu_item style_57707"
+                            href="campaign/4698/JASMINE-COLLECTION.html" title="BST MỚI">
+                            BST MỚI
+                        </a>
+                    </li>
                 </ul>
             </div>
-
             <div class="iconHeader col-lg-2 col-md-2">
                 <div class="wishlistBtn btnIcon">
                     <a aria-label="wishlist" href="wishlist.html">
