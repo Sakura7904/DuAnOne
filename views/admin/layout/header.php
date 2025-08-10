@@ -2,30 +2,13 @@
     <input class="input w-full bg-transparent outline-none pl-2 h-5 text-gray-300 focus:!outline-none placeholder:text-gray-300 dark:placeholder:text-gray-dark-300 placeholder:font-semibold" type="text" placeholder="Search"><img src="./assets/admin/assets/images/icons/icon-microphone-2.svg" alt="microphone icon">
 </div>
 <div class="dropdown">
-    <label class="cursor-pointer dropdown-label flex items-center justify-between w-[142px]" tabindex="0">
-        <div class="items-center justify-center hidden rounded-lg border border-neutral dark:border-dark-neutral-border gap-x-[10px] px-[18px] py-[11px] sm:flex">
-            <div class="flex items-center gap-[11px]"><img src="./assets/admin/assets/images/icons/icon-export.svg" alt="export icon"><span class="text-normal font-semibold text-gray-500 dark:text-gray-dark-500">Browse</span></div><img src="./assets/admin/assets/images/icons/icon-arrow-down.svg" alt="down icon">
-        </div>
-    </label>
-    <ul class="dropdown-content" tabindex="0">
-        <div class="relative menu rounded-box dropdown-shadow min-w-[237px] mt-[25px] md:mt-[48px] p-[25px] pb-[10px] bg-color-brands">
-            <div class="border-solid border-b-8 border-x-transparent border-x-8 border-t-0 absolute w-[14px] top-[-7px] border-b-color-brands"></div>
-            <li class="text-normal p-[15px] pl-[21px]"><a class="flex items-center bg-transparent p-0 gap-[7px]" href="#"> <i class="w-4 h-4 grid place-items-center"><img src="./assets/admin/assets/images/icons/icon-verify.svg" alt="icon"></i><span class="text-white hover:text-[#C6CBD9]">All Brands</span></a>
-            </li>
-            <li class="text-normal p-[15px] pl-[21px]"><a class="flex items-center bg-transparent p-0 gap-[7px]" href="#"> <i class="w-4 h-4 grid place-items-center"><img src="./assets/admin/assets/images/icons/icon-verify.svg" alt="icon"></i><span class="text-white hover:text-[#C6CBD9]">News Reviews</span></a>
-            </li>
-            <li class="text-normal p-[15px] pl-[21px]"><a class="flex items-center bg-transparent p-0 gap-[7px]" href="#"> <i class="w-4 h-4 grid place-items-center"><img src="./assets/admin/assets/images/icons/icon-verify.svg" alt="icon"></i><span class="text-white hover:text-[#C6CBD9]">Financial report</span></a>
-            </li>
-            <li class="text-normal p-[15px] pl-[21px]"><a class="flex items-center bg-transparent p-0 gap-[7px]" href="#"> <i class="w-4 h-4 grid place-items-center"><img src="./assets/admin/assets/images/icons/icon-verify.svg" alt="icon"></i><span class="text-white hover:text-[#C6CBD9]">Shipping</span></a>
-            </li>
-            <li class="text-normal p-[15px] pl-[21px]"><a class="flex items-center bg-transparent p-0 gap-[7px]" href="#"> <i class="w-4 h-4 grid place-items-center"><img src="./assets/admin/assets/images/icons/icon-verify.svg" alt="icon"></i><span class="text-white hover:text-[#C6CBD9]">View Catalog</span></a>
-            </li>
-            <li class="text-normal p-[15px] pl-[21px]"><a class="flex items-center bg-transparent p-0 gap-[7px]" href="#"> <i class="w-4 h-4 grid place-items-center"><img src="./assets/admin/assets/images/icons/icon-verify.svg" alt="icon"></i><span class="text-white hover:text-[#C6CBD9]">Revenue report</span></a>
-            </li>
-            <li class="text-normal p-[15px] pl-[21px]"><a class="flex items-center bg-transparent p-0 gap-[7px]" href="#"> <i class="w-4 h-4 grid place-items-center"><img src="./assets/admin/assets/images/icons/icon-verify.svg" alt="icon"></i><span class="text-white hover:text-[#C6CBD9]">Refund requests</span></a>
-            </li>
-        </div>
-    </ul>
+    <a href="?user=home">
+        <label class="cursor-pointer dropdown-label flex items-center justify-between w-[142px]" tabindex="0">
+            <div class="items-center justify-center hidden rounded-lg border border-neutral dark:border-dark-neutral-border gap-x-[10px] px-[18px] py-[11px] sm:flex">
+                <div class="flex items-center gap-[11px]"><img src="./assets/admin/assets/images/icons/icon-export.svg" alt="export icon"><span class="text-normal font-semibold text-gray-500 dark:text-gray-dark-500">Trang client</span></div>
+            </div>
+        </label>
+    </a>
 </div>
 <div class="flex items-center order-2 user-noti gap-[30px] xl:gap-[48px] lg:order-3 lg:mr-0">
     <div class="dropdown dropdown-end">
