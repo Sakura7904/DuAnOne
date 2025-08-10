@@ -128,7 +128,7 @@
                                 <a href="#box-rating" class="number-purchase">0 Nhận xét</a>
                             </div>
                         </div>
-                        <div class="price-box">
+                        <div class="price-box" id="priceDisplay">
                             <?php if ($defaultVariant['sale_price'] && $defaultVariant['sale_price'] > 0): ?>
                                 <span class="discountPrice tp_product_detail_price"><?= number_format($defaultVariant['sale_price']) ?>đ</span>
                                 <del class="product-price-old tp_product_detail_price_old"><?= number_format($defaultVariant['price']) ?>đ</del>
@@ -137,7 +137,8 @@
                             <?php endif; ?>
                         </div>
                         <input type="hidden" id="prdInfo" data-category="Thu Đông 1F" data-id="40768009"
-                            data-name="Đầm sát nách dáng ôm dài buộc nơ" data-price="995,000">
+                            data-name="Đầm sát nách dáng ôm dài buộc nơ"
+                            data-price="<?= $defaultVariant['sale_price'] && $defaultVariant['sale_price'] > 0 ? number_format($defaultVariant['sale_price']) : number_format($defaultVariant['price']) ?>">
 
                     </div>
                     <div id="script-general-container"></div>
@@ -168,7 +169,9 @@
                         }
                     }
                     ?>
+
                     <div class="attr">
+                        <!-- Chọn màu sắc -->
                         <div class="colorPicker clearfix">
                             <label class="control-label options-title">Màu sắc: </label>
                             <?php if (isset($colorAttribute['values'])) : ?>
@@ -176,15 +179,11 @@
                                     <p class="color req" column="i1">
                                         <span class="itemColor">
                                             <a rel="nofollow" href="javascript:"
-                                                data-cloudzoom="useZoom: '.cloudzoom', image: 'https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg', zoomImage: 'https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg'"
-                                                class="cloudzoom-gallery " value="1755477" title="<?= $value['value'] ?>"
-                                                data-pIds="40768010,40768011,40768012,40768013"
-                                                selid="40768010,40768011,40768012,40768013"
-                                                data-src="https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg"
+                                                class="color-option-new"
+                                                data-color-value="<?= htmlspecialchars($value['value']) ?>"
+                                                title="<?= htmlspecialchars($value['value']) ?>"
                                                 style="background-color: <?= $value['color_code'] ?>">
-                                                <img
-                                                    src="https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg"
-                                                    alt="" />
+                                                <img src="https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg" alt="" />
                                             </a>
                                         </span>
                                     </p>
@@ -193,20 +192,25 @@
                                 <p>Chưa có màu sắc</p>
                             <?php endif; ?>
                         </div>
-                        <div class="sizePicker clearfix">
-                            <label class="control-label options-title">Size: </label>
-                            <?php if (isset($sizeAttribute['values'])) : ?>
 
-                                <?php foreach ($sizeAttribute['values'] as $value): ?>
-                                    <p class="size req" column="i2">
-                                        <a value="1747441" href="javascript:void(0)" class=""><?= $value['value'] ?></a>
-                                    </p>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <p>Chưa có size</p>
-                            <?php endif; ?>
+                        <!-- Chọn size (ẩn ban đầu) -->
+                        <div class="sizePicker clearfix" id="sizeSection" style="display: none;">
+                            <label class="control-label options-title">Size: </label>
+                            <div id="sizeContainer" class="size-options-inline">
+                                <!-- Size sẽ được load bằng JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Hiển thị số lượng tồn kho (ẩn ban đầu) -->
+                        <div class="stockInfo clearfix" id="stockSection" style="display: none;">
+                            <label class="control-label options-title">Còn: </label>
+                            <div id="stockContainer" class="stock-options-inline">
+                                <!-- Số lượng tồn kho sẽ được hiển thị ở đây -->
+                            </div>
                         </div>
                     </div>
+
+
                     <div class="form-product">
                         <div class="clearfix form-group">
                             <div class="qty-ant clearfix custom-btn-number">
@@ -467,3 +471,317 @@
             </div>
         </div>
 </section>
+
+<script>
+    let selectedColor = null;
+    let selectedSize = null;
+    let currentProductId = <?= $product['id'] ?>;
+
+    // Xử lý chọn màu
+    document.querySelectorAll('.color-option-new').forEach(colorOption => {
+        colorOption.addEventListener('click', function() {
+            // Reset trạng thái
+            selectedColor = this.dataset.colorValue;
+            selectedSize = null;
+
+            // Cập nhật UI màu được chọn
+            document.querySelectorAll('.color-option-new').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            this.classList.add('selected');
+
+            // Ẩn section size và stock
+            document.getElementById('sizeSection').style.display = 'none';
+            document.getElementById('stockSection').style.display = 'none';
+
+            // Load size theo màu đã chọn
+            loadSizesByColor(selectedColor);
+        });
+    });
+
+    // Hàm load size theo màu
+    function loadSizesByColor(colorValue) {
+        fetch('?user=getSizesByColor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    product_id: currentProductId,
+                    color_value: colorValue
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.sizes.length > 0) {
+                    displaySizes(data.sizes);
+                    document.getElementById('sizeSection').style.display = 'block';
+                } else {
+                    alert('Màu này hiện tại không có size nào có sẵn');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi load size:', error);
+            });
+    }
+
+    // Hiển thị sizes
+    function displaySizes(sizes) {
+        const sizeContainer = document.getElementById('sizeContainer');
+        sizeContainer.innerHTML = '';
+
+        sizes.forEach(size => {
+            const sizeElement = document.createElement('p');
+            sizeElement.className = 'size req';
+            sizeElement.innerHTML = `
+            <a href="javascript:void(0)" 
+               class="size-option-new" 
+               data-size-value="${size.size_value}"
+               data-variant-id="${size.variant_id}">
+                ${size.size_value}
+            </a>
+        `;
+            sizeContainer.appendChild(sizeElement);
+        });
+
+        // Gắn event cho các size options
+        document.querySelectorAll('.size-option-new').forEach(sizeOption => {
+            sizeOption.addEventListener('click', function() {
+                selectedSize = this.dataset.sizeValue;
+
+                // Cập nhật UI size được chọn
+                document.querySelectorAll('.size-option-new').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+
+                // Load thông tin tồn kho
+                loadStockInfo(selectedColor, selectedSize);
+            });
+        });
+    }
+
+    // Hàm load thông tin tồn kho
+    function loadStockInfo(colorValue, sizeValue) {
+        fetch('?user=getVariantByColorAndSize', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    product_id: currentProductId,
+                    color_value: colorValue,
+                    size_value: sizeValue
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayStockInfo(data.variant, data.quantity);
+                    document.getElementById('stockSection').style.display = 'block';
+
+                    // Cập nhật variant hiện tại để có thể thêm vào giỏ hàng
+                    currentVariant = data.variant;
+
+                    // Cập nhật giá
+                    updatePriceDisplay(data.variant);
+                } else {
+                    alert('Không tìm thấy sản phẩm với màu và size này');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi load thông tin tồn kho:', error);
+            });
+    }
+
+    // Hiển thị thông tin tồn kho
+    function displayStockInfo(variant, quantity) {
+        const stockContainer = document.getElementById('stockContainer');
+
+        if (quantity > 0) {
+            stockContainer.innerHTML = `
+            <p class="stock-info text-success">
+                <strong>${quantity} sản phẩm</strong> có sẵn
+            </p>
+        `;
+
+            // Enable nút thêm vào giỏ hàng
+            const addToCartBtn = document.querySelector('.add-to-cart-btn');
+            if (addToCartBtn) {
+                addToCartBtn.disabled = false;
+                addToCartBtn.textContent = 'Thêm vào giỏ hàng';
+            }
+        } else {
+            stockContainer.innerHTML = `
+            <p class="stock-info text-danger">
+                <strong>Hết hàng</strong>
+            </p>
+        `;
+
+            // Disable nút thêm vào giỏ hàng
+            const addToCartBtn = document.querySelector('.add-to-cart-btn');
+            if (addToCartBtn) {
+                addToCartBtn.disabled = true;
+                addToCartBtn.textContent = 'Hết hàng';
+            }
+        }
+    }
+
+    // Cập nhật hiển thị giá
+    function updatePriceDisplay(variant) {
+        const priceDisplay = document.getElementById('priceDisplay');
+
+        if (variant.sale_price && variant.sale_price > 0) {
+            priceDisplay.innerHTML = `
+            <span class="discountPrice tp_product_detail_price">${parseInt(variant.sale_price).toLocaleString()}đ</span>
+            <del class="product-price-old tp_product_detail_price_old">${parseInt(variant.price).toLocaleString()}đ</del>
+        `;
+        } else {
+            priceDisplay.innerHTML = `
+            <span class="normalPrice tp_product_detail_price">${parseInt(variant.price).toLocaleString()}đ</span>
+        `;
+        }
+    }
+</script>
+
+<script>
+    // Cập nhật hiển thị giá - sửa lại
+    function updatePriceDisplay(variant) {
+        const priceDisplay = document.querySelector('.price-box'); // Thay đổi selector
+
+        if (variant.sale_price && variant.sale_price > 0) {
+            priceDisplay.innerHTML = `
+            <span class="discountPrice tp_product_detail_price">${parseInt(variant.sale_price).toLocaleString()}đ</span>
+            <del class="product-price-old tp_product_detail_price_old">${parseInt(variant.price).toLocaleString()}đ</del>
+        `;
+        } else {
+            priceDisplay.innerHTML = `
+            <span class="discountPrice tp_product_detail_price">${parseInt(variant.price).toLocaleString()}đ</span>
+        `;
+        }
+
+        // Cập nhật thông tin hidden input nếu cần
+        const prdInfoInput = document.getElementById('prdInfo');
+        if (prdInfoInput) {
+            const displayPrice = variant.sale_price && variant.sale_price > 0 ? variant.sale_price : variant.price;
+            prdInfoInput.setAttribute('data-price', parseInt(displayPrice).toLocaleString());
+        }
+    }
+
+    // Hàm load thông tin tồn kho - đã sửa
+    function loadStockInfo(colorValue, sizeValue) {
+        fetch('?user=getVariantByColorAndSize', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    product_id: currentProductId,
+                    color_value: colorValue,
+                    size_value: sizeValue
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Cập nhật variant hiện tại
+                    currentVariant = data.variant;
+
+                    // Cập nhật giá TRƯỚC khi hiển thị stock info
+                    updatePriceDisplay(data.variant);
+
+                    // Hiển thị thông tin tồn kho
+                    displayStockInfo(data.variant, data.quantity);
+                    document.getElementById('stockSection').style.display = 'block';
+
+                    // Cập nhật input quantity max
+                    const quantityInput = document.getElementById('quantity');
+                    if (quantityInput) {
+                        quantityInput.max = data.quantity;
+                        // Reset quantity về 1 nếu vượt quá số lượng có sẵn
+                        if (parseInt(quantityInput.value) > data.quantity) {
+                            quantityInput.value = Math.min(1, data.quantity);
+                        }
+                    }
+
+                } else {
+                    alert('Không tìm thấy sản phẩm với màu và size này');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi load thông tin tồn kho:', error);
+            });
+    }
+</script>
+
+<style>
+    /* Style để size giống hệt màu sắc */
+    .size-options-inline,
+    .stock-options-inline {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    /* Style cho màu sắc được chọn - border đỏ */
+    .color-option-new {
+        border: 2px solid transparent;
+        /* Border trong suốt ban đầu */
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+
+    .color-option-new.selected {
+        border: 3px solid #e74c3c !important;
+        /* Border đỏ khi được chọn */
+        box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+        /* Shadow đỏ nhẹ */
+        transform: scale(1.05);
+        /* Phóng to nhẹ */
+    }
+
+    .color-option-new:hover {
+        border-color: #c0392b;
+        /* Border đỏ đậm khi hover */
+    }
+
+    /* Đảm bảo màu sắc trong itemColor cũng có border đỏ */
+    .itemColor .color-option-new.selected {
+        border: 3px solid #e74c3c !important;
+    }
+
+    /* Style cho size được chọn - border đỏ */
+    .size-option-new {
+        display: inline-block;
+        padding: 8px 16px;
+        border: 2px solid #ddd;
+        /* Border xám ban đầu */
+        border-radius: 4px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        background-color: white;
+        color: #333;
+        min-width: 45px;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    .size-option-new:hover {
+        border-color: #c0392b;
+        /* Border đỏ đậm khi hover */
+        background-color: #f8f9fa;
+        text-decoration: none;
+    }
+
+    .size-option-new.selected {
+        background-color: #fff5f5 !important;
+        /* Nền hồng nhẹ */
+        color: #e74c3c !important;
+        /* Chữ đỏ */
+        border: 3px solid #e74c3c !important;
+        /* Border đỏ */
+        box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.15);
+        /* Shadow đỏ nhẹ */
+        font-weight: 600;
+    }
+</style>

@@ -99,6 +99,8 @@ if (!empty($user) || (empty($admin) && empty($user))) {
 
         // ===== Trang chi tiết sản =====
         'detailProduct' => (new DetailProductController())->detailProduct(),
+        'getSizesByColor' => (new DetailProductController())->getSizesByColor(),
+        'getVariantByColorAndSize' => (new DetailProductController())->getVariantByColorAndSize(),
 
         // ===== Trang đăng ký đăng nhập =====
         'login' => (new AuthClientController())->login(),

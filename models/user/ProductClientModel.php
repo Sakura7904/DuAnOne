@@ -401,4 +401,64 @@ class ProductClientModel
 
         return $stmt->execute();
     }
+
+    /**
+     * Lấy các size có sẵn của một màu cụ thể
+     */
+    public function getSizesByColor($productId, $colorValue)
+    {
+        $sql = "SELECT DISTINCT 
+                   size_av.value as size_value,
+                   size_av.id as size_value_id,
+                   pv.id as variant_id,
+                   pv.quantity
+            FROM productvariants pv
+            JOIN productvariantvalues pvv_color ON pv.id = pvv_color.variant_id
+            JOIN attributevalues color_av ON pvv_color.value_id = color_av.id
+            JOIN attributes color_attr ON color_av.attribute_id = color_attr.id
+            JOIN productvariantvalues pvv_size ON pv.id = pvv_size.variant_id
+            JOIN attributevalues size_av ON pvv_size.value_id = size_av.id
+            JOIN attributes size_attr ON size_av.attribute_id = size_attr.id
+            WHERE pv.product_id = :product_id
+            AND LOWER(color_attr.name) IN ('color', 'màu', 'màu sắc', 'mau', 'mau sac')
+            AND color_av.value = :color_value
+            AND LOWER(size_attr.name) IN ('size', 'kích thước', 'kich thuoc', 'kích cỡ', 'kich co')
+            ORDER BY size_av.id";
+
+        $stmt = $this->db->pdo->prepare($sql);
+        $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
+        $stmt->bindParam(':color_value', $colorValue, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Lấy thông tin variant và số lượng tồn kho theo màu và size
+     */
+    public function getVariantByColorAndSize($productId, $colorValue, $sizeValue)
+    {
+        $sql = "SELECT pv.*
+            FROM productvariants pv
+            JOIN productvariantvalues pvv_color ON pv.id = pvv_color.variant_id
+            JOIN attributevalues color_av ON pvv_color.value_id = color_av.id
+            JOIN attributes color_attr ON color_av.attribute_id = color_attr.id
+            JOIN productvariantvalues pvv_size ON pv.id = pvv_size.variant_id
+            JOIN attributevalues size_av ON pvv_size.value_id = size_av.id
+            JOIN attributes size_attr ON size_av.attribute_id = size_attr.id
+            WHERE pv.product_id = :product_id
+            AND LOWER(color_attr.name) IN ('color', 'màu', 'màu sắc', 'mau', 'mau sac')
+            AND color_av.value = :color_value
+            AND LOWER(size_attr.name) IN ('size', 'kích thước', 'kich thuoc', 'kích cỡ', 'kich co')
+            AND size_av.value = :size_value
+            LIMIT 1";
+
+        $stmt = $this->db->pdo->prepare($sql);
+        $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
+        $stmt->bindParam(':color_value', $colorValue, PDO::PARAM_STR);
+        $stmt->bindParam(':size_value', $sizeValue, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }

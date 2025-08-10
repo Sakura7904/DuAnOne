@@ -80,4 +80,56 @@ class DetailProductController
             'userId' => $userId
         ]);
     }
+
+    /**
+     * API lấy size theo màu đã chọn
+     */
+    public function getSizesByColor()
+    {
+        header('Content-Type: application/json');
+
+        $productId = $_POST['product_id'] ?? null;
+        $colorValue = $_POST['color_value'] ?? null;
+
+        if (!$productId || !$colorValue) {
+            echo json_encode(['success' => false, 'message' => 'Thiếu thông tin']);
+            return;
+        }
+
+        $sizes = $this->productClientModel->getSizesByColor($productId, $colorValue);
+
+        echo json_encode([
+            'success' => true,
+            'sizes' => $sizes
+        ]);
+    }
+
+    /**
+     * API lấy thông tin variant và số lượng tồn kho theo màu và size
+     */
+    public function getVariantByColorAndSize()
+    {
+        header('Content-Type: application/json');
+
+        $productId = $_POST['product_id'] ?? null;
+        $colorValue = $_POST['color_value'] ?? null;
+        $sizeValue = $_POST['size_value'] ?? null;
+
+        if (!$productId || !$colorValue || !$sizeValue) {
+            echo json_encode(['success' => false, 'message' => 'Thiếu thông tin']);
+            return;
+        }
+
+        $variant = $this->productClientModel->getVariantByColorAndSize($productId, $colorValue, $sizeValue);
+
+        if ($variant) {
+            echo json_encode([
+                'success' => true,
+                'variant' => $variant,
+                'quantity' => $variant['quantity']
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Không tìm thấy sản phẩm']);
+        }
+    }
 }
