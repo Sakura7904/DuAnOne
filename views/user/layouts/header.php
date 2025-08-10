@@ -74,10 +74,14 @@
                     </a>
                 </div>
                 <div class="cartBtn btnIcon">
-                    <a aria-label="cart" class="cartBtnOpen" href="javascript:void(0)">
+                    <a aria-label="cart" class="cartBtnOpen" href="?user=cart">
                         <i class="far fa-shopping-bag"></i>
                         <span class="header__cart-count">0</span>
                     </a>
+                    <!-- <a aria-label="cart" class="cartBtnOpen" href="javascript:void(0)">
+                        <i class="far fa-shopping-bag"></i>
+                        <span class="header__cart-count">0</span>
+                    </a> -->
                     <div class="cartHeaderContent" style="display: none">
                         <div class="cartReload"></div>
                     </div>

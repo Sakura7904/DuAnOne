@@ -705,12 +705,23 @@
 
             if (!hidVariantId.value) {
                 e.preventDefault();
-                toast('Vui lòng chọn màu và size!');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Thiếu thông tin!',
+                    text: 'Vui lòng chọn màu và size!',
+                    confirmButtonText: 'OK'
+                });
                 return;
             }
+
             if (max && qty > max) {
                 e.preventDefault();
-                toast('Số lượng vượt quá tồn kho!');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Vượt quá tồn kho!',
+                    text: 'Số lượng bạn chọn vượt quá số lượng tồn kho.',
+                    confirmButtonText: 'OK'
+                });
                 return;
             }
             // OK -> submit: product_id, variant_id, color_value, size_value, stock_qty, quantity, variant_image
