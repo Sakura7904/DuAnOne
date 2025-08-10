@@ -126,12 +126,9 @@ if (!empty($user) || (empty($admin) && empty($user))) {
         // ===== Trang thanh toán =====
         'order'              => (new OrderController())->order(),
         'actCheckoutFromCart' => (new OrderController())->actCheckoutFromCart(),
-        'actCheckoutDirect'  => (new OrderController())->actCheckoutDirect(),
-        'actCancelOrder'     => (new OrderController())->actCancelOrder(),
-        'actUpdatePayment'   => (new OrderController())->actUpdatePayment(),
-        'actUpdateStatus'    => (new OrderController())->actUpdateStatus(),
-        'actAddWishlist'     => (new OrderController())->actAddWishlist(),
-        'actRemoveWishlist'  => (new OrderController())->actRemoveWishlist(),
+        // ===== Thanh toán MOMO=====
+        'actMomoReturn'   => (new OrderController())->actMomoReturn(),
+        'actMomoIPN'      => (new OrderController())->actMomoIPN(),
 
 
         // ===== Mặc định không tìm thấy =====
