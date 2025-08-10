@@ -255,81 +255,96 @@
             </div>
         </div>
 
- <div class="productSuggest-wrapper tp_product_detail_suggest boxItem" data-name="product">
-    <h2 class="titleBox">Những sản phẩm mới nhất</h2>
-    <div class="container-fluid">
-        <div class="productSuggest productList clearfix owl-carousel">
-            <?php foreach ($latestProducts as $product): ?>
-                <div class="productItem prd<?= htmlspecialchars($product['id']) ?>" data-id="<?= htmlspecialchars($product['id']) ?>">
-                    <div class="productImage">
-                        <a href="index.php?user=detailProduct&id=<?= htmlspecialchars($product['id']) ?>">
-                            <img loading="lazy"
-                                src="<?= htmlspecialchars($product['image_url']) ?>"
-                                alt="<?= htmlspecialchars($product['name']) ?>">
-                        </a>
-                        <?php if (!empty($product['sale_price']) && $product['price'] > 0): ?>
-                            <?php 
-                                $discount = round(100 - ($product['sale_price'] / $product['price'] * 100)); 
-                            ?>
-                            <span class="saleLabel">-<?= $discount ?>%</span>
-                        <?php endif; ?>
-                    </div>
+        <div class="productSuggest-wrapper tp_product_detail_suggest boxItem" data-name="product">
+            <h2 class="titleBox">Những sản phẩm mới nhất</h2>
+            <div class="container-fluid">
+                <div class="productSuggest productList clearfix owl-carousel">
+                    <?php foreach ($latestProducts as $product): ?>
+                        <div class="productItem prd<?= htmlspecialchars($product['id']) ?>" data-id="<?= htmlspecialchars($product['id']) ?>">
+                            <div class="productImage">
+                                <a href="index.php?user=detailProduct&id=<?= htmlspecialchars($product['id']) ?>">
+                                    <img loading="lazy"
+                                        src="<?= htmlspecialchars($product['image_url']) ?>"
+                                        alt="<?= htmlspecialchars($product['name']) ?>">
+                                </a>
+                                <?php if (!empty($product['sale_price']) && $product['price'] > 0): ?>
+                                    <?php
+                                    $discount = round(100 - ($product['sale_price'] / $product['price'] * 100));
+                                    ?>
+                                    <span class="saleLabel">-<?= $discount ?>%</span>
+                                <?php endif; ?>
+                            </div>
 
-                    <div class="productInfo">
-                        <a href="index.php?user=detailProduct&id=<?= htmlspecialchars($product['id']) ?>">
-                            <h4 class="productName tp_product_name">
-                                <?= htmlspecialchars($product['name']) ?>
-                            </h4>
-                        </a>
+                            <div class="productInfo">
+                                <a href="index.php?user=detailProduct&id=<?= htmlspecialchars($product['id']) ?>">
+                                    <h4 class="productName tp_product_name">
+                                        <?= htmlspecialchars($product['name']) ?>
+                                    </h4>
+                                </a>
 
-                        <div class="wrappMidInfo">
-                            <div class="pro-color-selector">
-                                <div class="frameImageChilds">
-                                    <ul class="color-swatches text-center" data-hover="true" psId="<?= $product['id'] ?>">
-                                        <?php foreach ($product['colors'] as $color): ?>
-                                            <li class="color-item"
-                                            
-                                                value="<?= $color['variant_id'] ?>">
-                                                <span style="background-color: <?= htmlspecialchars($color['color_code']) ?>"></span>
-                                            </li>
-                                        <?php endforeach; ?>
-                                    </ul>
+                                <div class="wrappMidInfo">
+                                    <div class="pro-color-selector">
+                                        <div class="frameImageChilds">
+                                            <ul class="color-swatches text-center" data-hover="true" psId="<?= $product['id'] ?>">
+                                                <?php foreach ($product['colors'] as $color): ?>
+                                                    <li class="color-item"
+
+                                                        value="<?= $color['variant_id'] ?>">
+                                                        <span style="background-color: <?= htmlspecialchars($color['color_code']) ?>"></span>
+                                                    </li>
+                                                <?php endforeach; ?>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <a class="wishlistAdd wishlistItems" href="javascript:void(0)" data-id="<?= $product['id'] ?>">
+                                        <svg width="14px" height="14px" viewBox="0 0 15 12" version="1.1" class="wishlist-icon">
+                                            <!-- SVG icon here -->
+                                        </svg>
+                                    </a>
+                                </div>
+
+                                <div class="productPrice">
+                                    <?php if (!empty($product['sale_price'])): ?>
+                                        <span class="priceNew tp_product_price">
+                                            <?= number_format($product['sale_price'], 0, ',', '.') ?>đ
+                                        </span>
+                                        <del class="oldPrice tp_product_price_old">
+                                            <?= number_format($product['price'], 0, ',', '.') ?>đ
+                                        </del>
+                                    <?php else: ?>
+                                        <span class="priceNew tp_product_price">
+                                            <?= number_format($product['price'], 0, ',', '.') ?>đ
+                                        </span>
+                                    <?php endif; ?>
                                 </div>
                             </div>
-                            <a class="wishlistAdd wishlistItems" href="javascript:void(0)" data-id="<?= $product['id'] ?>">
-                                <svg width="14px" height="14px" viewBox="0 0 15 12" version="1.1" class="wishlist-icon">
-                                    <!-- SVG icon here -->
-                                </svg>
-                            </a>
-                        </div>
 
-                        <div class="productPrice">
-                            <?php if (!empty($product['sale_price'])): ?>
-                                <span class="priceNew tp_product_price">
-                                    <?= number_format($product['sale_price'], 0, ',', '.') ?>đ
-                                </span>
-                                <del class="oldPrice tp_product_price_old">
-                                    <?= number_format($product['price'], 0, ',', '.') ?>đ
-                                </del>
-                            <?php else: ?>
-                                <span class="priceNew tp_product_price">
-                                    <?= number_format($product['price'], 0, ',', '.') ?>đ
-                                </span>
-                            <?php endif; ?>
+                            <div class="hook-reviews">
+                                <span class="number-purchase">(322 đã bán)</span>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="hook-reviews">
-                        <span class="number-purchase">(322 đã bán)</span>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
-            <?php endforeach; ?>
+                <div id="flip"><span>Xem thêm <i class="far fa-angle-right"></i></span></div>
+            </div>
         </div>
-        <div id="flip"><span>Xem thêm <i class="far fa-angle-right"></i></span></div>
-    </div>
-</div>
-
-    
-        
     </div>
 </section>
+
+<?php if (isset($_SESSION['order_alert'])): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: '<?= $_SESSION['order_alert']['type'] ?>',
+                title: '<?= $_SESSION['order_alert']['type'] == 'success' ? 'Thành công!' : ($_SESSION['order_alert']['type'] == 'error' ? 'Lỗi!' : 'Thông báo!') ?>',
+                text: '<?= htmlspecialchars($_SESSION['order_alert']['message']) ?>',
+                confirmButtonText: 'OK',
+                timer: 3000,
+                timerProgressBar: true
+            });
+        });
+    </script>
+<?php
+    unset($_SESSION['order_alert']);
+endif;
+?>

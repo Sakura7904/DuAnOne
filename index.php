@@ -26,6 +26,7 @@ include "controllers/user/HomeController.php";
 include "controllers/user/DetailProductController.php";
 include "controllers/user/AuthClientController.php";
 include "controllers/user/CartController.php";
+include "controllers/user/OrderController.php";
 
 $admin = $_GET['admin'] ?? "";
 $user = $_GET['user'] ?? "";
@@ -121,6 +122,16 @@ if (!empty($user) || (empty($admin) && empty($user))) {
         'updateCartQuantity' => (new CartController())->updateCartQuantity(),
         'removeFromCart' => (new CartController())->removeFromCart(),
         'clearCart' => (new CartController())->clearCart(),
+
+        // ===== Trang thanh toán =====
+        'order'              => (new OrderController())->order(),
+        'actCheckoutFromCart' => (new OrderController())->actCheckoutFromCart(),
+        'actCheckoutDirect'  => (new OrderController())->actCheckoutDirect(),
+        'actCancelOrder'     => (new OrderController())->actCancelOrder(),
+        'actUpdatePayment'   => (new OrderController())->actUpdatePayment(),
+        'actUpdateStatus'    => (new OrderController())->actUpdateStatus(),
+        'actAddWishlist'     => (new OrderController())->actAddWishlist(),
+        'actRemoveWishlist'  => (new OrderController())->actRemoveWishlist(),
 
 
         // ===== Mặc định không tìm thấy =====

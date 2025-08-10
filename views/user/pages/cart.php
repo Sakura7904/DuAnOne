@@ -13,7 +13,7 @@
             </div>
             <ul class="breadcrumbCate">
                 <li>
-                    <a href="/">Trang chủ</a>
+                    <a href="?user=home">Trang chủ</a>
                 </li>
                 <li>
                     <a class="129976" href="/cart">Giỏ hàng</a>
@@ -210,7 +210,7 @@
 
                                     <?php if (!empty($cartItems)): ?>
                                         <div class="each-row">
-                                            <a class="btn-large btn-checkout" title="Tiến hành đặt hàng" href="?user=checkout">Tiến hành đặt hàng</a>
+                                            <a class="btn-large btn-checkout" title="Tiến hành đặt hàng" href="?user=order">Tiến hành đặt hàng</a>
                                             <a class="btn-large btn-buy" title="Mua thêm sản phẩm" href="?user=shop">Mua thêm sản phẩm</a>
                                         </div>
                                     <?php endif; ?>
