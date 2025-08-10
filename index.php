@@ -25,6 +25,7 @@ include "controllers/admin/ProductController.php";
 include "controllers/user/HomeController.php";
 include "controllers/user/DetailProductController.php";
 include "controllers/user/AuthClientController.php";
+include "controllers/user/CartController.php";
 
 $admin = $_GET['admin'] ?? "";
 $user = $_GET['user'] ?? "";
@@ -113,6 +114,14 @@ if (!empty($user) || (empty($admin) && empty($user))) {
         // ===== Trang profile =====
         'profile' => (new AuthClientController())->profile(),
         'handleUpdateProfile' => (new AuthClientController())->handleUpdateProfile(),
+
+        // ===== Trang cart =====
+        'cart' => (new CartController())->cart(),
+        'addToCart' => (new CartController())->addToCart(),
+        'updateCartQuantity' => (new CartController())->updateCartQuantity(),
+        'removeFromCart' => (new CartController())->removeFromCart(),
+        'clearCart' => (new CartController())->clearCart(),
+
 
         // ===== Mặc định không tìm thấy =====
         default => die("Không tìm thấy file nào như thế cả!!!"),

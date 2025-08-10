@@ -47,6 +47,7 @@
     <script defer type="text/javascript"
         src="https://web.nvnstatic.net/js/jquery/jquery.validationEngine-vi.js?v=4"></script>
     <script defer type="text/javascript" src="https://web.nvnstatic.net/tp/T0356/js/main.js?v=10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style type="text/css">
         .tp_banner_main {
             display: block !important
