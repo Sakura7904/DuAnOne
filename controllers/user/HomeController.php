@@ -13,10 +13,15 @@ class HomeController
             $product['colors'] = $productModel->getProductColors($product['id']);
         }
         unset($product);
+
+        // Lấy danh sách danh mục
+        $categories = $productModel->getAllCategories();
+        
         $content = getContentPathClient('', 'home');
         view('user/index', [
             'content' => $content,
-            'latestProducts' => $latestProducts
+            'latestProducts' => $latestProducts,
+            'categories' => $categories
         ]);
     }
 }

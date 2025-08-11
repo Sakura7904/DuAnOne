@@ -19,14 +19,14 @@ include "controllers/admin/AuthController.php";
 include "controllers/admin/AccountsController.php";
 include "controllers/admin/ProductController.php";
 
-
-
 // ========================= Controller client =========================
 include "controllers/user/HomeController.php";
 include "controllers/user/DetailProductController.php";
 include "controllers/user/AuthClientController.php";
 include "controllers/user/CartController.php";
 include "controllers/user/OrderController.php";
+include "controllers/user/PurchaseController.php";
+include "controllers/user/ProductByCategoryController.php";
 
 $admin = $_GET['admin'] ?? "";
 $user = $_GET['user'] ?? "";
@@ -98,6 +98,9 @@ if (!empty($user) || (empty($admin) && empty($user))) {
     match ($user) {
         // ===== Trang chủ =====
         'home' => (new HomeController())->home(),
+        
+        // ===== Trang sản phẩm the danh mục =====
+        'productsByCategory' => (new ProductByCategoryController())->showByCategory(),
 
         // ===== Trang chi tiết sản =====
         'detailProduct' => (new DetailProductController())->detailProduct(),
@@ -126,6 +129,7 @@ if (!empty($user) || (empty($admin) && empty($user))) {
         // ===== Trang thanh toán =====
         'order'              => (new OrderController())->order(),
         'actCheckoutFromCart' => (new OrderController())->actCheckoutFromCart(),
+
         // ===== Thanh toán MOMO=====
         'actMomoReturn'   => (new OrderController())->actMomoReturn(),
         'actMomoIPN'      => (new OrderController())->actMomoIPN(),
@@ -133,8 +137,9 @@ if (!empty($user) || (empty($admin) && empty($user))) {
         // ===== Trang thanh toán Stripe =====        
         'actStripeReturn'     => (new OrderController())->actStripeReturn(),
 
+        // ===== Trang đơn hàng =====        
+        'purchase'     => (new PurchaseController())->purchase(),
 
-        // ===== Mặc định không tìm thấy =====
         default => die("Không tìm thấy file nào như thế cả!!!"),
     };
 }
