@@ -13,7 +13,7 @@
             </ul>
             <p><a href="http://online.gov.vn/Home/WebDetails/64522?AspxAutoDetectCookieSupport=1"
                     target="_blank" rel="noreferrer noopener"><img class="image_resized" style="width:150px;"
-                        src="../assets/users/pos.nvncdn.com/4ef0bf-108661/contentKey/20230317_6VOgJAwz.png"
+                        src="./assets/users/pos.nvncdn.com/4ef0bf-108661/contentKey/20230317_6VOgJAwz.png"
                         alt="20230317_6VOgJAwz.png" /></a></p>
         </div>
     </div>
@@ -25,7 +25,7 @@
                 <li class="socialItem facebookIcon">
                     <a aria-label="facebook" title="Facebook" href="https://www.facebook.com/jm.com.vn">
                         <img width="10" height="10" loading="lazy"
-                            src="../assets/users/web.nvnstatic.net/tp/T0356/img/facebookc164.png?v=9">
+                            src="./assets/users/web.nvnstatic.net/tp/T0356/img/facebookc164.png?v=9">
                         <span>Facebook</span>
                     </a>
                 </li>
@@ -45,7 +45,7 @@
                 <li class="socialItem gmailIcon">
                     <a aria-label="gmail" title="Gmail" href="#">
                         <img width="10" height="7" loading="lazy"
-                            src="../assets/users/web.nvnstatic.net/tp/T0356/img/gmailc164.png?v=9">
+                            src="./assets/users/web.nvnstatic.net/tp/T0356/img/gmailc164.png?v=9">
                         <span>Email: marketing@jm.com.vn</span>
                     </a>
                 </li>
@@ -89,7 +89,7 @@
             <span>Chúng tôi nhận thanh toán qua:</span>
             <div class="listMethod">
                 <img width="30" height="19" loading="lazy"
-                    src="../assets/users/web.nvnstatic.net/img/logo-vnpay30f4.png?v=3">
+                    src="./assets/users/web.nvnstatic.net/img/logo-vnpay30f4.png?v=3">
             </div>
         </div>
     </div>

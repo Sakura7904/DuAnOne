@@ -15,7 +15,7 @@ function e($v)
             <div class="logoHeader col-lg-1 col-md-1">
                 <a aria-label="logo" href="index.php?user=home">
                     <img width="77" height="48" alt="logo"
-                        src="../assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
+                        src="./assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
                 </a>
             </div>
             <div class="menuMain col-lg-9 col-md-9">
@@ -108,19 +108,19 @@ function e($v)
             <ul>
                 <li>
                     <a aria-label="policy" href="he-thong-cua-hang.html">
-                        <img src="../assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20220217_DbZC1P3EtEQCzjezvBFKNdfn.png">
+                        <img src="./assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20220217_DbZC1P3EtEQCzjezvBFKNdfn.png">
                         <span>Hệ thống cửa hàng</span>
                     </a>
                 </li>
                 <li>
                     <a aria-label="policy" href="chinh-sach-van-chuyen-n93684.html">
-                        <img src="../assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20220217_zI3LVzaVQ2ecO28wILTulXo0.png">
+                        <img src="./assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20220217_zI3LVzaVQ2ecO28wILTulXo0.png">
                         <span>Thông tin vận chuyển</span>
                     </a>
                 </li>
                 <li>
                     <a aria-label="policy" href="chuong-trinh-tich-diem-n93679.html">
-                        <img src="../assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20220217_6vuovyS0B4AEqbNDogOFTiB2.png">
+                        <img src="./assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20220217_6vuovyS0B4AEqbNDogOFTiB2.png">
                         <span>Chính sách tích điểm</span>
                     </a>
                 </li>
@@ -141,7 +141,7 @@ function e($v)
             </div>
             <div class="logoHeader col-xs-4 col-sm-4">
                 <a aria-label="logo" href="index.php?user=home">
-                    <img alt="logo" src="../assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
+                    <img alt="logo" src="./assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
                 </a>
             </div>
            
@@ -180,7 +180,7 @@ function e($v)
         </div>
         <div class="logoSearchBox">
             <a aria-label="logosearch" href="index.php?user=home">
-                <img alt="logo" src="../assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
+                <img alt="logo" src="./assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
             </a>
         </div>
     </div>
