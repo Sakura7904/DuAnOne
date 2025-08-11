@@ -15,14 +15,13 @@ class CategoriesController
     /* ======================= UPLOAD ẢNH DANH MỤC ======================= */
     /**
      * Xử lý upload ảnh cho category
-     * @param array $file       Mảng $_FILES['image']
-     * @param ?string $oldPath  Đường dẫn ảnh cũ (URL tương đối) để xóa khi cập nhật
-     * @return ?string          URL tương đối để lưu DB (vd: /images/categories/abc.jpg)
-     * @throws RuntimeException Khi upload lỗi / file không hợp lệ
+     * @param array        $file     Mảng $_FILES['image']
+     * @param string|null  $oldPath  URL ảnh cũ (vd: /images/categories/abc.jpg) để xoá khi cập nhật
+     * @return string|null           URL public để lưu DB (vd: /images/categories/abc.jpg) hoặc null
      */
     private function handleImageUpload(array $file, ?string $oldPath = null): ?string
     {
-        // Không chọn file -> giữ nguyên ảnh cũ (có thể là null)
+        // Không chọn file -> giữ nguyên ảnh cũ
         if (empty($file['name']) || ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
             return $oldPath;
         }
@@ -31,7 +30,7 @@ class CategoriesController
             throw new RuntimeException('Upload lỗi: ' . $file['error']);
         }
 
-        // Giới hạn kích thước 2MB
+        // Giới hạn 2MB
         if ($file['size'] > 2 * 1024 * 1024) {
             throw new RuntimeException('Ảnh quá lớn (tối đa 2MB).');
         }
@@ -39,44 +38,36 @@ class CategoriesController
         // Xác thực MIME thực sự
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mime  = $finfo->file($file['tmp_name']);
-        $allowed = [
-            'image/jpeg' => 'jpg',
-            'image/png'  => 'png',
-            'image/webp' => 'webp',
-        ];
+        $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
         if (!isset($allowed[$mime])) {
             throw new RuntimeException('Chỉ chấp nhận JPG/PNG/WebP.');
         }
 
-        // Thư mục đích (tương đối từ gốc project)
-        $uploadDir = 'images/categories';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0775, true);
+        // Thư mục vật lý để lưu (theo DocumentRoot của domain)
+        $uploadDirFs = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . '/images/categories';
+        if (!is_dir($uploadDirFs)) {
+            mkdir($uploadDirFs, 0775, true);
         }
 
         // Tên file unique
         $ext = $allowed[$mime];
-        $basename = bin2hex(random_bytes(8)) . '_' . time();
-        $filename = $basename . '.' . $ext;
+        $filename = bin2hex(random_bytes(8)) . '_' . time() . '.' . $ext;
+        $destFs = $uploadDirFs . '/' . $filename;
 
-        $destination = $uploadDir . '/' . $filename;
-
-        if (!move_uploaded_file($file['tmp_name'], $destination)) {
+        if (!move_uploaded_file($file['tmp_name'], $destFs)) {
             throw new RuntimeException('Không thể lưu file.');
         }
 
-        // Xóa ảnh cũ nếu có (và nếu nằm trong đúng thư mục upload)
+        // Xoá ảnh cũ nếu có
         if ($oldPath) {
-            $oldRelPath = ltrim($oldPath, '/');               // /images/... -> images/...
-            $oldReal    = realpath($oldRelPath);
-            $baseReal   = realpath($uploadDir);
-            if ($oldReal && $baseReal && strpos($oldReal, $baseReal) === 0 && file_exists($oldReal)) {
-                @unlink($oldReal);
+            $oldFs = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . '/' . ltrim($oldPath, '/');
+            if (is_file($oldFs)) {
+                @unlink($oldFs);
             }
         }
 
-        // Trả URL tương đối để dùng trong <img src="...">
-       return $uploadDir . '/' . $filename;  
+        // Trả về URL public
+        return '/images/categories/' . $filename;
     }
     /* =================================================================== */
 
@@ -118,7 +109,7 @@ class CategoriesController
             exit;
         }
 
-        // Model phải có insert($name, $parent_id, $image_url)
+        // Model: insert($name, $parent_id, $image_url)
         $this->model->insert($name, $parent_id, $image_url);
         header('Location: index.php?admin=list_categories');
         exit;
@@ -154,7 +145,7 @@ class CategoriesController
             exit;
         }
 
-        // Model phải có update($id, $name, $parent_id, $image_url)
+        // Model: update($id, $name, $parent_id, $image_url)
         $this->model->update($id, $name, $parent_id, $image_url);
         header('Location: index.php?admin=list_categories');
         exit;
@@ -172,19 +163,6 @@ class CategoriesController
             exit;
         }
 
-        // (Tuỳ chọn) Xóa ảnh trước khi xoá DB — cần Model có getImagePathById($id)
-        if (method_exists($this->model, 'getImagePathById')) {
-            $img = $this->model->getImagePathById($id);
-            if ($img) {
-                $rel = ltrim($img, '/'); // /images/... -> images/...
-                $real = realpath($rel);
-                $base = realpath('images/categories');
-                if ($real && $base && strpos($real, $base) === 0 && file_exists($real)) {
-                    @unlink($real);
-                }
-            }
-        }
-
         if ($this->model->hasProducts($id)) {
             $_SESSION['msg'] = '❌ Không thể xóa! Danh mục đang có sản phẩm còn tồn kho.';
             $_SESSION['msg_type'] = 'error';
@@ -192,8 +170,20 @@ class CategoriesController
             exit;
         }
 
-        // Gọi xoá cascade
+        // Xóa ảnh file trước khi xóa DB
+        if (method_exists($this->model, 'getImagePathById')) {
+            $img = $this->model->getImagePathById($id);
+            if ($img) {
+                $imgFs = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . '/' . ltrim($img, '/');
+                if (is_file($imgFs)) {
+                    @unlink($imgFs);
+                }
+            }
+        }
+
+        // Xóa cascade DB
         $this->model->deleteCategoryCascade($id);
+
         $_SESSION['msg'] = '✅ Xóa danh mục và toàn bộ dữ liệu liên quan thành công!';
         $_SESSION['msg_type'] = 'success';
         header('Location: index.php?admin=list_categories');
