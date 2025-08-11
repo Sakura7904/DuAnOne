@@ -93,7 +93,7 @@ $oldInput = $data['oldInput'] ?? [];
                         Đơn hàng của tôi
                     </h2>
                 </div>
-                <p>Tra cứu đơn hàng của tôi <a href="/order/index" style="color: #D40404">tại đây</a></p>
+                <p>Tra cứu đơn hàng của tôi <a href="?user=purchase" style="color: #D40404">tại đây</a></p>
             </div>
         </div>
     </div>

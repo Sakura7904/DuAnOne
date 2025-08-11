@@ -103,6 +103,9 @@
                             <a aria-label="profile" href="?user=profile" title="<?= htmlspecialchars($_SESSION['user']['full_name']) ?>">
                                 Tài khoản của tôi
                             </a>
+                            <a aria-label="logout" href="?user=purchase">
+                                Đơn mua
+                            </a>
                             <a aria-label="logout" href="?user=logout">
                                 Đăng xuất
                             </a>
