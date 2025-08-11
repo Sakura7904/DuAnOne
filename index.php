@@ -26,6 +26,7 @@ include "controllers/user/AuthClientController.php";
 include "controllers/user/CartController.php";
 include "controllers/user/OrderController.php";
 include "controllers/user/PurchaseController.php";
+include "controllers/user/ProductByCategoryController.php";
 
 $admin = $_GET['admin'] ?? "";
 $user = $_GET['user'] ?? "";
@@ -97,6 +98,9 @@ if (!empty($user) || (empty($admin) && empty($user))) {
     match ($user) {
         // ===== Trang chủ =====
         'home' => (new HomeController())->home(),
+        
+        // ===== Trang sản phẩm the danh mục =====
+        'productsByCategory' => (new ProductByCategoryController())->showByCategory(),
 
         // ===== Trang chi tiết sản =====
         'detailProduct' => (new DetailProductController())->detailProduct(),
@@ -136,8 +140,6 @@ if (!empty($user) || (empty($admin) && empty($user))) {
         // ===== Trang đơn hàng =====        
         'purchase'     => (new PurchaseController())->purchase(),
 
-
-        // ===== Mặc định không tìm thấy =====
         default => die("Không tìm thấy file nào như thế cả!!!"),
     };
 }

@@ -1,4 +1,27 @@
-<script defer type="text/javascript" src="../assets/users/web.nvnstatic.net/tp/T0356/js/index5e1f.js?v=2"></script>
+<?php
+// Lấy categories nếu controller chưa truyền sang
+if (!isset($categories) || !is_array($categories)) {
+    require_once 'models/admin/CategoryModel.php';
+    $catModel   = new CategoryModel();
+    $categories = $catModel->getAll(); // đã có image_url
+}
+
+// Base path của dự án (ví dụ /DuAnOne). Dùng để build URL cho ảnh tương đối.
+$BASE_PATH = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+
+// Hàm nhỏ chuẩn hoá đường dẫn ảnh (hỗ trợ cả http(s), bắt đầu bằng '/', hoặc tương đối 'images/...').
+$toImgSrc = function ($raw) use ($BASE_PATH) {
+    if (empty($raw)) {
+        return $BASE_PATH . '/assets/images/placeholder-category.png';
+    }
+    if (preg_match('#^https?://#', $raw) || str_starts_with($raw, '/')) {
+        return $raw; // đã là URL tuyệt đối hoặc từ root
+    }
+    return $BASE_PATH . '/' . ltrim($raw, '/'); // đường dẫn tương đối
+};
+?>
+
+<script defer type="text/javascript" src="./assets/users/web.nvnstatic.net/tp/T0356/js/index5e1f.js?v=2"></script>
 <h1 class="hidden">Thương hiệu thời trang nữ JM có hệ thống cửa hàng toàn quốc</h1>
 <div class="bannerCategoryTop visible-xs visible-sm">
     <div class="container">
@@ -32,7 +55,7 @@
                 <a aria-label="mainbanner" class="clearfix" target="_self"
                     href="campaign/4698/JASMINE-COLLECTION.html">
                     <img width="1520" height="475" class="img-responsive center-block"
-                        src="../assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20250612_TTzB9Zkr.jpg" alt="JASMINE COLLECTION">
+                        src="./assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20250612_TTzB9Zkr.jpg" alt="JASMINE COLLECTION">
                 </a>
             </div>
             <div class="item">
@@ -88,41 +111,21 @@
 
 <div class="category-session hidden-xs hidden-sm">
     <div class="listCate container clearfix">
-        <div class="cateItem">
-            <a aria-label="cat-image" class="menu-img-icon" href="dam-pc542064.html">
-                <img width="40" height="40" alt="Đầm" loading="lazy"
-                    src="../assets/users/pos.nvncdn.com/4ef0bf-108661/pc/20211012_Vag7apRJM1rEJHHSo5lKbQYk.png">
-                <div class="image-title">Đầm</div>
-            </a>
-        </div>
-        <div class="cateItem">
-            <a aria-label="cat-image" class="menu-img-icon" href="ao-pc542071.html">
-                <img width="40" height="40" alt="Áo" loading="lazy"
-                    src="../assets/users/pos.nvncdn.com/4ef0bf-108661/pc/20211012_7Z5OnDTzjU2l1gugbxnoN9GS.png">
-                <div class="image-title">Áo</div>
-            </a>
-        </div>
-        <div class="cateItem">
-            <a aria-label="cat-image" class="menu-img-icon" href="quan-pc542075.html">
-                <img width="40" height="40" alt="Quần" loading="lazy"
-                    src="../assets/users/pos.nvncdn.com/4ef0bf-108661/pc/20211012_Ll1EKSnE1tm2gmg21vglg6K9.png">
-                <div class="image-title">Quần</div>
-            </a>
-        </div>
-        <div class="cateItem">
-            <a aria-label="cat-image" class="menu-img-icon" href="chan-vay-pc542079.html">
-                <img width="40" height="40" alt="Chân Váy" loading="lazy"
-                    src="../assets/users/pos.nvncdn.com/4ef0bf-108661/pc/20211012_Ci4aT211GpqlV3fgJsR6HXzk.png">
-                <div class="image-title">Chân Váy</div>
-            </a>
-        </div>
-        <div class="cateItem">
-            <a aria-label="cat-image" class="menu-img-icon" href="ao-khoac-pc542082.html">
-                <img width="40" height="40" alt="Áo Khoác" loading="lazy"
-                    src="../assets/users/pos.nvncdn.com/4ef0bf-108661/pc/20211012_rWpD2qGv2pDVmSDkscoMRMoV.png">
-                <div class="image-title">Áo Khoác</div>
-            </a>
-        </div>
+        <?php foreach ($categories as $cat): ?>
+            <div class="cateItem">
+                <a aria-label="cat-image"
+                    class="menu-img-icon"
+                    href="index.php?user=productsByCategory&category_id=<?= (int)$cat['id'] ?>">
+                    <img width="40" height="40"
+                        loading="lazy"
+                        src="<?= $cat['image_url'] ?? '' ?>">
+                    <div class="image-title"><?= $cat['name'] ?></div>
+                </a>
+            </div>
+        <?php endforeach; ?>
+        <?php if (empty($categories)): ?>
+            <div class="text-gray-500 py-4">Chưa có danh mục nào.</div>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -135,7 +138,7 @@
             <div class="cateItem">
                 <a aria-label="cat-image" class="menu-img-icon" href="dam-pc542064.html">
                     <img class="owl-lazy" alt="Đầm"
-                        data-src="../assets/users/pos.nvncdn.com/4ef0bf-108661/pc/20211012_Vag7apRJM1rEJHHSo5lKbQYk.png">
+                        data-src="./assets/users/pos.nvncdn.com/4ef0bf-108661/pc/20211012_Vag7apRJM1rEJHHSo5lKbQYk.png">
                 </a>
             </div>
             <div class="image-title">Đầm</div>
@@ -144,7 +147,7 @@
             <div class="cateItem">
                 <a aria-label="cat-image" class="menu-img-icon" href="ao-pc542071.html">
                     <img class="owl-lazy" alt="Áo"
-                        data-src="../assets/users/pos.nvncdn.com/4ef0bf-108661/pc/20211012_7Z5OnDTzjU2l1gugbxnoN9GS.png">
+                        data-src="./assets/users/pos.nvncdn.com/4ef0bf-108661/pc/20211012_7Z5OnDTzjU2l1gugbxnoN9GS.png">
                 </a>
             </div>
             <div class="image-title">Áo</div>
@@ -153,7 +156,7 @@
             <div class="cateItem">
                 <a aria-label="cat-image" class="menu-img-icon" href="quan-pc542075.html">
                     <img class="owl-lazy" alt="Quần"
-                        data-src="../assets/users/pos.nvncdn.com/4ef0bf-108661/pc/20211012_Ll1EKSnE1tm2gmg21vglg6K9.png">
+                        data-src="./assets/users/pos.nvncdn.com/4ef0bf-108661/pc/20211012_Ll1EKSnE1tm2gmg21vglg6K9.png">
                 </a>
             </div>
             <div class="image-title">Quần</div>
@@ -162,7 +165,7 @@
             <div class="cateItem">
                 <a aria-label="cat-image" class="menu-img-icon" href="chan-vay-pc542079.html">
                     <img class="owl-lazy" alt="Chân Váy"
-                        data-src="../assets/users/pos.nvncdn.com/4ef0bf-108661/pc/20211012_Ci4aT211GpqlV3fgJsR6HXzk.png">
+                        data-src="./assets/users/pos.nvncdn.com/4ef0bf-108661/pc/20211012_Ci4aT211GpqlV3fgJsR6HXzk.png">
                 </a>
             </div>
             <div class="image-title">Chân Váy</div>
@@ -171,7 +174,7 @@
             <div class="cateItem">
                 <a aria-label="cat-image" class="menu-img-icon" href="ao-khoac-pc542082.html">
                     <img class="owl-lazy" alt="Áo Khoác"
-                        data-src="../assets/users/pos.nvncdn.com/4ef0bf-108661/pc/20211012_rWpD2qGv2pDVmSDkscoMRMoV.png">
+                        data-src="./assets/users/pos.nvncdn.com/4ef0bf-108661/pc/20211012_rWpD2qGv2pDVmSDkscoMRMoV.png">
                 </a>
             </div>
             <div class="image-title">Áo Khoác</div>
@@ -220,37 +223,37 @@
             <div class="bannerPromotionItem col-lg-6 col-md-6 col-xs-12 col-sm-12">
                 <a aria-label="promotion" href="campaign/4698/JASMINE-COLLECTION.html">
                     <img width="576" height="219" alt="JASMINE COLLECTION" loading="lazy"
-                        src="../assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20250612_notK7Pm1.jpg">
+                        src="./assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20250612_notK7Pm1.jpg">
                 </a>
             </div>
             <div class="bannerPromotionItem col-lg-6 col-md-6 col-xs-12 col-sm-12">
                 <a aria-label="promotion" href="campaign/4686/NET-COLLECTION.html">
                     <img width="576" height="219" alt="NÉT COLLECTION" loading="lazy"
-                        src="../assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20250529_UJr8VuS6.jpg">
+                        src="./assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20250529_UJr8VuS6.jpg">
                 </a>
             </div>
             <div class="bannerPromotionItem col-lg-6 col-md-6 col-xs-12 col-sm-12">
                 <a aria-label="promotion" href="campaign/4673/HA-COLLECTION.html">
                     <img width="576" height="219" alt="BST HẠ" loading="lazy"
-                        src="../assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20250515_OR5diWmu.jpg">
+                        src="./assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20250515_OR5diWmu.jpg">
                 </a>
             </div>
             <div class="bannerPromotionItem col-lg-6 col-md-6 col-xs-12 col-sm-12">
                 <a aria-label="promotion" href="campaign/4654/DONG-CHAY-THANH-LICH.html">
                     <img width="576" height="219" alt="DÒNG CHẢY THANH LỊCH" loading="lazy"
-                        src="../assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20250505_nx3ivtje.jpg">
+                        src="./assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20250505_nx3ivtje.jpg">
                 </a>
             </div>
             <div class="bannerPromotionItem col-lg-6 col-md-6 col-xs-12 col-sm-12">
                 <a aria-label="promotion" href="campaign/4634/LAC-GIUA-RUNG-MER-COLLECTION.html">
                     <img width="576" height="219" alt="BST LẠC GIỮA RỪNG MER" loading="lazy"
-                        src="../assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20250418_m335juU8.jpg">
+                        src="./assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20250418_m335juU8.jpg">
                 </a>
             </div>
             <div class="bannerPromotionItem col-lg-6 col-md-6 col-xs-12 col-sm-12">
                 <a aria-label="promotion" href="campaign/4617/DU-ANH-COLLECTION.html">
                     <img width="576" height="219" alt="DƯ ẢNH COLLECTION" loading="lazy"
-                        src="../assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20250403_zl8dbcHt.jpg">
+                        src="./assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20250403_zl8dbcHt.jpg">
                 </a>
             </div>
         </div>

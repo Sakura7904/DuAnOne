@@ -1,76 +1,91 @@
+<?php
+include_once "models/user/UserProductModel.php";
+
+$productModel = new UserProductModel();
+$categories = $productModel->getAllCategories();
+
+if (!isset($categories) || !is_array($categories)) {
+    $categories = [];
+}
+function e($v)
+{
+    return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+}
+?>
 <header class="main_nav_header">
     <div class="botHeader hidden-xs hidden-sm">
         <div class="container">
+
             <div class="logoHeader col-lg-1 col-md-1">
-                <a aria-label="logo" href="?user=home">
+                <a aria-label="logo" href="index.php?user=home">
                     <img width="77" height="48" alt="logo"
-                        src="../assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
+                        src="./assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
                 </a>
             </div>
             <div class="menuMain col-lg-9 col-md-9">
                 <ul class="tp_menu nav-navbar clearfix">
-                    <li class="title_lv1">
-                        <a aria-label="menu" class="tp_menu_item style_32323"
-                            href="khOi-nguOn-thanh-lIch-(-web)-pm128511.html" title="SALE CHÀO HÈ">
-                            SALE CHÀO HÈ
-                            <i class="fal fa-angle-down" aria-hidden="true"></i>
-                            <span class="saleTick">Sale</span>
-                        </a>
-                        <ul class="mainChild levlup_2">
-                            <li class="title_lv2">
-                                <a aria-label="menu" href="khOi-nguOn-thanh-lIch-(-web)-pm128511.html"
-                                    title="Khuyến mại theo từng sản phẩm">Khuyến mại theo từng sản phẩm</a>
+                    <!-- Hiển thị menu cha (Trang phục nữ) và các danh mục con bên trong dropdown -->
+                    <?php foreach ($categories as $cat): ?>
+                        <?php
+                        $catId    = (int)($cat['id'] ?? 0);
+                        $catName  = $cat['name'] ?? '';
+                        $parentId = $cat['parent_id'] ?? null;
+                        ?>
+                        <?php if ($parentId === null): ?>
+                            <li class="title_lv1">
+                                <a aria-label="menu" class="tp_menu_item"
+                                    href="index.php?user=productsByCategory&category_id=<?= $catId ?>"
+                                    title="<?= e($catName) ?>">
+                                    <?= e(mb_strtoupper((string)$catName, 'UTF-8')) ?>
+                                    <i class="fal fa-angle-down" aria-hidden="true"></i>
+                                </a>
+                                <ul class="mainChild levlup_2">
+                                    <?php foreach ($categories as $sub): ?>
+                                        <?php
+                                        $subId     = (int)($sub['id'] ?? 0);
+                                        $subName   = $sub['name'] ?? '';
+                                        $subParent = $sub['parent_id'] ?? null;
+                                        ?>
+                                        <?php if ($subParent == $catId): ?>
+                                            <li class="title_lv2">
+                                                <a aria-label="menu"
+                                                    href="index.php?user=productsByCategory&category_id=<?= $subId ?>"
+                                                    title="<?= e($subName) ?>">
+                                                    <?= e($subName) ?>
+                                                </a>
+                                            </li>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </ul>
                             </li>
-                        </ul>
-                    </li>
-                    <li class="title_lv1">
-                        <a aria-label="menu" class="tp_menu_item style_32261" href="dam-pc542064.html" title="ĐẦM">
-                            ĐẦM
-                        </a>
-                    </li>
-                    <li class="title_lv1">
-                        <a aria-label="menu" class="tp_menu_item style_32268" href="ao-pc542071.html" title="ÁO">
-                            ÁO
-                        </a>
-                    </li>
-                    <li class="title_lv1">
-                        <a aria-label="menu" class="tp_menu_item style_32269" href="quan-pc542075.html"
-                            title="QUẦN">
-                            QUẦN
-                        </a>
-                    </li>
-                    <li class="title_lv1">
-                        <a aria-label="menu" class="tp_menu_item style_32270" href="chan-vay-pc542079.html"
-                            title="CHÂN VÁY">
-                            CHÂN VÁY
-                        </a>
-                    </li>
-                    <li class="title_lv1">
-                        <a aria-label="menu" class="tp_menu_item style_32271" href="ao-khoac-pc542082.html"
-                            title="ÁO KHOÁC">
-                            ÁO KHOÁC
-                        </a>
-                    </li>
-                    <li class="title_lv1">
-                        <a aria-label="menu" class="tp_menu_item style_2153" href="lookbook-ac2153.html"
-                            title="LOOKBOOK">
-                            LOOKBOOK
-                        </a>
-                    </li>
-                    <li class="title_lv1">
-                        <a aria-label="menu" class="tp_menu_item style_57707"
-                            href="campaign/4698/JASMINE-COLLECTION.html" title="BST MỚI">
-                            BST MỚI
-                        </a>
-                    </li>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+
+                    <!-- Vẫn hiển thị tất cả các danh mục con như menu độc lập (GIỮ NGUYÊN LOGIC) -->
+                    <?php foreach ($categories as $cat): ?>
+                        <?php
+                        $catId    = (int)($cat['id'] ?? 0);
+                        $catName  = $cat['name'] ?? '';
+                        $parentId = $cat['parent_id'] ?? null;
+                        ?>
+                        <?php if ($parentId != null): ?>
+                            <li class="title_lv1">
+                                <a aria-label="menu" class="tp_menu_item"
+                                    href="index.php?user=productsByCategory&category_id=<?= $catId ?>"
+                                    title="<?= e($catName) ?>">
+                                    <?= e(mb_strtoupper((string)$catName, 'UTF-8')) ?>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+
                 </ul>
             </div>
             <div class="iconHeader col-lg-2 col-md-2">
                 <div class="wishlistBtn btnIcon">
                     <a aria-label="wishlist" href="wishlist.html">
                         <i class="far fa-heart"></i>
-                        <span class="wishlistCount">
-                            0 </span>
+                        <span class="wishlistCount">0</span>
                     </a>
                 </div>
                 <div class="cartBtn btnIcon">
@@ -85,7 +100,6 @@
                     <div class="cartHeaderContent" style="display: none">
                         <div class="cartReload"></div>
                     </div>
-
                 </div>
 
                 <?php if (isset($_SESSION['user'])): ?>
@@ -128,19 +142,19 @@
             <ul>
                 <li>
                     <a aria-label="policy" href="he-thong-cua-hang.html">
-                        <img src="../assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20220217_DbZC1P3EtEQCzjezvBFKNdfn.png">
+                        <img src="./assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20220217_DbZC1P3EtEQCzjezvBFKNdfn.png">
                         <span>Hệ thống cửa hàng</span>
                     </a>
                 </li>
                 <li>
                     <a aria-label="policy" href="chinh-sach-van-chuyen-n93684.html">
-                        <img src="../assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20220217_zI3LVzaVQ2ecO28wILTulXo0.png">
+                        <img src="./assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20220217_zI3LVzaVQ2ecO28wILTulXo0.png">
                         <span>Thông tin vận chuyển</span>
                     </a>
                 </li>
                 <li>
                     <a aria-label="policy" href="chuong-trinh-tich-diem-n93679.html">
-                        <img src="../assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20220217_6vuovyS0B4AEqbNDogOFTiB2.png">
+                        <img src="./assets/users/pos.nvncdn.com/4ef0bf-108661/bn/20220217_6vuovyS0B4AEqbNDogOFTiB2.png">
                         <span>Chính sách tích điểm</span>
                     </a>
                 </li>
@@ -160,10 +174,16 @@
                 </div>
             </div>
             <div class="logoHeader col-xs-4 col-sm-4">
-                <a aria-label="logo" href="?user=home">
+                <<<<<<< HEAD
+                    <a aria-label="logo" href="?user=home">
                     <img alt="logo" src="../assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
-                </a>
+                    =======
+                    <a aria-label="logo" href="index.php?user=home">
+                        <img alt="logo" src="./assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
+                        >>>>>>> 2e1ea7cc8e2670e82800c1f353e265ebf918affd
+                    </a>
             </div>
+
             <div class="iconRight col-xs-4 col-sm-4">
                 <div class="searchBtn btnIcon">
                     <a aria-label="searchmobile" class="openSearchMobile" href="javascript:void(0)"><i
@@ -172,8 +192,7 @@
                 <div class="wishlistBtn btnIcon">
                     <a aria-label="wishlist" href="wishlist.html">
                         <i class="far fa-heart"></i>
-                        <span class="wishlistCount">
-                            0 </span>
+                        <span class="wishlistCount">0</span>
                     </a>
                 </div>
                 <div class="cartBtn btnIcon">
@@ -199,8 +218,8 @@
             </form>
         </div>
         <div class="logoSearchBox">
-            <a aria-label="logosearch" href="index.html">
-                <img alt="logo" src="../assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
+            <a aria-label="logosearch" href="index.php?user=home">
+                <img alt="logo" src="./assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
             </a>
         </div>
     </div>
