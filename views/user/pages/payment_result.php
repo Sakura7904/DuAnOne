@@ -9,7 +9,8 @@ $amountVn  = number_format((int)($amount ?? 0), 0, ',', '.') . 'đ';
             <h2 style="color:#16a34a;margin:0 0 8px">Thanh toán thành công</h2>
             <p>Mã đơn: <strong>#<?= htmlspecialchars($orderId) ?></strong></p>
             <p>Số tiền: <strong><?= $amountVn ?></strong></p>
-            <p>Mã giao dịch MoMo: <strong><?= htmlspecialchars($transId ?? '') ?></strong></p>
+            <p>Thanh toán qua: <strong><?= $payType ?></strong></p>
+            <p>Mã giao dịch: <strong><?= htmlspecialchars($transId ?? '') ?></strong></p>
             <p style="color:#555">Trạng thái sẽ được xác nhận qua hệ thống (IPN). Bạn có thể xem chi tiết đơn ngay bây giờ.</p>
         <?php else: ?>
             <h2 style="color:#dc2626;margin:0 0 8px">Thanh toán thất bại</h2>

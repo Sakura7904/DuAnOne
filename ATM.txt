@@ -1,4 +1,9 @@
 Thẻ test (nhập trên trang MoMo)
 - Tên: NGUYEN VAN A
 - Số thẻ: 4111 1111 1111 1111 - CVC: 111
-- Ngày hết: 05/26 - OTP - Thành công
+- Ngày hết: 05/26 - Thành công
+
+Thẻ test (nhập trên trang Stripe)
+- Tên: NGUYEN VAN A
+- Số thẻ: 4242 4242 4242 4242 - CVC: 3 sô ngẫu nhiên
+- Ngày hết: MM/YY tương lai - Thành công

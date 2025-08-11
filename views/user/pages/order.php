@@ -237,10 +237,10 @@ $totals   = $totals   ?? ['total_original_fmt' => '0đ', 'total_discount_fmt' =>
                                                 <div class="radio-wrapper content-box-row b active">
                                                     <label class="radio-label">
                                                         <div class="radio-input">
-                                                            <input class="input-radio cod" name="payment_method" type="radio">
+                                                            <input class="input-radio" name="payment_method" type="radio" value="STRIPE">
                                                         </div>
                                                         <div class="radio-label-primary">
-                                                            <span>Thanh toán VNPAY</span>
+                                                            <span>Thanh toán STRIPE - Thẻ quốc tế</span>
                                                         </div>
                                                     </label>
                                                 </div>

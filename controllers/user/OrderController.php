@@ -12,6 +12,8 @@ class OrderController
     private $momoAccessKey;
     private $momoSecretKey;
 
+    private \Stripe\StripeClient $stripe;
+
 
     public function __construct()
     {
@@ -22,6 +24,10 @@ class OrderController
         $this->momoPartnerCode = getenv('MOMO_PARTNER_CODE') ?: 'MOMOBKUN20180529';
         $this->momoAccessKey   = getenv('MOMO_ACCESS_KEY')   ?: 'klm05TvNBzhg7h7j';
         $this->momoSecretKey   = getenv('MOMO_SECRET_KEY')   ?: 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa';
+
+        // ==== STRIPE config ====
+        $secret = getenv('STRIPE_SECRET') ?: 'sk_test_51RurcsE6oG8GV64YReTLjfXvGvSKdQEDDZlqN4khiho6nn5214shp2yjJl3T6Ski4m5FKHEHrwA6sIpLjxfEdG9x00g2TZOKOm'; // test key
+        $this->stripe = new \Stripe\StripeClient($secret);
     }
 
     /* ========== Helpers ========== */
@@ -131,6 +137,107 @@ class OrderController
         $this->redirect("index.php?user=order&id={$orderId}");
     }
 
+    // ----- HTTP helpers -----
+    private function httpPostForm($url, array $fields, array $headers)
+    {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_HTTPHEADER     => $headers,
+            CURLOPT_POSTFIELDS     => http_build_query($fields),
+            CURLOPT_TIMEOUT        => 30,
+        ]);
+        $resp = curl_exec($ch);
+        $err = curl_error($ch);
+        curl_close($ch);
+        return [$err ? null : json_decode($resp, true), $err ?: null];
+    }
+    private function httpGet($url, array $headers)
+    {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER     => $headers,
+            CURLOPT_TIMEOUT        => 30,
+        ]);
+        $resp = curl_exec($ch);
+        $err = curl_error($ch);
+        curl_close($ch);
+        return [$err ? null : json_decode($resp, true), $err ?: null];
+    }
+
+    // ----- Stripe: tạo Checkout Session & redirect -----
+    private function stripeCreateCheckoutDetailed(int $orderId, array $items, ?string $customerEmail = null, int $shippingFeeVnd = 0)
+    {
+        // Xây line_items từ giỏ
+        $lineItems = [];
+        foreach ($items as $it) {
+            $name = $it['product_name'];
+            $desc = trim(($it['color_name'] ? 'Màu: ' . $it['color_name'] : '') .
+                ($it['size_name'] ? ' • Size: ' . $it['size_name'] : ''));
+            $img  = !empty($it['image_url']) ? $it['image_url'] : null; // PHẢI LÀ URL HTTPS public
+
+            $line = [
+                'price_data' => [
+                    'currency'     => 'vnd',                                   // giữ tiền Việt
+                    'product_data' => array_filter([
+                        'name'        => $name,
+                        'description' => $desc ?: null,
+                        'images'      => $img ? [$img] : null,                 // optional
+                    ]),
+                    // dùng giá đã áp khuyến mãi (effective)
+                    'unit_amount'  => (int)($it['sale_price'] ?? $it['original_price']),
+                ],
+                'quantity' => (int)$it['quantity'],
+            ];
+            $lineItems[] = $line;
+        }
+
+        // Thêm dòng phí ship (nếu có)
+        if ($shippingFeeVnd > 0) {
+            $lineItems[] = [
+                'price_data' => [
+                    'currency'     => 'vnd',
+                    'product_data' => ['name' => 'Phí vận chuyển'],
+                    'unit_amount'  => (int)$shippingFeeVnd,
+                ],
+                'quantity' => 1,
+            ];
+        }
+
+        // URL
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
+        $base   = $scheme . '://' . $_SERVER['HTTP_HOST'];
+
+        // Tạo session Checkout
+        $session = $this->stripe->checkout->sessions->create([
+            'mode'        => 'payment',
+            'success_url' => $base . '/index.php?user=actStripeReturn&session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url'  => $base . '/index.php?user=order&id=' . $orderId,
+
+            'locale'      => 'vi',                   // giao diện tiếng Việt
+            'line_items'  => $lineItems,
+            'metadata'    => ['order_id' => (string)$orderId],
+
+            // Hiển thị thêm thông tin/thu thập thông tin
+            'customer_email'              => $customerEmail ?: null,
+
+            // Thêm ghi chú (hiển thị ngay trên nút thanh toán)
+            'custom_text' => [
+                'submit' => ['message' => 'Bấm Thanh toán để hoàn tất đơn hàng #' . $orderId],
+            ],
+
+            // Cho nhập mã khuyến mại (nếu bạn tạo coupon trên Stripe)
+            // 'allow_promotion_codes' => true,
+        ]);
+
+        header('Location: ' . $session->url);
+        exit;
+    }
+
+
+
 
     /* ==================================
      * View: trang order (list/detail)
@@ -165,12 +272,13 @@ class OrderController
     public function actCheckoutFromCart()
     {
         $userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
+        $itemsForStripe = $this->orderModel->getCartItemsDetailed($userId);
 
         $receiverName    = $this->postTrim('receiver_name');
         $receiverPhone   = $this->postTrim('receiver_phone');
         $shippingAddress = $this->postTrim('shipping_address');
-        $paymentMethod   = strtoupper($this->postTrim('payment_method', 'COD')); // MOMO_ATM | MOMO_CC | COD
         $email           = $this->postTrim('customerEmail');
+        $paymentMethod   = strtoupper($this->postTrim('payment_method', 'COD')); // Stripe | MOMO_CC | COD
 
         if ($userId <= 0 || $receiverName === '' || $receiverPhone === '' || $shippingAddress === '') {
             $_SESSION['order_alert'] = ['type' => 'warning', 'message' => 'Vui lòng nhập đủ thông tin giao hàng.'];
@@ -193,9 +301,8 @@ class OrderController
         $orderId = (int)$res['order_id'];
         $total   = (int)round((float)$res['total']);
 
-        if ($paymentMethod === 'MOMO_ATM') {
-            // Napas – cần số điện thoại để issuer gửi OTP
-            $this->momoCreateCardPayment($orderId, $total, 'payWithATM', null, $receiverPhone);
+        if ($paymentMethod === 'STRIPE') {
+            $this->stripeCreateCheckoutDetailed($orderId, $itemsForStripe, $email, /*shippingFeeVnd*/ 0);
         } elseif ($paymentMethod === 'MOMO_CC') {
             // Visa/Master/JCB – nên truyền email
             $this->momoCreateCardPayment($orderId, $total, 'payWithCC', $email, null);
@@ -212,7 +319,6 @@ class OrderController
         $resultCode = isset($_GET['resultCode']) ? (int)$_GET['resultCode'] : -1;
         $amount     = isset($_GET['amount']) ? (int)$_GET['amount'] : 0;
         $transId    = $_GET['transId'] ?? '';
-        $payType    = $_GET['payType'] ?? '';
         $extraData  = $_GET['extraData'] ?? '';
 
         $orderId = 0;
@@ -239,7 +345,7 @@ class OrderController
             'amount'    => $amount,
             'orderInfo' => $_GET['orderInfo'] ?? '',
             'transId'   => $transId,
-            'payType'   => $payType,
+            'payType'   => 'MOMO',
             'resultCode' => $resultCode,
         ]);
     }
@@ -269,6 +375,54 @@ class OrderController
         echo 'NOK';
         exit;
     }
+
+    // ----- Stripe return: xác thực & set paid, KHÔNG tự chuyển trang -----
+    public function actStripeReturn()
+    {
+        $sessionId = $_GET['session_id'] ?? '';
+        if ($sessionId === '') {
+            $_SESSION['alert'] = ['type' => 'error', 'message' => 'Thiếu session_id Stripe.'];
+            $this->redirect('index.php?user=order');
+        }
+
+        try {
+            // Lấy session + payment_intent
+            $session = $this->stripe->checkout->sessions->retrieve($sessionId, ['expand' => ['payment_intent']]);
+
+            $orderId  = isset($session->metadata['order_id']) ? (int)$session->metadata['order_id'] : 0;
+            $pi       = $session->payment_intent;
+            $piStatus = $pi->status ?? '';
+            $currency = $pi->currency ?? 'vnd';
+            $amountRaw = (int)($pi->amount ?? 0);
+
+            // ✅ VND là zero-decimal: KHÔNG chia 100
+            $amount = ($currency === 'vnd') ? $amountRaw : $amountRaw / 100;
+
+            $isSuccess = false;
+            if ($piStatus === 'succeeded' && $orderId > 0) {
+                $this->orderModel->updatePaymentStatus($orderId, 'paid'); // set paid ngay
+                $isSuccess = true;
+            }
+
+            // Render trang kết quả, không redirect
+            $content = getContentPathClient('', 'payment_result');
+            view('user/index', [
+                'content'   => $content,
+                'isSuccess' => $isSuccess,
+                'orderId'   => $orderId,
+                'amount'    => $amount,              // VND: số đồng; USD: số $
+                'orderInfo' => 'Stripe Checkout',
+                'transId'   => $pi->id ?? '',
+                'payType'   => 'STRIPE',
+                'resultCode' => $piStatus,
+            ]);
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            $_SESSION['alert'] = ['type' => 'error', 'message' => 'Stripe error: ' . $e->getMessage()];
+            $this->redirect('index.php?user=order');
+        }
+    }
+
+
 
     public function actCheckoutDirect()
     {

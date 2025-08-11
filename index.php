@@ -3,7 +3,7 @@ session_start();
 
 include "database/function.php";
 include "commons/helpers.php";
-
+require_once __DIR__ . '/vendor/autoload.php';
 
 if (isset($_GET['page'])) {
     $content = getContentPath();
@@ -129,6 +129,9 @@ if (!empty($user) || (empty($admin) && empty($user))) {
         // ===== Thanh toán MOMO=====
         'actMomoReturn'   => (new OrderController())->actMomoReturn(),
         'actMomoIPN'      => (new OrderController())->actMomoIPN(),
+
+        // ===== Trang thanh toán Stripe =====        
+        'actStripeReturn'     => (new OrderController())->actStripeReturn(),
 
 
         // ===== Mặc định không tìm thấy =====
