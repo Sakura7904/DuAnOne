@@ -58,13 +58,13 @@ if (isset($_SESSION['msg'])) {
                         } else {
                             $src = (preg_match('#^https?://#', $raw) || str_starts_with($raw, '/'))
                                 ? $raw
-                                : '/DuAnOne/' . ltrim($raw, '/'); // base path dự án
+                                :  ltrim($raw, '/'); // base path dự án
                         }
                     ?>
                     <tr class="border-b text-normal text-gray-1100 border-neutral dark:border-dark-neutral-border dark:text-gray-dark-1100">
                         <td class="py-[18px]"><?= $key + 1 ?></td>
                         <td class="py-[18px]">
-                            <img src="<?= htmlspecialchars($src) ?>" alt="<?= htmlspecialchars($cat['name']) ?>" width="40" height="40" style="object-fit:cover;border-radius:8px;">
+                            <img src="<?= $src ?>" alt="<?= htmlspecialchars($cat['name']) ?>" width="40" height="40" style="object-fit:cover;border-radius:8px;">
                         </td>
                         <td class="py-[18px]"><?= htmlspecialchars($cat['name']) ?></td>
                         <td class="py-[18px]">
