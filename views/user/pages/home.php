@@ -291,7 +291,7 @@ $toImgSrc = function ($raw) use ($BASE_PATH) {
                                             <ul class="color-swatches text-center" data-hover="true" psId="<?= $product['id'] ?>">
                                                 <?php foreach ($product['colors'] as $color): ?>
                                                     <li class="color-item"
-
+                                                    
                                                         value="<?= $color['variant_id'] ?>">
                                                         <span style="background-color: <?= htmlspecialchars($color['color_code']) ?>"></span>
                                                     </li>

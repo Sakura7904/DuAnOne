@@ -98,7 +98,7 @@ if (!empty($user) || (empty($admin) && empty($user))) {
     match ($user) {
         // ===== Trang chủ =====
         'home' => (new HomeController())->home(),
-        
+
         // ===== Trang sản phẩm the danh mục =====
         'productsByCategory' => (new ProductByCategoryController())->showByCategory(),
 
@@ -139,6 +139,7 @@ if (!empty($user) || (empty($admin) && empty($user))) {
 
         // ===== Trang đơn hàng =====        
         'purchase'     => (new PurchaseController())->purchase(),
+        'cancelOrderItem' => (new PurchaseController())->cancelOrderItem(),
 
         default => die("Không tìm thấy file nào như thế cả!!!"),
     };
