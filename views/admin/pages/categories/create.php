@@ -33,8 +33,7 @@ unset($_SESSION['errors'], $_SESSION['old']);
                 name="name" id="name"
                 value="<?= htmlspecialchars($old['name'] ?? '') ?>"
                 class="input bg-transparent text-sm leading-4 text-gray-700 dark:text-gray-dark-400 h-fit min-h-fit py-4 focus:outline-none pl-[13px] placeholder:text-inherit"
-                type="text" placeholder="Nhập tên danh mục"
-            >
+                type="text" placeholder="Nhập tên danh mục">
         </div>
         <?php if (!empty($errors['name'])): ?>
             <div class="mt-1 font-bold text-sm" style="color:red"><?= htmlspecialchars($errors['name']) ?></div>
@@ -43,7 +42,7 @@ unset($_SESSION['errors'], $_SESSION['old']);
         <!-- Danh mục cha -->
         <p class="text-gray-1100 text-base leading-4 font-medium capitalize mb-[10px] dark:text-gray-dark-1100">Danh Mục Cha</p>
         <select name="parent_id"
-                class="select w-full border rounded-lg font-normal text-sm leading-4 text-gray-700 dark:text-gray-dark-400 py-4 h-fit min-h-fit border-[#E8EDF2] dark:border-[#313442] focus:outline-none pl-[13px] min-w-[252px] mb-12">
+            class="select w-full border rounded-lg font-normal text-sm leading-4 text-gray-700 dark:text-gray-dark-400 py-4 h-fit min-h-fit border-[#E8EDF2] dark:border-[#313442] focus:outline-none pl-[13px] min-w-[252px] mb-12">
             <option value="">-- Không có --</option>
             <?php foreach ($parent_categories as $cat): ?>
                 <option value="<?= $cat['id'] ?>"
@@ -55,26 +54,50 @@ unset($_SESSION['errors'], $_SESSION['old']);
 
         <!-- Ảnh danh mục -->
         <p class="text-gray-1100 text-base leading-4 font-medium capitalize mb-[10px] dark:text-gray-dark-1100">Ảnh Danh Mục</p>
-        <div class="border rounded-lg border-[#E8EDF2] dark:border-[#313442] p-4 mb-2">
-            <input type="file" name="image" accept="image/*"
-                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
-                          file:rounded file:border-0 file:text-sm file:font-semibold
-                          file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
+        <div
+            class="border-dashed border-2 text-center mb-12 border-neutral py-[26px] dark:border-dark-neutral-border"
+            id="thumbnailUploadArea" style="cursor: pointer;">
+            <img class="mx-auto inline-block mb-[15px]" src="./assets/admin/assets/images/icons/icon-image.svg" alt="image icon">
+            <p class="text-sm leading-6 text-gray-500 font-normal mb-[5px]">Hãy chọn ảnh từ thư viện của bạn</p>
+            <p class="leading-6 text-gray-400 text-[13px]">Hỗ trợ các file như: JPG, PNG & GIF</p>
+
+            <!-- Input file ẩn -->
+            <input type="file"
+                id="imageInput"
+                name="image"
+                style="display: none;">
+
+            <!-- Preview area -->
+            <div id="thumbnailPreview" class="mt-2">
+                <?php if (!empty($category['image_url'])): ?>
+                    <div style="position: relative; display: inline-block;">
+                        <img src="<?= $category['image_url'] ?>"
+                            style="max-width: 200px; max-height: 150px; object-fit: cover; border-radius: 8px;"
+                            alt="Preview">
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
+
         <?php if (!empty($errors['image'])): ?>
-            <div class="mt-1 text-red-500 font-bold text-sm"  style="color:red"><?= htmlspecialchars($errors['image']) ?></div>
+            <div class="mt-1 text-red-500 font-bold text-sm" style="color:red"><?= htmlspecialchars($errors['image']) ?></div>
         <?php endif; ?>
 
         <!-- Submit -->
         <div>
             <button type="submit"
-                    class="btn normal-case h-fit min-h-fit transition-all duration-300 border-4 bg-color-brands hover:bg-color-brands hover:border-[#B2A7FF] dark:hover:border-[#B2A7FF] border-neutral-bg px-6 dark:border-dark-neutral-bg py-[14px]">
+                class="btn normal-case h-fit min-h-fit transition-all duration-300 border-4 bg-color-brands hover:bg-color-brands hover:border-[#B2A7FF] dark:hover:border-[#B2A7FF] border-neutral-bg px-6 dark:border-dark-neutral-bg py-[14px]">
                 Thêm danh mục
             </button>
             <a href="index.php?admin=list_categories"
-               class="btn normal-case h-fit min-h-fit transition-all duration-300 px-6 border-0 bg-[#E8EDF2] text-[#B8B1E4] hover:!bg-[#bdbec0] hover:text-white dark:bg-[#313442] dark:hover:!bg-[#424242] py-[14px]">
+                class="btn normal-case h-fit min-h-fit transition-all duration-300 px-6 border-0 bg-[#E8EDF2] text-[#B8B1E4] hover:!bg-[#bdbec0] hover:text-white dark:bg-[#313442] dark:hover:!bg-[#424242] py-[14px]">
                 Quay lại
             </a>
         </div>
     </form>
 </div>
+<script>
+    document.getElementById('thumbnailUploadArea').addEventListener('click', function() {
+        document.getElementById('imageInput').click();
+    });
+</script>

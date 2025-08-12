@@ -160,28 +160,53 @@ public function store()
     }
 
     // Cập nhật (không bắt buộc up ảnh mới)
-    public function update($id)
-    {
-        $name = $_POST['name'] ?? '';
-        $parent_id = $_POST['parent_id'] ?? null;
-        $parent_id = ($parent_id === '') ? null : $parent_id;
+public function update($id)
+{
+    $name = trim($_POST['name'] ?? '');
+    $parent_id = $_POST['parent_id'] ?? null;
+    $parent_id = ($parent_id === '') ? null : $parent_id;
+    $current_image = $_POST['current_image'] ?? null;
 
-        $current_image = $_POST['current_image'] ?? null;
+    $errors = [];
+    $old = [
+        'name' => $name,
+        'parent_id' => $parent_id
+    ];
 
-        try {
-            $image_url = $this->handleImageUpload($_FILES['image'] ?? [], $current_image);
-        } catch (Throwable $e) {
-            $_SESSION['msg'] = '❌ ' . $e->getMessage();
-            $_SESSION['msg_type'] = 'error';
-            header('Location: index.php?admin=edit_category&id=' . (int)$id);
-            exit;
-        }
+    // Validate tên danh mục
+    if ($name === '') {
+        $errors['name'] = 'Chưa điền danh mục!';
+    } elseif ($this->model->existsByNameExceptId($name, (int)$id)) {
+        $errors['name'] = 'Tên danh mục đã tồn tại!';
+    }
 
-        // Model: update($id, $name, $parent_id, $image_url)
-        $this->model->update($id, $name, $parent_id, $image_url);
-        header('Location: index.php?admin=list_categories');
+    // Nếu có lỗi -> quay lại form và hiển thị
+    if (!empty($errors)) {
+        $_SESSION['errors'] = $errors;
+        $_SESSION['old'] = $old;
+        header('Location: index.php?admin=edit_category&id=' . (int)$id);
         exit;
     }
+
+    // Upload ảnh (nếu có)
+    try {
+        $image_url = $this->handleImageUpload($_FILES['image'] ?? [], $current_image);
+    } catch (Throwable $e) {
+        $_SESSION['msg'] = '❌ ' . $e->getMessage();
+        $_SESSION['msg_type'] = 'error';
+        $_SESSION['old'] = $old;
+        header('Location: index.php?admin=edit_category&id=' . (int)$id);
+        exit;
+    }
+
+    // Cập nhật DB
+    $this->model->update($id, $name, $parent_id, $image_url);
+
+    $_SESSION['msg'] = '✅ Cập nhật danh mục thành công!';
+    $_SESSION['msg_type'] = 'success';
+    header('Location: index.php?admin=list_categories');
+    exit;
+}
 
     // Xóa
     public function delete($id)
