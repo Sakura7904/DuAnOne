@@ -93,27 +93,59 @@ class CategoriesController
         ]);
     }
 
-    // Lưu thêm
-    public function store()
-    {
-        $name = $_POST['name'] ?? '';
-        $parent_id = $_POST['parent_id'] ?? null;
-        $parent_id = ($parent_id === '') ? null : $parent_id;
+    // Lưu thêm (YÊU CẦU: phải chọn ảnh)
+public function store()
+{
+    $name = trim($_POST['name'] ?? '');
+    $parent_id = $_POST['parent_id'] ?? null;
+    $parent_id = ($parent_id === '') ? null : $parent_id;
 
-        try {
-            $image_url = $this->handleImageUpload($_FILES['image'] ?? []);
-        } catch (Throwable $e) {
-            $_SESSION['msg'] = '❌ ' . $e->getMessage();
-            $_SESSION['msg_type'] = 'error';
-            header('Location: index.php?admin=create_category');
-            exit;
-        }
+    $errors = [];
+    $old = [
+        'name' => $name,
+        'parent_id' => $parent_id
+    ];
 
-        // Model: insert($name, $parent_id, $image_url)
-        $this->model->insert($name, $parent_id, $image_url);
-        header('Location: index.php?admin=list_categories');
+    // Validate tên
+    if ($name === '') {
+        $errors['name'] = 'Chưa điền danh mục!';
+    } elseif ($this->model->existsByName($name)) {
+        $errors['name'] = 'Tên danh mục đã tồn tại!';
+    }
+
+    // Validate ảnh (bắt buộc có)
+    if (empty($_FILES['image']['name'])) {
+        $errors['image'] = 'Chưa thêm ảnh!';
+    }
+
+    // Nếu có lỗi → quay lại form
+    if (!empty($errors)) {
+        $_SESSION['errors'] = $errors;
+        $_SESSION['old'] = $old;
+        header('Location: index.php?admin=create_category');
         exit;
     }
+
+    // Upload ảnh
+    try {
+        $image_url = $this->handleImageUpload($_FILES['image'] ?? []);
+    } catch (Throwable $e) {
+        $_SESSION['errors'] = ['image' => $e->getMessage()];
+        $_SESSION['old'] = $old;
+        header('Location: index.php?admin=create_category');
+        exit;
+    }
+
+    // Lưu DB
+    $this->model->insert($name, $parent_id, $image_url);
+
+    $_SESSION['msg'] = '✅ Thêm danh mục thành công!';
+    $_SESSION['msg_type'] = 'success';
+    header('Location: index.php?admin=list_categories');
+    exit;
+}
+
+
 
     // Sửa
     public function edit($id)
@@ -127,7 +159,7 @@ class CategoriesController
         ]);
     }
 
-    // Cập nhật
+    // Cập nhật (không bắt buộc up ảnh mới)
     public function update($id)
     {
         $name = $_POST['name'] ?? '';
