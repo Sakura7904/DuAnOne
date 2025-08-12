@@ -308,8 +308,21 @@ class OrderController
             $this->momoCreateCardPayment($orderId, $total, 'payWithCC', $email, null);
         } else {
             // COD (hoặc cổng khác)
-            $_SESSION['order_alert'] = ['type' => 'success', 'message' => "Đặt hàng thành công. Mã đơn #$orderId • Tổng " . number_format($total, 0, ',', '.') . 'đ'];
-            $this->redirect("index.php?user=order&id={$orderId}");
+            $resultCode = 0;                  // COD = success
+            $amount     = (int)$total;
+            $transId    = 'COD-' . $orderId;    // hoặc '' nếu không dùng
+            $content    = getContentPathClient('', 'payment_result');
+
+            view('user/index', [
+                'content'    => $content,
+                'isSuccess'  => true,
+                'orderId'    => $orderId,
+                'amount'     => $amount,
+                'orderInfo'  => 'Thanh toán khi nhận hàng (COD)',
+                'transId'    => $transId,
+                'payType'    => 'Ship COD',
+                'resultCode' => $resultCode,
+            ]);
         }
     }
 
