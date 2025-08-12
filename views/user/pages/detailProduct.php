@@ -220,7 +220,7 @@
                                     <button type="submit" class="btnAddToCart btnAtc unsel btn-outline tp_button mr-3">
                                         <span>Thêm vào giỏ hàng</span>
                                     </button>
-                                    <button type="submit" name="buy_now" value="1" class="btnAddToCart btnAtc btn-outline tp_button">
+                                    <button type="submit" name="buy_now" class="btnAddToCart btnAtc btn-outline tp_button">
                                         Mua ngay
                                     </button>
                                 </div>
