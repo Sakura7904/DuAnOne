@@ -19,7 +19,7 @@ function vnItemStatus(string $s): string
 {
     return match ($s) {
         'pending'   => 'Chờ thanh toán',
-        'confirmed' => 'Đang xử lý',
+        'processing' => 'Đang xử lý',
         'shipped'   => 'Chờ giao hàng',
         'delivered' => 'Hoàn thành',
         'cancelled' => 'Đã hủy',
@@ -142,7 +142,7 @@ function vnItemStatus(string $s): string
                                                         <div class="cpro_item qty productOrder text-center hidden-xs hidden-sm col-md-1">
                                                             <div class="cpro_item_inner" style="text-align:left;">
                                                                 <?php if ($img): ?>
-                                                                    <img src="<?=$img ?>" alt="" style="width:50px;height:50px;object-fit:cover;border-radius:6px">
+                                                                    <img src="<?= $img ?>" alt="" style="width:50px;height:50px;object-fit:cover;border-radius:6px">
                                                                 <?php else: ?>
                                                                     <div style="width:50px;height:50px;background:#f2f2f2;border-radius:6px;"></div>
                                                                 <?php endif; ?>
@@ -194,12 +194,14 @@ function vnItemStatus(string $s): string
                                                                     <b><?= vnItemStatus($itemStatus) ?></b>
                                                                 </span>
 
-                                                                <?php if (in_array($itemStatus, ['pending', 'confirmed'], true) && $orderItemId > 0): ?>
+                                                                <?php if (in_array($itemStatus, ['pending', 'processing'], true) && $orderItemId > 0): ?>
                                                                     <form action="?user=cancelOrderItem<?= isset($_GET['status']) ? '&status=' . urlencode($_GET['status']) : '' ?>"
                                                                         method="post" class="cancel-item-form" style="margin-top:6px;">
                                                                         <input type="hidden" name="order_item_id" value="<?= $orderItemId ?>">
                                                                         <button type="button" class="btn tab btn-sm btn-danger btn-cancel-item">Hủy đơn</button>
                                                                     </form>
+                                                                <?php elseif (in_array($itemStatus, ['cancelled'], true)): ?>
+                                                                    <a href="?user=detailProduct&id=<?=$it['product_id']?>" class="btn tab btn-sm btn-success">Mua lại</a>
                                                                 <?php endif; ?>
                                                             </div>
                                                         </div>

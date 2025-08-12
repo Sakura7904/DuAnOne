@@ -16,7 +16,7 @@ class PurchaseController
     private array $tabToItemStatuses = [
         'all'       => null,                 // không lọc
         'pending'   => ['pending'],          // Chờ thanh toán (item)
-        'processing' => ['confirmed'],        // Đang xử lý (item)
+        'processing' => ['processing'],        // Đang xử lý (item)
         'shipping'  => ['shipped'],          // Chờ giao hàng (item)
         'done'      => ['delivered'],        // Hoàn thành (item)
         'cancelled' => ['cancelled'],        // Đã hủy (item)
