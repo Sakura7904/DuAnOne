@@ -1,3 +1,8 @@
+<?php
+$errors = $_SESSION['errors_products'] ?? [];
+$old    = $_SESSION['old_products'] ?? [];
+unset($_SESSION['errors_products'], $_SESSION['old_products']);
+?>
 <div>
     <h2 class="capitalize text-gray-1100 font-bold text-[28px] leading-[35px] dark:text-gray-dark-1100 mb-[13px]">Thêm sản phẩm</h2>
     <div class="flex items-center text-xs text-gray-500 gap-x-[11px] mb-[17px]">
@@ -6,20 +11,32 @@
     <form action="?admin=store_products" method="POST" enctype="multipart/form-data" >
         <div class="flex gap-x-12 border rounded-2xl justify-between flex-col gap-y-12 bg-white border-neutral pt-[50px] pb-[132px] px-[39px] dark:border-dark-neutral-border lg:flex-row lg:gap-y-0 dark:bg-[#1F2128]">
             <div class="lg:max-w-[610px]">
-                <p class="text-gray-1100 text-base leading-4 font-medium capitalize mb-[10px] dark:text-gray-dark-1100">Tến sản phẩm</p>
+
+                <!-- Tên sản phẩm -->
+                <p class="text-gray-1100 text-base leading-4 font-medium capitalize mb-[10px] dark:text-gray-dark-1100">Tên sản phẩm</p>
                 <div class="input-group border rounded-lg border-[#E8EDF2] dark:border-[#313442] sm:min-w-[252px] mb-12">
                     <input name="name"
+                        value="<?= htmlspecialchars($old['name'] ?? '') ?>"
                         class="input bg-transparent text-sm leading-4 text-gray-400 h-fit min-h-fit py-4 focus:outline-none pl-[13px] dark:text-gray-dark-400 placeholder:text-inherit"
                         type="text" placeholder="Nhập tên sản phẩm">
                 </div>
+                <?php if (!empty($errors['name'])): ?>
+                    <p class="text-[13px] text-[#E23738] mb-12"><?= htmlspecialchars($errors['name']) ?></p>
+                <?php endif; ?>
 
+                <!-- Giá gốc -->
                 <p class="text-gray-1100 text-base leading-4 font-medium capitalize mb-[10px] dark:text-gray-dark-1100">Giá gốc</p>
                 <div class="input-group border rounded-lg border-[#E8EDF2] dark:border-[#313442] sm:min-w-[252px] mb-12">
                     <input name="price" id="price"
+                        value="<?= htmlspecialchars($old['price'] ?? '') ?>"
                         class="input bg-transparent text-sm leading-4 text-gray-400 h-fit min-h-fit py-4 focus:outline-none pl-[13px] dark:text-gray-dark-400 placeholder:text-inherit"
                         type="number" placeholder="Nhập giá gốc">
                 </div>
+                <?php if (!empty($errors['price'])): ?>
+                    <p class="text-[13px] text-[#E23738] mb-12"><?= htmlspecialchars($errors['price']) ?></p>
+                <?php endif; ?>
 
+                <!-- Ảnh chính -->
                 <p class="text-gray-1100 text-base leading-4 font-medium capitalize mb-[10px] dark:text-gray-dark-1100">Ảnh chính</p>
                 <div class="border-dashed border-2 text-center mb-12 border-neutral py-[26px] dark:border-dark-neutral-border"
                     id="thumbnailUploadArea" style="cursor: pointer;">
@@ -35,15 +52,18 @@
                         style="display: none;">
 
                     <!-- Preview area -->
-                    <div id="thumbnailPreview" class="mt-2">
-                    </div>
+                    <div id="thumbnailPreview" class="mt-2"></div>
                 </div>
+                <?php if (!empty($errors['thumbnail'])): ?>
+                    <p class="text-[13px] text-[#E23738] mb-12"><?= htmlspecialchars($errors['thumbnail']) ?></p>
+                <?php endif; ?>
 
+                <!-- Danh mục -->
                 <p class="text-gray-1100 text-base leading-4 font-medium capitalize mb-[10px] dark:text-gray-dark-1100">Danh mục</p>
                 <select name="category_id" class="select w-full border rounded-lg font-normal text-sm leading-4 text-gray-400 py-4 h-fit min-h-fit border-[#E8EDF2] dark:border-[#313442] focus:outline-none pl-[13px] min-w-[252px] dark:text-gray-dark-400 mb-12">
-                    <option disabled="" selected="">--Chọn danh mục--</option>
+                    <option value="" disabled <?= empty($old['category_id']) ? 'selected' : '' ?>>--Chọn danh mục--</option>
                     <?php foreach ($categories as $category): ?>
-                        <option value="<?= $category['id'] ?>">
+                        <option value="<?= $category['id'] ?>" <?= ((string)($old['category_id'] ?? '') === (string)$category['id']) ? 'selected' : '' ?>>
                             <?= htmlspecialchars($category['name']) ?>
                             <?php if ($category['parent_name']): ?>
                                 (<?= htmlspecialchars($category['parent_name']) ?>)
@@ -51,20 +71,43 @@
                         </option>
                     <?php endforeach; ?>
                 </select>
+                <?php if (!empty($errors['category_id'])): ?>
+                    <p class="text-[13px] text-[#E23738] mb-12"><?= htmlspecialchars($errors['category_id']) ?></p>
+                <?php endif; ?>
+
+                <!-- Mô tả -->
                 <p class="text-gray-1100 text-base leading-4 font-medium capitalize mb-[10px] dark:text-gray-dark-1100">Mô tả</p>
                 <div class="rounded-lg mb-12 border border-neutral dark:border-dark-neutral-border p-[13px]">
                     <div class="flex items-center gap-y-4 flex-col gap-x-[27px] mb-[31px] xl:flex-row xl:gap-y-0">
-                        <div class="flex items-center gap-x-[20px]"><img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-bold.svg" alt="bold icon"><img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-italicized.svg" alt="italicized icon"><img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-underlined.svg" alt="underlined icon"><img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-strikethrough.svg" alt="strikethrough icon"><img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-textcolor.svg" alt="textcolor icon"><img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-backgroundcolor.svg" alt="backgroundcolor icon"><img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-smile.svg" alt="smile icon"></div>
+                        <div class="flex items-center gap-x-[20px]">
+                            <img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-bold.svg" alt="bold icon">
+                            <img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-italicized.svg" alt="italicized icon">
+                            <img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-underlined.svg" alt="underlined icon">
+                            <img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-strikethrough.svg" alt="strikethrough icon">
+                            <img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-textcolor.svg" alt="textcolor icon">
+                            <img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-backgroundcolor.svg" alt="backgroundcolor icon">
+                            <img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-smile.svg" alt="smile icon">
+                        </div>
                         <div class="flex items-center gap-x-[20px]">
                             <div class="flex items-center cursor-pointer gap-x-[1.5px]"><img src="./assets/admin/assets/images/icons/icon-paragraphformat.svg" alt="paragraphformat icon"><img src="./assets/admin/assets/images/icons/icon-arrow-down-triangle.svg" alt="arrow down triangle icon"></div>
                             <div class="flex items-center cursor-pointer gap-x-[1.5px]"><img src="./assets/admin/assets/images/icons/icon-align-left.svg" alt="align left icon"><img src="./assets/admin/assets/images/icons/icon-arrow-down-triangle.svg" alt="arrow down triangle icon"></div>
                             <div class="flex items-center cursor-pointer gap-x-[1.5px]"><img src="./assets/admin/assets/images/icons/icon-ordered-list.svg" alt="ordered list icon"><img src="./assets/admin/assets/images/icons/icon-arrow-down-triangle.svg" alt="arrow down triangle icon"></div>
-                            <div class="flex items-center cursor-pointer gap-x-[1.5px]"><img src="./assets/admin/assets/images/icons/icon-unordered-list.svg" alt="unordered list icon"><img src="./assets/admin/assets/images/icons/icon-arrow-down-triangle.svg" alt="arrow down triangle icon"></div><img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-indent.svg" alt="indent icon"><img class="cursor-pointer opacity-40" src="./assets/admin/assets/images/icons/icon-indent.svg" alt="outdent icon">
+                            <div class="flex items-center cursor-pointer gap-x-[1.5px]"><img src="./assets/admin/assets/images/icons/icon-unordered-list.svg" alt="unordered list icon"><img src="./assets/admin/assets/images/icons/icon-arrow-down-triangle.svg" alt="arrow down triangle icon"></div>
+                            <img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-indent.svg" alt="indent icon">
+                            <img class="cursor-pointer opacity-40" src="./assets/admin/assets/images/icons/icon-indent.svg" alt="outdent icon">
                         </div>
-                        <div class="flex items-center gap-x-[20px]"><img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-insert-image.svg" alt="insert image icon"><img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-insert-link.svg" alt="insert link icon"><img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-insert-file.svg" alt="insert-file icon"><img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-insert-video.svg" alt="insert video icon"><img class="cursor-pointer opacity-40" src="./assets/admin/assets/images/icons/icon-undo.svg" alt="undo icon"><img class="cursor-pointer opacity-40" src="./assets/admin/assets/images/icons/icon-redo.svg" alt="redo icon"></div>
+                        <div class="flex items-center gap-x-[20px]">
+                            <img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-insert-image.svg" alt="insert image icon">
+                            <img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-insert-link.svg" alt="insert link icon">
+                            <img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-insert-file.svg" alt="insert-file icon">
+                            <img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-insert-video.svg" alt="insert video icon">
+                            <img class="cursor-pointer opacity-40" src="./assets/admin/assets/images/icons/icon-undo.svg" alt="undo icon">
+                            <img class="cursor-pointer opacity-40" src="./assets/admin/assets/images/icons/icon-redo.svg" alt="redo icon">
+                        </div>
                     </div>
-                    <textarea class="textarea w-full p-0 text-gray-400 resize-none rounded-none bg-transparent min-h-[140px] focus:outline-none" placeholder="Nhập mô tả"></textarea>
+                    <textarea name="description" class="textarea w-full p-0 text-gray-400 resize-none rounded-none bg-transparent min-h-[140px] focus:outline-none" placeholder="Nhập mô tả"><?= htmlspecialchars($old['description'] ?? '') ?></textarea>
                 </div>
+
                 <div class="">
                     <button type="submit"
                         class="btn normal-case h-fit min-h-fit transition-all duration-300 border-4 bg-color-brands hover:bg-color-brands hover:border-[#B2A7FF] dark:hover:border-[#B2A7FF] border-neutral-bg px-6 dark:border-dark-neutral-bg py-[14px]">
@@ -76,6 +119,8 @@
                     </a>
                 </div>
             </div>
+
+            <!-- Ảnh con -->
             <div style="width: 610px;">
                 <p class="text-gray-1100 text-base leading-4 font-medium capitalize mb-[10px] dark:text-gray-dark-1100">Ảnh con</p>
                 <div id="galleryUploadArea" style="cursor: pointer;"
@@ -92,28 +137,20 @@
                         data-max-files="10"
                         onchange="validateFileCount(this)"
                         style="display: none;">
-
                     <script>
                         function validateFileCount(input) {
                             const maxFiles = parseInt(input.dataset.maxFiles) || 10;
-
                             if (input.files.length > maxFiles) {
                                 alert(`Bạn chỉ được chọn tối đa ${maxFiles} ảnh!`);
                                 input.value = '';
                                 return false;
                             }
-
-                            // Tiếp tục xử lý preview...
                             previewGallery(input);
                             return true;
                         }
                     </script>
-
                 </div>
-
-                <div id="galleryPreviewContainer" class="flex flex-col mb-12 gap-y-[10px]">
-
-                </div>
+                <div id="galleryPreviewContainer" class="flex flex-col mb-12 gap-y-[10px]"></div>
                 <div class="flex items-center gap-x-4 flex-wrap gap-y-4">
                     <button type="button"
                         id="selectGalleryBtn"
@@ -128,11 +165,9 @@
                 </div>
             </div>
         </div>
-
-
-
     </form>
 </div>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

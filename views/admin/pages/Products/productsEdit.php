@@ -1,9 +1,20 @@
 <?php
-$product = $data['product'] ?? [];
-$categories = $data['categories'] ?? [];
+$product        = $data['product'] ?? [];
+$categories     = $data['categories'] ?? [];
 $defaultVariant = $data['defaultVariant'] ?? null;
-$galleryImages = $data['galleryImages'] ?? [];
-$title = $data['title'] ?? 'Sửa sản phẩm';
+$galleryImages  = $data['galleryImages'] ?? [];
+$title          = $data['title'] ?? 'Sửa sản phẩm';
+
+/* Lấy lỗi & dữ liệu cũ (nếu submit fail) */
+$errors = $_SESSION['errors_products'] ?? [];
+$old    = $_SESSION['old_products'] ?? [];
+unset($_SESSION['errors_products'], $_SESSION['old_products']);
+
+/* Helper lấy giá trị hiển thị: ưu tiên $old -> $product */
+$nameValue        = isset($old['name'])        ? $old['name']        : ($product['name'] ?? '');
+$priceValue       = isset($old['price'])       ? $old['price']       : ($defaultVariant ? $defaultVariant['price'] : 0);
+$descValue        = isset($old['description']) ? $old['description'] : ($product['description'] ?? '');
+$selectedCategory = isset($old['category_id']) ? $old['category_id'] : ($product['category_id'] ?? '');
 ?>
 <div>
     <h2 class="capitalize text-gray-1100 font-bold text-[28px] leading-[35px] dark:text-gray-dark-1100 mb-[13px]"><?= $title ?></h2>
@@ -17,17 +28,23 @@ $title = $data['title'] ?? 'Sửa sản phẩm';
             <div class="lg:max-w-[610px]">
                 <p class="text-gray-1100 text-base leading-4 font-medium capitalize mb-[10px] dark:text-gray-dark-1100">Tến sản phẩm</p>
                 <div class="input-group border rounded-lg border-[#E8EDF2] dark:border-[#313442] sm:min-w-[252px] mb-12">
-                    <input name="name" value="<?= $product['name']  ?>"
+                    <input name="name" value="<?= htmlspecialchars($nameValue) ?>"
                         class="input bg-transparent text-sm leading-4 text-gray-400 h-fit min-h-fit py-4 focus:outline-none pl-[13px] dark:text-gray-dark-400 placeholder:text-inherit"
                         type="text" placeholder="Nhập tên sản phẩm">
                 </div>
+                <?php if (!empty($errors['name'])): ?>
+                    <p class="text-[13px] text-[#E23738] mb-12"><?= htmlspecialchars($errors['name']) ?></p>
+                <?php endif; ?>
 
                 <p class="text-gray-1100 text-base leading-4 font-medium capitalize mb-[10px] dark:text-gray-dark-1100">Giá gốc</p>
                 <div class="input-group border rounded-lg border-[#E8EDF2] dark:border-[#313442] sm:min-w-[252px] mb-12">
-                    <input name="price" id="price" value="<?= $defaultVariant ? $defaultVariant['price'] : 0 ?>"
+                    <input name="price" id="price" value="<?= htmlspecialchars($priceValue) ?>"
                         class="input bg-transparent text-sm leading-4 text-gray-400 h-fit min-h-fit py-4 focus:outline-none pl-[13px] dark:text-gray-dark-400 placeholder:text-inherit"
                         type="number" placeholder="Nhập giá gốc">
                 </div>
+                <?php if (!empty($errors['price'])): ?>
+                    <p class="text-[13px] text-[#E23738] mb-12"><?= htmlspecialchars($errors['price']) ?></p>
+                <?php endif; ?>
 
                 <p class="text-gray-1100 text-base leading-4 font-medium capitalize mb-[10px] dark:text-gray-dark-1100">Ảnh chính</p>
                 <div
@@ -63,13 +80,16 @@ $title = $data['title'] ?? 'Sửa sản phẩm';
                         <?php endif; ?>
                     </div>
                 </div>
+                <?php if (!empty($errors['thumbnail'])): ?>
+                    <p class="text-[13px] text-[#E23738] mb-12"><?= htmlspecialchars($errors['thumbnail']) ?></p>
+                <?php endif; ?>
 
                 <p class="text-gray-1100 text-base leading-4 font-medium capitalize mb-[10px] dark:text-gray-dark-1100">Danh mục</p>
                 <select name="category_id" class="select w-full border rounded-lg font-normal text-sm leading-4 text-gray-400 py-4 h-fit min-h-fit border-[#E8EDF2] dark:border-[#313442] focus:outline-none pl-[13px] min-w-[252px] dark:text-gray-dark-400 mb-12">
-                    <option disabled="" selected="">--Chọn danh mục--</option>
+                    <option disabled="" <?= $selectedCategory === '' ? 'selected' : '' ?>>--Chọn danh mục--</option>
                     <?php foreach ($categories as $category): ?>
                         <option value="<?= $category['id'] ?>"
-                            <?= $category['id'] == $product['category_id'] ? 'selected' : '' ?>>
+                            <?= ((string)$category['id'] === (string)$selectedCategory) ? 'selected' : '' ?>>
                             <?= htmlspecialchars($category['name']) ?>
                             <?php if ($category['parent_name']): ?>
                                 (<?= htmlspecialchars($category['parent_name']) ?>)
@@ -77,6 +97,10 @@ $title = $data['title'] ?? 'Sửa sản phẩm';
                         </option>
                     <?php endforeach; ?>
                 </select>
+                <?php if (!empty($errors['category_id'])): ?>
+                    <p class="text-[13px] text-[#E23738] mb-12"><?= htmlspecialchars($errors['category_id']) ?></p>
+                <?php endif; ?>
+
                 <p class="text-gray-1100 text-base leading-4 font-medium capitalize mb-[10px] dark:text-gray-dark-1100">Mô tả</p>
                 <div class="rounded-lg mb-12 border border-neutral dark:border-dark-neutral-border p-[13px]">
                     <div class="flex items-center gap-y-4 flex-col gap-x-[27px] mb-[31px] xl:flex-row xl:gap-y-0">
@@ -89,7 +113,7 @@ $title = $data['title'] ?? 'Sửa sản phẩm';
                         </div>
                         <div class="flex items-center gap-x-[20px]"><img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-insert-image.svg" alt="insert image icon"><img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-insert-link.svg" alt="insert link icon"><img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-insert-file.svg" alt="insert-file icon"><img class="cursor-pointer" src="./assets/admin/assets/images/icons/icon-insert-video.svg" alt="insert video icon"><img class="cursor-pointer opacity-40" src="./assets/admin/assets/images/icons/icon-undo.svg" alt="undo icon"><img class="cursor-pointer opacity-40" src="./assets/admin/assets/images/icons/icon-redo.svg" alt="redo icon"></div>
                     </div>
-                    <textarea name="description" class="textarea w-full p-0 text-gray-400 resize-none rounded-none bg-transparent min-h-[140px] focus:outline-none" placeholder="Nhập mô tả"><?= htmlspecialchars($product['description']) ?></textarea>
+                    <textarea name="description" class="textarea w-full p-0 text-gray-400 resize-none rounded-none bg-transparent min-h-[140px] focus:outline-none" placeholder="Nhập mô tả"><?= htmlspecialchars($descValue) ?></textarea>
                 </div>
                 <div class="">
                     <button type="submit"
@@ -143,6 +167,7 @@ $title = $data['title'] ?? 'Sửa sản phẩm';
         </div>
     </form>
 </div>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

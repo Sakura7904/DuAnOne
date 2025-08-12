@@ -143,6 +143,22 @@ class ProductModel
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+    public function existsByName($name)
+    {
+        $sql = "SELECT COUNT(*) FROM products WHERE name = ?";
+        $stmt = $this->db->pdo->prepare($sql);
+        $stmt->execute([$name]);
+        return $stmt->fetchColumn() > 0;
+    }
+    public function existsByNameExcept($name, $id)
+{
+    $sql = "SELECT COUNT(*) FROM products WHERE name = ? AND id != ?";
+    $stmt = $this->db->pdo->prepare($sql);
+    $stmt->execute([$name, $id]);
+    return $stmt->fetchColumn() > 0;
+}
+
+
 
     // Lấy sản phẩm theo danh mục
     public function getProductsByCategory($category_id)
