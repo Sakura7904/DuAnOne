@@ -1,4 +1,10 @@
 <?php
+$hasProducts = ($totalProducts > 0);
+$startItem   = $hasProducts ? (($currentPage - 1) * $perPage + 1) : 0;
+$endItem     = $hasProducts ? min($startItem + count($products) - 1, $totalProducts) : 0;
+
+// giữ lại keyword (nếu có) khi click phân trang
+$qKeyword = ($keyword ?? '') !== '' ? '&keyword=' . urlencode($keyword) : '';
 ?>
 <div class="container">
     <div class="headCategory hidden-xs hidden-sm"
@@ -127,51 +133,44 @@
                                 </div>
                             </div>
                         <?php endforeach; ?>
-                        <ul class="pagination col-lg-12 col-md-12 hidden-sm hidden-xs">
-                            <div class="paginator">
-                                <?php
-                                $startItem = ($currentPage - 1) * $perPage + 1;
-                                $endItem = min($startItem + count($products) - 1, $totalProducts);
-                                ?>
+                 <ul class="pagination col-lg-12 col-md-12 hidden-sm hidden-xs">
+    <div class="paginator">
+        <span class="labelPages"><?= $startItem ?> - <?= $endItem ?> / <?= $totalProducts ?></span>
+        <span class="titlePages">&nbsp;&nbsp;Trang: </span>
 
-                                <!-- Tổng số -->
-                                <span class="labelPages"><?= $startItem ?> - <?= $endItem ?> / <?= $totalProducts ?></span>
-                                <span class="titlePages">&nbsp;&nbsp;Trang: </span>
+        <?php if ($hasProducts && $currentPage > 1): ?>
+            <a
+                rel="nofollow, noindex"
+                class="paging-previous ico"
+                title="Trang trước"
+                href="index.php?user=productsByCategory&category_id=<?= (int)$categoryId ?>&sort=<?= htmlspecialchars($sort) ?><?= $qKeyword ?>&pg=<?= $currentPage - 1 ?>">
+            </a>
+        <?php endif; ?>
 
-                                <!-- Nút Preview -->
-                                <?php if ($currentPage > 1): ?>
-                                    <a
-                                        rel="nofollow, noindex"
-                                        class="paging-previous ico"
-                                        title="Trang trước"
-                                        href="index.php?user=productsByCategory&category_id=<?= $categoryId ?>&sort=<?= $sort ?>&page=<?= $currentPage - 1 ?>">
-                                    </a>
-                                <?php endif; ?>
+        <?php if ($hasProducts): ?>
+            <?php for ($i = 1; $i <= (int)$totalPages; $i++): ?>
+                <?php if ($i == (int)$currentPage): ?>
+                    <span class="currentPage"><?= $i ?></span>
+                <?php else: ?>
+                    <a
+                        rel="nofollow, noindex"
+                        href="index.php?user=productsByCategory&category_id=<?= (int)$categoryId ?>&sort=<?= htmlspecialchars($sort) ?><?= $qKeyword ?>&pg=<?= $i ?>">
+                        <?= $i ?>
+                    </a>
+                <?php endif; ?>
+            <?php endfor; ?>
+        <?php endif; ?>
 
-                                <!-- Số trang -->
-                                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                    <?php if ($i == $currentPage): ?>
-                                        <span class="currentPage"><?= $i ?></span>
-                                    <?php else: ?>
-                                        <a
-                                            rel="nofollow, noindex"
-                                            href="index.php?user=productsByCategory&category_id=<?= $categoryId ?>&sort=<?= $sort ?>&page=<?= $i ?>">
-                                            <?= $i ?>
-                                        </a>
-                                    <?php endif; ?>
-                                <?php endfor; ?>
-
-                                <!-- Nút Next -->
-                                <?php if ($currentPage < $totalPages): ?>
-                                    <a
-                                        rel="nofollow, noindex"
-                                        class="paging-next ico"
-                                        title="Trang sau"
-                                        href="index.php?user=productsByCategory&category_id=<?= $categoryId ?>&sort=<?= $sort ?>&page=<?= $currentPage + 1 ?>">
-                                    </a>
-                                <?php endif; ?>
-                            </div>
-                        </ul>
+        <?php if ($hasProducts && $currentPage < (int)$totalPages): ?>
+            <a
+                rel="nofollow, noindex"
+                class="paging-next ico"
+                title="Trang sau"
+                href="index.php?user=productsByCategory&category_id=<?= (int)$categoryId ?>&sort=<?= htmlspecialchars($sort) ?><?= $qKeyword ?>&pg=<?= $currentPage + 1 ?>">
+            </a>
+        <?php endif; ?>
+    </div>
+</ul>
 
 
 

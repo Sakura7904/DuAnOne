@@ -3,17 +3,16 @@ include_once "models/user/UserProductModel.php";
 
 class ProductByCategoryController
 {
-    
     public function showByCategory()
     {
         $categoryId   = isset($_GET['category_id']) ? (int)$_GET['category_id'] : 0;
         $sort         = $_GET['sort'] ?? 'newest';
-        $currentPage  = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        // ĐỌC THAM SỐ TRANG TỪ 'pg' (không phải 'page')
+        $currentPage  = isset($_GET['pg']) ? max(1, (int)$_GET['pg']) : 1;
         $perPage      = 12;
         $offset       = ($currentPage - 1) * $perPage;
         $keyword      = trim($_GET['keyword'] ?? '');
 
-        // Trang danh mục vẫn cần category id hợp lệ
         if ($categoryId <= 0) {
             die("Danh mục không hợp lệ!");
         }
@@ -21,16 +20,28 @@ class ProductByCategoryController
         $productModel = new UserProductModel();
 
         if ($keyword !== '') {
-            // ======= TÌM KIẾM CƠ BẢN (TOÀN SHOP) =======
+            // TÌM KIẾM: không phân trang
             $products       = $productModel->searchProduct($keyword); 
             $totalProducts  = count($products);
-            $totalPages     = 1;                 // đơn giản: không phân trang khi search
+            $totalPages     = 1;
             $currentPage    = 1;
         } else {
-            // ======= DANH MỤC BÌNH THƯỜNG =======
+            // DANH MỤC
             $totalProducts  = $productModel->countProductsByCategory($categoryId);
-            $products       = $productModel->getProductsByCategory($categoryId, $sort, $perPage, $offset);
             $totalPages     = (int)ceil($totalProducts / $perPage);
+
+            // Clamp & nạp lại nếu cần
+            if ($totalPages === 0) {
+                $currentPage = 1;
+                $offset = 0;
+                $products = [];
+            } elseif ($currentPage > $totalPages) {
+                $currentPage = $totalPages;
+                $offset = ($currentPage - 1) * $perPage;
+                $products = $productModel->getProductsByCategory($categoryId, $sort, $perPage, $offset);
+            } else {
+                $products = $productModel->getProductsByCategory($categoryId, $sort, $perPage, $offset);
+            }
         }
 
         foreach ($products as &$product) {
