@@ -18,6 +18,7 @@ include "controllers/admin/CategoriesController.php";
 include "controllers/admin/AuthController.php";
 include "controllers/admin/AccountsController.php";
 include "controllers/admin/ProductController.php";
+include "controllers/admin/OrdersController.php";
 
 // ========================= Controller client =========================
 include "controllers/user/HomeController.php";
@@ -87,6 +88,9 @@ if (!empty($admin)) {
         'list_accounts'         => (new AccountsController())->index(),
         'change_status_accounts' => (new AccountsController())->changeStatus($_POST['id']),
         'promote_accounts_role'    => (new AccountsController())->changeRole($_POST['id']),
+
+        // ===== QUẢN LÝ ĐƠN HÀNG =====
+        'list-order' => (new OrdersController())->order(),
 
 
         // ===== Mặc định không tìm thấy =====

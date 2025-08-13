@@ -200,8 +200,8 @@ function vnItemStatus(string $s): string
                                                                         <input type="hidden" name="order_item_id" value="<?= $orderItemId ?>">
                                                                         <button type="button" class="btn tab btn-sm btn-danger btn-cancel-item">Hủy đơn</button>
                                                                     </form>
-                                                                <?php elseif (in_array($itemStatus, ['cancelled'], true)): ?>
-                                                                    <a href="?user=detailProduct&id=<?=$it['product_id']?>" class="btn tab btn-sm btn-success">Mua lại</a>
+                                                                <?php elseif (in_array($itemStatus, ['cancelled', 'delivered'], true)): ?>
+                                                                    <a href="?user=detailProduct&id=<?= $it['product_id'] ?>" class="btn tab btn-sm btn-success">Mua lại</a>
                                                                 <?php endif; ?>
                                                             </div>
                                                         </div>
