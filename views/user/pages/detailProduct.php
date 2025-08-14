@@ -96,359 +96,388 @@
 
                     </div>
                 </div>
-            </div>
+                <?php
+                $pid = (int)$product['id'];
+                $vid = isset($defaultVariant['id']) ? (int)$defaultVariant['id'] : 0;
 
-            <div class="col-xs-12 col-sm-12 col-lg-6 col-md-6 details-pro noPadding">
-                <div class="popupBuyMobile">
-                    <div class="boxProductMobile">
-                        <div class="infoProductMobile">
-                            <h1 class="title-head"><?= $product['name'] ?></h1>
-                            <div class="boxHeadViewProduct">
-                                <div class="product-code">Danh mục: <span><?= $product['category_name'] ?></span></div>
-                                <div class="starbaprv-widget">
-                                    <div class="starbap-prev-badge voteView0">
-                                        <a class="starbap-star starbap--off star-1">
-                                            <i class="fas fa-star fa-fw"></i>
-                                        </a>
-                                        <a class="starbap-star starbap--off star-2">
-                                            <i class="fas fa-star fa-fw"></i>
-                                        </a>
-                                        <a class="starbap-star starbap--off star-3">
-                                            <i class="fas fa-star fa-fw"></i>
-                                        </a>
-                                        <a class="starbap-star starbap--off star-4">
-                                            <i class="fas fa-star fa-fw"></i>
-                                        </a>
-                                        <a class="starbap-star starbap--off star-5">
-                                            <i class="fas fa-star fa-fw"></i>
-                                        </a>
-                                        <span class="starbap-prev-badgetext">(0)</span>
-                                    </div>
+                // (tuỳ chọn) đổi icon nếu đã thích
+                $liked = false;
+                if (!empty($_SESSION['user_id'])) {
+                    include_once 'models/user/WishlistModel.php';
+                    $wl  = new WishlistModel();
+                    $map = $wl->getProductIdsByUser((int)$_SESSION['user_id']); // [product_id => true]
+                    $liked = !empty($map[$pid]);
+                }
+                ?>
+                <form action="index.php?user=toggleWishlist" method="post"
+                    class="wishlistAdd wishlistItems wishlist-abs">
+                    <?php if ($vid > 0): ?>
+                        <input type="hidden" name="variant_id" value="<?= $vid ?>">
+                    <?php else: ?>
+                        <input type="hidden" name="product_id" value="<?= $pid ?>">
+                    <?php endif; ?>
+
+                    <button type="submit" aria-label="<?= $liked ? 'Bỏ khỏi yêu thích' : 'Thêm vào yêu thích' ?>"
+                        class="btn-wishlist-icon" title="<?= $liked ? 'Bỏ khỏi yêu thích' : 'Thêm vào yêu thích' ?>">
+                        <i class="<?= $liked ? 'fas' : 'far' ?> fa-heart"></i>
+                    </button>
+                </form>
+                <!-- === HẾT NÚT WISHLIST === -->
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-lg-6 col-md-6 details-pro noPadding">
+            <div class="popupBuyMobile">
+                <div class="boxProductMobile">
+                    <div class="infoProductMobile">
+                        <h1 class="title-head"><?= $product['name'] ?></h1>
+                        <div class="boxHeadViewProduct">
+                            <div class="product-code">Danh mục: <span><?= $product['category_name'] ?></span></div>
+                            <div class="starbaprv-widget">
+                                <div class="starbap-prev-badge voteView0">
+                                    <a class="starbap-star starbap--off star-1">
+                                        <i class="fas fa-star fa-fw"></i>
+                                    </a>
+                                    <a class="starbap-star starbap--off star-2">
+                                        <i class="fas fa-star fa-fw"></i>
+                                    </a>
+                                    <a class="starbap-star starbap--off star-3">
+                                        <i class="fas fa-star fa-fw"></i>
+                                    </a>
+                                    <a class="starbap-star starbap--off star-4">
+                                        <i class="fas fa-star fa-fw"></i>
+                                    </a>
+                                    <a class="starbap-star starbap--off star-5">
+                                        <i class="fas fa-star fa-fw"></i>
+                                    </a>
+                                    <span class="starbap-prev-badgetext">(0)</span>
                                 </div>
-                                <a href="#box-rating" class="number-purchase">0 Nhận xét</a>
                             </div>
+                            <a href="#box-rating" class="number-purchase">0 Nhận xét</a>
                         </div>
-                        <div class="price-box" id="priceDisplay">
-                            <?php if ($defaultVariant['sale_price'] && $defaultVariant['sale_price'] > 0): ?>
-                                <span class="discountPrice tp_product_detail_price"><?= number_format($defaultVariant['sale_price']) ?>đ</span>
-                                <del class="product-price-old tp_product_detail_price_old"><?= number_format($defaultVariant['price']) ?>đ</del>
+                    </div>
+                    <div class="price-box" id="priceDisplay">
+                        <?php if ($defaultVariant['sale_price'] && $defaultVariant['sale_price'] > 0): ?>
+                            <span class="discountPrice tp_product_detail_price"><?= number_format($defaultVariant['sale_price']) ?>đ</span>
+                            <del class="product-price-old tp_product_detail_price_old"><?= number_format($defaultVariant['price']) ?>đ</del>
+                        <?php else: ?>
+                            <span class="discountPrice tp_product_detail_price"><?= number_format($defaultVariant['price']) ?>đ</span>
+                        <?php endif; ?>
+                    </div>
+                    <input type="hidden" id="prdInfo" data-category="Thu Đông 1F" data-id="40768009"
+                        data-name="Đầm sát nách dáng ôm dài buộc nơ"
+                        data-price="<?= $defaultVariant['sale_price'] && $defaultVariant['sale_price'] > 0 ? number_format($defaultVariant['sale_price']) : number_format($defaultVariant['price']) ?>">
+
+                </div>
+                <?php
+                // Tách riêng các thuộc tính
+                $colorAttribute = null;
+                $sizeAttribute = null;
+                $otherAttributes = [];
+
+                foreach ($attributes as $attribute) {
+                    $attributeName = strtolower($attribute['name']);
+
+                    if (in_array($attributeName, ['color', 'màu', 'màu sắc', 'mau', 'mau sac'])) {
+                        $colorAttribute = $attribute;
+                    } elseif (in_array($attributeName, ['size', 'kích thước', 'kich thuoc', 'kích cỡ', 'kich co'])) {
+                        $sizeAttribute = $attribute;
+                    } else {
+                        $otherAttributes[] = $attribute;
+                    }
+                }
+                ?>
+
+                <!-- ==== FORM ADD TO CART ==== -->
+                <form id="addToCartForm" action="?user=addToCart" method="POST">
+
+                    <!-- Các thuộc tính chọn (giữ nguyên của bạn) -->
+                    <div class="attr">
+                        <!-- Chọn màu sắc -->
+                        <div class="colorPicker clearfix">
+                            <label class="control-label options-title">Màu sắc: </label>
+                            <?php if (isset($colorAttribute['values'])) : ?>
+                                <?php foreach ($colorAttribute['values'] as $value): ?>
+                                    <p class="color req" column="i1">
+                                        <span class="itemColor">
+                                            <a rel="nofollow" href="javascript:"
+                                                class="color-option-new"
+                                                data-color-value="<?= htmlspecialchars($value['value']) ?>"
+                                                title="<?= htmlspecialchars($value['value']) ?>"
+                                                style="background-color: <?= $value['color_code'] ?>">
+                                                <img src="https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg" alt="" />
+                                            </a>
+                                        </span>
+                                    </p>
+                                <?php endforeach; ?>
                             <?php else: ?>
-                                <span class="discountPrice tp_product_detail_price"><?= number_format($defaultVariant['price']) ?>đ</span>
+                                <p>Chưa có màu sắc</p>
                             <?php endif; ?>
                         </div>
-                        <input type="hidden" id="prdInfo" data-category="Thu Đông 1F" data-id="40768009"
-                            data-name="Đầm sát nách dáng ôm dài buộc nơ"
-                            data-price="<?= $defaultVariant['sale_price'] && $defaultVariant['sale_price'] > 0 ? number_format($defaultVariant['sale_price']) : number_format($defaultVariant['price']) ?>">
 
+                        <!-- Size -->
+                        <div class="sizePicker clearfix" id="sizeSection" style="display:none;">
+                            <label class="control-label options-title">Size: </label>
+                            <div id="sizeContainer" class="size-options-inline"></div>
+                        </div>
+
+                        <!-- Tồn kho -->
+                        <div class="stockInfo clearfix" id="stockSection" style="display:none;">
+                            <label class="control-label options-title">Còn: </label>
+                            <div id="stockContainer" class="stock-options-inline"></div>
+                        </div>
                     </div>
-                    <?php
-                    // Tách riêng các thuộc tính
-                    $colorAttribute = null;
-                    $sizeAttribute = null;
-                    $otherAttributes = [];
 
-                    foreach ($attributes as $attribute) {
-                        $attributeName = strtolower($attribute['name']);
-
-                        if (in_array($attributeName, ['color', 'màu', 'màu sắc', 'mau', 'mau sac'])) {
-                            $colorAttribute = $attribute;
-                        } elseif (in_array($attributeName, ['size', 'kích thước', 'kich thuoc', 'kích cỡ', 'kich co'])) {
-                            $sizeAttribute = $attribute;
-                        } else {
-                            $otherAttributes[] = $attribute;
-                        }
-                    }
-                    ?>
-
-                    <!-- ==== FORM ADD TO CART ==== -->
-                    <form id="addToCartForm" action="?user=addToCart" method="POST">
-
-                        <!-- Các thuộc tính chọn (giữ nguyên của bạn) -->
-                        <div class="attr">
-                            <!-- Chọn màu sắc -->
-                            <div class="colorPicker clearfix">
-                                <label class="control-label options-title">Màu sắc: </label>
-                                <?php if (isset($colorAttribute['values'])) : ?>
-                                    <?php foreach ($colorAttribute['values'] as $value): ?>
-                                        <p class="color req" column="i1">
-                                            <span class="itemColor">
-                                                <a rel="nofollow" href="javascript:"
-                                                    class="color-option-new"
-                                                    data-color-value="<?= htmlspecialchars($value['value']) ?>"
-                                                    title="<?= htmlspecialchars($value['value']) ?>"
-                                                    style="background-color: <?= $value['color_code'] ?>">
-                                                    <img src="https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg" alt="" />
-                                                </a>
-                                            </span>
-                                        </p>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <p>Chưa có màu sắc</p>
-                                <?php endif; ?>
-                            </div>
-
-                            <!-- Size -->
-                            <div class="sizePicker clearfix" id="sizeSection" style="display:none;">
-                                <label class="control-label options-title">Size: </label>
-                                <div id="sizeContainer" class="size-options-inline"></div>
-                            </div>
-
-                            <!-- Tồn kho -->
-                            <div class="stockInfo clearfix" id="stockSection" style="display:none;">
-                                <label class="control-label options-title">Còn: </label>
-                                <div id="stockContainer" class="stock-options-inline"></div>
-                            </div>
-                        </div>
-
-                        <!-- Số lượng -->
-                        <div class="form-product">
-                            <div class="clearfix form-group">
-                                <div class="qty-ant clearfix custom-btn-number">
-                                    <label>Số lượng:</label>
-                                    <div class="custom custom-btn-numbers">
-                                        <button type="button" class="btn-cts btn-minus-view">–</button>
-                                        <input type="number" name="quantity" class="qty-detail input-text qty-view"
-                                            value="1" id="quantityInput" min="1">
-                                        <button type="button" class="btn-cts btn-plus-view">+</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Nút -->
-                            <div class="btn-mua">
-                                <div class="buttonWrapp">
-                                    <button type="submit" class="btnAddToCart btnAtc unsel btn-outline tp_button mr-3">
-                                        <span>Thêm vào giỏ hàng</span>
-                                    </button>
-                                    <button type="submit" name="buy_now" value="1" class="btnAddToCart btnAtc btn-outline tp_button">
-                                        Mua ngay
-                                    </button>
+                    <!-- Số lượng -->
+                    <div class="form-product">
+                        <div class="clearfix form-group">
+                            <div class="qty-ant clearfix custom-btn-number">
+                                <label>Số lượng:</label>
+                                <div class="custom custom-btn-numbers">
+                                    <button type="button" class="btn-cts btn-minus-view">–</button>
+                                    <input type="number" name="quantity" class="qty-detail input-text qty-view"
+                                        value="1" id="quantityInput" min="1">
+                                    <button type="button" class="btn-cts btn-plus-view">+</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- ==== HIDDEN INPUTS để POST ==== -->
-                        <input type="hidden" name="product_id" id="productIdHidden" value="<?= (int)$product['id'] ?>">
-                        <input type="hidden" name="variant_id" id="variantIdHidden" value="">
-                        <input type="hidden" name="color_value" id="colorValueHidden" value="">
-                        <input type="hidden" name="size_value" id="sizeValueHidden" value="">
-                        <input type="hidden" name="stock_qty" id="stockHidden" value="">
-                        <input type="hidden" name="variant_image" id="variantImageHidden" value="">
-
-                    </form>
-
-                    <div class="accordion-wrapper">
-                        <div class="content descriptionProduct boxItem" data-name="information">
-                            <div class="title-content">
-                                <h2>Thông tin chi tiết</h2>
-                                <i class="far fa-plus"></i>
-                            </div>
-                            <div class="descriptionContent">
-                                <p><?= $product['description'] ?> </p>
+                        <!-- Nút -->
+                        <div class="btn-mua">
+                            <div class="buttonWrapp">
+                                <button type="submit" class="btnAddToCart btnAtc unsel btn-outline tp_button mr-3">
+                                    <span>Thêm vào giỏ hàng</span>
+                                </button>
+                                <button type="submit" name="buy_now" value="1" class="btnAddToCart btnAtc btn-outline tp_button">
+                                    Mua ngay
+                                </button>
                             </div>
                         </div>
-                        <div class="content descriptionProduct">
-                            <div class="title-content">
-                                <h2>Bảng size</h2>
-                                <i class="far fa-plus"></i>
-                            </div>
-                            <div class="descriptionContent">
-                                <p><img src="https://pos.nvncdn.com/4ef0bf-108661/contentKey/20230428_sxfyDIA1.jpg"
-                                        alt="20230428_sxfyDIA1.jpg" /><img
-                                        src="https://pos.nvncdn.com/4ef0bf-108661/contentKey/20230531_D9iytd2BVuMY.png"
-                                        alt="" /></p>
-                            </div>
+                    </div>
+
+
+                    <!-- ==== HIDDEN INPUTS để POST ==== -->
+                    <input type="hidden" name="product_id" id="productIdHidden" value="<?= (int)$product['id'] ?>">
+                    <input type="hidden" name="variant_id" id="variantIdHidden" value="">
+                    <input type="hidden" name="color_value" id="colorValueHidden" value="">
+                    <input type="hidden" name="size_value" id="sizeValueHidden" value="">
+                    <input type="hidden" name="stock_qty" id="stockHidden" value="">
+                    <input type="hidden" name="variant_image" id="variantImageHidden" value="">
+
+                </form>
+
+                <div class="accordion-wrapper">
+                    <div class="content descriptionProduct boxItem" data-name="information">
+                        <div class="title-content">
+                            <h2>Thông tin chi tiết</h2>
+                            <i class="far fa-plus"></i>
+                        </div>
+                        <div class="descriptionContent">
+                            <p><?= $product['description'] ?> </p>
+                        </div>
+                    </div>
+                    <div class="content descriptionProduct">
+                        <div class="title-content">
+                            <h2>Bảng size</h2>
+                            <i class="far fa-plus"></i>
+                        </div>
+                        <div class="descriptionContent">
+                            <p><img src="https://pos.nvncdn.com/4ef0bf-108661/contentKey/20230428_sxfyDIA1.jpg"
+                                    alt="20230428_sxfyDIA1.jpg" /><img
+                                    src="https://pos.nvncdn.com/4ef0bf-108661/contentKey/20230531_D9iytd2BVuMY.png"
+                                    alt="" /></p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div id="box-rating" class="inner-box-content-detail box-review boxItem" data-name="comment">
-            <div class="container">
-                <div class="starbap-widget starbap-review-widget">
-                    <div class="starbap-rev-widg">
-                        <div class="starbap-rev-widg__header">
-                            <h2 class="starbap-rev-widg__title">Đánh giá sản phẩm</h2>
-                            <div class="starbap-rev-widg__summary-text">0 đánh giá</div>
-                            <div class="reviewWrapper clearfix">
-                                <div class="boxLeft">
-                                    <div class="starbap-rev-widg__summary">
-                                        <p class="starbap-rev-total-point">0.0 / <span>5</span></p>
-                                        <div class="starbap-rev-widg__summary-stars voteView0">
-                                            <a class="starbap-star starbap--off star-1">
-                                                <i class="fa fa-star fa-fw"></i>
-                                            </a>
-                                            <a class="starbap-star starbap--off star-2">
-                                                <i class="fa fa-star fa-fw"></i>
-                                            </a>
-                                            <a class="starbap-star starbap--off star-3">
-                                                <i class="fa fa-star fa-fw"></i>
-                                            </a>
-                                            <a class="starbap-star starbap--off star-4">
-                                                <i class="fa fa-star fa-fw"></i>
-                                            </a>
-                                            <a class="starbap-star starbap--off star-5">
-                                                <i class="fa fa-star fa-fw"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="boxRight">
-                                    <h4>Sản phẩm được đánh giá</h4>
-
-                                    <!-- Product View Voted -->
-
-                                    <ul>
-                                        <li class="show-vote-5">
-                                            <label class="title">5 sao </label>
-                                            <span class="percentWrapper">
-                                                <span class="percent" style="width: 0;"></span>
-                                            </span>
-                                            <span class="count">(0)</span>
-                                        </li>
-                                        <li class="show-vote-4">
-                                            <label class="title">4 sao </label>
-                                            <span class="percentWrapper">
-                                                <span class="percent" style="width: 0;"></span>
-                                            </span>
-                                            <span class="count">(0)</span>
-                                        </li>
-                                        <li class="show-vote-3">
-                                            <label class="title">3 sao </label>
-                                            <span class="percentWrapper">
-                                                <span class="percent" style="width: 0;"></span>
-                                            </span>
-                                            <span class="count">(0)</span>
-                                        </li>
-                                        <li class="show-vote-2">
-                                            <label class="title">2 sao </label>
-                                            <span class="percentWrapper">
-                                                <span class="percent" style="width: 0;"></span>
-                                            </span>
-                                            <span class="count">(0)</span>
-                                        </li>
-                                        <li class="show-vote-1">
-                                            <label class="title">1 sao </label>
-                                            <span class="percentWrapper">
-                                                <span class="percent" style="width: 0;"></span>
-                                            </span>
-                                            <span class="count">(0)</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <!--                        <a href="javascript:void(0);" class="starbap-write-rev-link">Chấm điểm và viết đánh giá sản phẩm</a>-->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="productSuggest-wrapper tp_product_detail_suggest boxItem" data-name="product">
-            <h2 class="titleBox">
-                Có thể bạn sẽ thích </h2>
-            <div class="container-fluid">
-                <div class="productSuggest productList clearfix owl-carousel">
-
-                    <?php foreach ($relatedProducts as $related): ?>
-                        <div class="productItem prd40768686" data-id="40768686">
-                            <div class="productImage">
-                                <a
-                                    href="?user=detailProduct&id=<?= $related['id'] ?>">
-                                    <img loading="lazy"
-                                        src="<?= $related['image_thumbnail'] ?>"
-                                        alt="<?= $related['name'] ?>" data-hover="">
-                                </a>
-                                <!-- <span class="saleLabel">-50%</span> -->
-                            </div>
-                            <div class="productInfo">
-                                <a
-                                    href="?user=productDetail&id=<?= $related['id'] ?>">
-                                    <h4 class="productName tp_product_name"><?= $related['name'] ?></h4>
-                                </a>
-                                <div class="wrappMidInfo">
-                                    <div class="pro-color-selector">
-                                        <div class="frameImageChilds">
-                                            <?php
-                                            $maxColors = 3; // Tối đa 3 màu
-                                            $totalColors = count($related['color_options']);
-                                            $remainingColors = max(0, $totalColors - $maxColors);
-                                            ?>
-                                            <ul class="color-swatches text-center" data-hover="true" psId="40768686"
-                                                data-handle="/dam-co-beo-ngan-tay-chan-xep-ly-chum-tay-ngan-p40768686.html"
-                                                column="">
-                                                <?php for ($i = 0; $i < min($maxColors, $totalColors); $i++): ?>
-                                                    <?php $color = $related['color_options'][$i]; ?>
-                                                    <!-- data-img="https://pos.nvncdn.com/4ef0bf-108661/ps/20250217_5TYb8DULPB.jpeg" -->
-                                                    <li class="color-item"
-                                                        value="40768687">
-                                                        <span style="background-color: <?= htmlspecialchars($color['color_code']) ?>; "></span>
-
-                                                    </li>
-                                                <?php endfor; ?>
-                                            </ul>
-                                            <?php if ($remainingColors > 0): ?>
-                                                <!-- href="https://jm.com.vn/dam-co-beo-ngan-tay-chan-xep-ly-chum-tay-ngan-p40768686.html" -->
-                                                <a
-                                                    class="numberColor">
-                                                    +<?= $remainingColors ?>
-                                                </a>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                    <a class="wishlistAdd wishlistItems" href="javascript:void(0)" data-id="40768686">
-                                        <!--                                        <i class="far fa-heart"></i>-->
-                                        <svg width="14px" height="14px" viewBox="0 0 15 12" version="1.1"
-                                            class="wishlist-icon">
-                                            <g stroke-width="1" fill-rule="evenodd" stroke-linecap="round"
-                                                stroke-linejoin="round">
-                                                <g transform="translate(-384.000000, -173.000000)">
-                                                    <g transform="translate(373.000000, 160.000000)">
-                                                        <path
-                                                            d="M24.1870486,15.1337994 C23.0156479,13.7915995 21.0146777,13.6174702 19.6357465,14.7377957 C19.0576454,15.2115959 18.655296,15.8713213 18.4944667,16.6082814 C18.3352955,15.8721638 17.9348804,15.2124384 17.3587137,14.7377957 C15.9806115,13.6211213 13.9837864,13.7949698 12.8129383,15.1337994 C11.6169435,16.5248678 11.756771,18.6380112 13.125754,19.853546 C13.1564276,19.8807888 13.1873776,19.9074699 13.2191566,19.9335893 L17.900338,23.7840937 C18.2510121,24.0719688 18.7517383,24.0719688 19.1024124,23.7840937 L23.7808304,19.9335893 C25.1929223,18.7705741 25.4101247,16.6641713 24.2658052,15.228728 C24.2401057,15.1967106 24.2138535,15.1649742 24.1870486,15.1337994 L24.1870486,15.1337994 Z">
-                                                        </path>
-                                                    </g>
-                                                </g>
-                                            </g>
-                                        </svg>
-                                    </a>
-                                </div>
-                                <div class="productPrice">
-                                    <span class="priceNew tp_product_price"> <?= number_format($related['min_price']) ?>đ</span>
-                                    <?php if ($related['min_price'] != $related['max_price']): ?>
-                                        <del class="oldPrice tp_product_price_old"> <?= number_format($related['max_price']) ?>đ</del>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                            <div class="hook-reviews">
-                                <div class="starbaprv-widget">
-                                    <div class="starbap-prev-badge voteView0">
+    </div>
+    <div id="box-rating" class="inner-box-content-detail box-review boxItem" data-name="comment">
+        <div class="container">
+            <div class="starbap-widget starbap-review-widget">
+                <div class="starbap-rev-widg">
+                    <div class="starbap-rev-widg__header">
+                        <h2 class="starbap-rev-widg__title">Đánh giá sản phẩm</h2>
+                        <div class="starbap-rev-widg__summary-text">0 đánh giá</div>
+                        <div class="reviewWrapper clearfix">
+                            <div class="boxLeft">
+                                <div class="starbap-rev-widg__summary">
+                                    <p class="starbap-rev-total-point">0.0 / <span>5</span></p>
+                                    <div class="starbap-rev-widg__summary-stars voteView0">
                                         <a class="starbap-star starbap--off star-1">
-                                            <i class="fas fa-star fa-fw"></i>
+                                            <i class="fa fa-star fa-fw"></i>
                                         </a>
                                         <a class="starbap-star starbap--off star-2">
-                                            <i class="fas fa-star fa-fw"></i>
+                                            <i class="fa fa-star fa-fw"></i>
                                         </a>
                                         <a class="starbap-star starbap--off star-3">
-                                            <i class="fas fa-star fa-fw"></i>
+                                            <i class="fa fa-star fa-fw"></i>
                                         </a>
                                         <a class="starbap-star starbap--off star-4">
-                                            <i class="fas fa-star fa-fw"></i>
+                                            <i class="fa fa-star fa-fw"></i>
                                         </a>
                                         <a class="starbap-star starbap--off star-5">
-                                            <i class="fas fa-star fa-fw"></i>
+                                            <i class="fa fa-star fa-fw"></i>
                                         </a>
-                                        <span class="starbap-prev-badgetext">(0)</span>
                                     </div>
                                 </div>
-                                <span class="number-purchase">(322 đã bán)</span>
+                            </div>
+
+                            <div class="boxRight">
+                                <h4>Sản phẩm được đánh giá</h4>
+
+                                <!-- Product View Voted -->
+
+                                <ul>
+                                    <li class="show-vote-5">
+                                        <label class="title">5 sao </label>
+                                        <span class="percentWrapper">
+                                            <span class="percent" style="width: 0;"></span>
+                                        </span>
+                                        <span class="count">(0)</span>
+                                    </li>
+                                    <li class="show-vote-4">
+                                        <label class="title">4 sao </label>
+                                        <span class="percentWrapper">
+                                            <span class="percent" style="width: 0;"></span>
+                                        </span>
+                                        <span class="count">(0)</span>
+                                    </li>
+                                    <li class="show-vote-3">
+                                        <label class="title">3 sao </label>
+                                        <span class="percentWrapper">
+                                            <span class="percent" style="width: 0;"></span>
+                                        </span>
+                                        <span class="count">(0)</span>
+                                    </li>
+                                    <li class="show-vote-2">
+                                        <label class="title">2 sao </label>
+                                        <span class="percentWrapper">
+                                            <span class="percent" style="width: 0;"></span>
+                                        </span>
+                                        <span class="count">(0)</span>
+                                    </li>
+                                    <li class="show-vote-1">
+                                        <label class="title">1 sao </label>
+                                        <span class="percentWrapper">
+                                            <span class="percent" style="width: 0;"></span>
+                                        </span>
+                                        <span class="count">(0)</span>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
-                    <?php endforeach; ?>
+                        <!--                        <a href="javascript:void(0);" class="starbap-write-rev-link">Chấm điểm và viết đánh giá sản phẩm</a>-->
+                    </div>
                 </div>
-                <div id="flip"><span>Xem thêm <i class="far fa-angle-right"></i></div>
             </div>
         </div>
+    </div>
+    <div class="productSuggest-wrapper tp_product_detail_suggest boxItem" data-name="product">
+        <h2 class="titleBox">
+            Có thể bạn sẽ thích </h2>
+        <div class="container-fluid">
+            <div class="productSuggest productList clearfix owl-carousel">
+
+                <?php foreach ($relatedProducts as $related): ?>
+                    <div class="productItem prd40768686" data-id="40768686">
+                        <div class="productImage">
+                            <a
+                                href="?user=detailProduct&id=<?= $related['id'] ?>">
+                                <img loading="lazy"
+                                    src="<?= $related['image_thumbnail'] ?>"
+                                    alt="<?= $related['name'] ?>" data-hover="">
+                            </a>
+                            <!-- <span class="saleLabel">-50%</span> -->
+                        </div>
+                        <div class="productInfo">
+                            <a
+                                href="?user=productDetail&id=<?= $related['id'] ?>">
+                                <h4 class="productName tp_product_name"><?= $related['name'] ?></h4>
+                            </a>
+                            <div class="wrappMidInfo">
+                                <div class="pro-color-selector">
+                                    <div class="frameImageChilds">
+                                        <?php
+                                        $maxColors = 3; // Tối đa 3 màu
+                                        $totalColors = count($related['color_options']);
+                                        $remainingColors = max(0, $totalColors - $maxColors);
+                                        ?>
+                                        <ul class="color-swatches text-center" data-hover="true" psId="40768686"
+                                            data-handle="/dam-co-beo-ngan-tay-chan-xep-ly-chum-tay-ngan-p40768686.html"
+                                            column="">
+                                            <?php for ($i = 0; $i < min($maxColors, $totalColors); $i++): ?>
+                                                <?php $color = $related['color_options'][$i]; ?>
+                                                <!-- data-img="https://pos.nvncdn.com/4ef0bf-108661/ps/20250217_5TYb8DULPB.jpeg" -->
+                                                <li class="color-item"
+                                                    value="40768687">
+                                                    <span style="background-color: <?= htmlspecialchars($color['color_code']) ?>; "></span>
+
+                                                </li>
+                                            <?php endfor; ?>
+                                        </ul>
+                                        <?php if ($remainingColors > 0): ?>
+                                            <!-- href="https://jm.com.vn/dam-co-beo-ngan-tay-chan-xep-ly-chum-tay-ngan-p40768686.html" -->
+                                            <a
+                                                class="numberColor">
+                                                +<?= $remainingColors ?>
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <a class="wishlistAdd wishlistItems" href="javascript:void(0)" data-id="40768686">
+                                    <!--                                        <i class="far fa-heart"></i>-->
+                                    <svg width="14px" height="14px" viewBox="0 0 15 12" version="1.1"
+                                        class="wishlist-icon">
+                                        <g stroke-width="1" fill-rule="evenodd" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <g transform="translate(-384.000000, -173.000000)">
+                                                <g transform="translate(373.000000, 160.000000)">
+                                                    <path
+                                                        d="M24.1870486,15.1337994 C23.0156479,13.7915995 21.0146777,13.6174702 19.6357465,14.7377957 C19.0576454,15.2115959 18.655296,15.8713213 18.4944667,16.6082814 C18.3352955,15.8721638 17.9348804,15.2124384 17.3587137,14.7377957 C15.9806115,13.6211213 13.9837864,13.7949698 12.8129383,15.1337994 C11.6169435,16.5248678 11.756771,18.6380112 13.125754,19.853546 C13.1564276,19.8807888 13.1873776,19.9074699 13.2191566,19.9335893 L17.900338,23.7840937 C18.2510121,24.0719688 18.7517383,24.0719688 19.1024124,23.7840937 L23.7808304,19.9335893 C25.1929223,18.7705741 25.4101247,16.6641713 24.2658052,15.228728 C24.2401057,15.1967106 24.2138535,15.1649742 24.1870486,15.1337994 L24.1870486,15.1337994 Z">
+                                                    </path>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="productPrice">
+                                <span class="priceNew tp_product_price"> <?= number_format($related['min_price']) ?>đ</span>
+                                <?php if ($related['min_price'] != $related['max_price']): ?>
+                                    <del class="oldPrice tp_product_price_old"> <?= number_format($related['max_price']) ?>đ</del>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="hook-reviews">
+                            <div class="starbaprv-widget">
+                                <div class="starbap-prev-badge voteView0">
+                                    <a class="starbap-star starbap--off star-1">
+                                        <i class="fas fa-star fa-fw"></i>
+                                    </a>
+                                    <a class="starbap-star starbap--off star-2">
+                                        <i class="fas fa-star fa-fw"></i>
+                                    </a>
+                                    <a class="starbap-star starbap--off star-3">
+                                        <i class="fas fa-star fa-fw"></i>
+                                    </a>
+                                    <a class="starbap-star starbap--off star-4">
+                                        <i class="fas fa-star fa-fw"></i>
+                                    </a>
+                                    <a class="starbap-star starbap--off star-5">
+                                        <i class="fas fa-star fa-fw"></i>
+                                    </a>
+                                    <span class="starbap-prev-badgetext">(0)</span>
+                                </div>
+                            </div>
+                            <span class="number-purchase">(322 đã bán)</span>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <div id="flip"><span>Xem thêm <i class="far fa-angle-right"></i></div>
+        </div>
+    </div>
 </section>
 
 <script>
@@ -880,6 +909,45 @@
         /* Shadow đỏ nhẹ */
         font-weight: 600;
     }
+
+
+    /* Đặt parent làm mốc để ghim */
+    .wrapperImage.boxItem {
+        position: relative;
+    }
+
+    /* Nút tim ghim góc phải trên như Home */
+    .wishlist-abs {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 5;
+    }
+
+    /* Nút tròn chỉ icon, không chữ */
+    .btn-wishlist-icon {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, .92);
+        border: 1px solid #eee;
+        border-radius: 50%;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .btn-wishlist-icon i {
+        font-size: 16px;
+        line-height: 1;
+    }
+
+    .btn-wishlist-icon:hover {
+        border-color: #f5a;
+    }
+
+    /* Nếu theme có .wishlistAdd/.wishlistItems thì vẫn giữ nguyên style cũ */
 </style>
 
 <?php if (isset($_SESSION['alert'])): ?>

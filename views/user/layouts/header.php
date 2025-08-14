@@ -11,6 +11,21 @@ function e($v)
 {
     return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 }
+$wishlistCount = 0;
+
+if (!empty($_SESSION['user_id']) || (!empty($_SESSION['user']) && !empty($_SESSION['user']['id']))) {
+    $uid = !empty($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : (int)$_SESSION['user']['id'];
+
+    // Không dùng __DIR__, include tương đối như cấu trúc hiện tại
+    if (!class_exists('WishlistModel')) {
+        include_once "models/user/WishlistModel.php";
+    }
+
+    static $WL = null;              // cache trong cùng 1 request
+    if ($WL === null) $WL = new WishlistModel();
+
+    $wishlistCount = (int)$WL->countByUser($uid);
+}
 ?>
 <header class="main_nav_header">
     <div class="botHeader hidden-xs hidden-sm">
@@ -83,11 +98,12 @@ function e($v)
             </div>
             <div class="iconHeader col-lg-2 col-md-2">
                 <div class="wishlistBtn btnIcon">
-                    <a aria-label="wishlist" href="wishlist.html">
+                    <a aria-label="wishlist" href="?user=wishlist">
                         <i class="far fa-heart"></i>
-                        <span class="wishlistCount">0</span>
+                        <span class="wishlistCount" id="wishlistCount"><?= (int)$wishlistCount ?></span>
                     </a>
                 </div>
+
                 <div class="cartBtn btnIcon">
                     <a aria-label="cart" class="cartBtnOpen" href="?user=cart">
                         <i class="far fa-shopping-bag"></i>
