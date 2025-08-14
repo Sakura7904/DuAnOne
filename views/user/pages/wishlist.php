@@ -61,7 +61,7 @@ $total = isset($total) ? (int)$total : (is_array($wishlist ?? null) ? count($wis
                                                     $vid   = (int)($row['variant_id'] ?? 0);
                                                     $href  = product_link($row);
                                                     $name  = htmlspecialchars($row['product_name'] ?? 'Sản phẩm');
-                                                    $img   = htmlspecialchars($row['image_url'] ?? './assets/no-image.png');
+                                                    $img   = htmlspecialchars($row['product_thumbnail'] ?? './assets/no-image.png');
 
                                                     $price       = $row['price']          ?? null;
                                                     $sale_price  = $row['sale_price']     ?? null;
