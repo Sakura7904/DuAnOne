@@ -83,58 +83,77 @@ class ProductController
         $content = getContentPath('Products', 'productsAdd');
         view('admin/master', ['content' => $content, 'categories' => $categories]);
     }
-    public function store()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ?admin=list_products');
-            exit;
-        }
-
-        try {
-            // Validate dữ liệu
-            $name = trim($_POST['name'] ?? '');
-            $description = trim($_POST['description'] ?? '');
-            $category_id = (int)($_POST['category_id'] ?? 0);
-            $price = (float)($_POST['price'] ?? 0);
-
-            if (empty($name)) {
-                throw new Exception('Tên sản phẩm không được để trống');
-            }
-
-            if ($price <= 0) {
-                throw new Exception('Giá sản phẩm phải lớn hơn 0');
-            }
-
-            // Xử lý upload ảnh thumbnail
-            $thumbnail_path = null;
-            if (isset($_FILES['thumbnail']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
-                $thumbnail_path = $this->uploadImage($_FILES['thumbnail'], 'thumbnail');
-            }
-
-            // Thêm sản phẩm vào database
-            $product_id = $this->productModel->addProduct($name, $description, $category_id, $thumbnail_path);
-
-            if (!$product_id) {
-                throw new Exception('Không thể thêm sản phẩm');
-            }
-
-            // Tạo variant mặc định với giá gốc
-            $variant_id = $this->productVariantModel->addVariant($product_id, $price, null, 0);
-
-            // Xử lý upload ảnh gallery
-            if (isset($_FILES['gallery']) && !empty($_FILES['gallery']['name'][0])) {
-                $this->uploadGalleryImages($_FILES['gallery'], $variant_id);
-            }
-
-            $_SESSION['success_products'] = 'Thêm sản phẩm thành công!';
-            header('Location: ?admin=list_products');
-            exit;
-        } catch (Exception $e) {
-            $_SESSION['error_products'] = $e->getMessage();
-            header('Location: ?admin=add_products');
-            exit;
-        }
+public function store()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: ?admin=list_products');
+        exit;
     }
+
+    $errors = [];
+
+    $name        = trim($_POST['name'] ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $category_id = (int)($_POST['category_id'] ?? 0);
+    $price       = $_POST['price'] ?? '';
+
+    // 1. Kiểm tra tên sản phẩm
+    if (empty($name)) {
+        $errors['name'] = 'Chưa nhập tên sản phẩm!';
+    } elseif ($this->productModel->existsByName($name)) {
+        $errors['name'] = 'Tên sản phẩm đã tồn tại!';
+    }
+
+    // 2. Kiểm tra giá
+    if ($price === '' || !is_numeric($price)) {
+        $errors['price'] = 'Chưa nhập giá sản phẩm!';
+    } elseif ($price <= 0) {
+        $errors['price'] = 'Giá sản phẩm phải lớn hơn 0!';
+    }
+
+    // 3. Kiểm tra danh mục
+    if ($category_id <= 0) {
+        $errors['category_id'] = 'Chưa chọn danh mục!';
+    }
+
+    // 4. Kiểm tra ảnh thumbnail
+    if (!isset($_FILES['thumbnail']) || $_FILES['thumbnail']['error'] !== UPLOAD_ERR_OK) {
+        $errors['thumbnail'] = 'Chưa thêm ảnh!';
+    }
+
+    // Nếu có lỗi → quay lại form
+    if (!empty($errors)) {
+        $_SESSION['errors_products'] = $errors;
+        $_SESSION['old_products'] = $_POST;
+        header('Location: ?admin=add_products');
+        exit;
+    }
+
+    // Upload ảnh thumbnail
+    $thumbnail_path = $this->uploadImage($_FILES['thumbnail'], 'thumbnail');
+
+    // Thêm sản phẩm
+    $product_id = $this->productModel->addProduct($name, $description, $category_id, $thumbnail_path);
+
+    if (!$product_id) {
+        $_SESSION['errors_products'] = ['general' => 'Không thể thêm sản phẩm'];
+        $_SESSION['old_products'] = $_POST;
+        header('Location: ?admin=add_products');
+        exit;
+    }
+
+    // Tạo variant mặc định
+    $variant_id = $this->productVariantModel->addVariant($product_id, (float)$price, null, 0);
+
+    // Upload gallery nếu có
+    if (isset($_FILES['gallery']) && !empty($_FILES['gallery']['name'][0])) {
+        $this->uploadGalleryImages($_FILES['gallery'], $variant_id);
+    }
+
+    $_SESSION['success_products'] = 'Thêm sản phẩm thành công!';
+    header('Location: ?admin=list_products');
+    exit;
+}
 
     /**
      * Hiển thị form chi tiết sản phẩm
@@ -232,99 +251,160 @@ class ProductController
     /**
      * Xử lý cập nhật sản phẩm
      */
-    public function update()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ?admin=list_products');
+public function update()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: ?admin=list_products');
+        exit;
+    }
+
+    $id = (int)($_POST['id'] ?? 0);
+    if ($id <= 0) {
+        $_SESSION['errors_products'] = ['general' => 'ID sản phẩm không hợp lệ'];
+        $_SESSION['old_products']    = $_POST;
+        header('Location: ?admin=edit_product&id=' . $id);
+        exit;
+    }
+
+    // Lấy thông tin sản phẩm hiện tại
+    $currentProduct = $this->productModel->getProductById($id);
+    if (!$currentProduct) {
+        $_SESSION['errors_products'] = ['general' => 'Không tìm thấy sản phẩm'];
+        $_SESSION['old_products']    = $_POST;
+        header('Location: ?admin=edit_product&id=' . $id);
+        exit;
+    }
+
+    $errors = [];
+
+    // Lấy dữ liệu từ form
+    $name        = trim($_POST['name'] ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $category_id = (int)($_POST['category_id'] ?? 0);
+    $price_raw   = $_POST['price'] ?? '';
+    $price       = is_numeric($price_raw) ? (float)$price_raw : $price_raw;
+
+    // 1) Tên sản phẩm
+    if ($name === '') {
+        $errors['name'] = 'Chưa nhập tên sản phẩm!';
+    } else {
+        // Kiểm tra trùng tên (ngoại trừ chính sản phẩm này)
+        if (method_exists($this->productModel, 'existsByNameExcept')) {
+            if ($this->productModel->existsByNameExcept($name, $id)) {
+                $errors['name'] = 'Tên sản phẩm đã tồn tại!';
+            }
+        } else {
+            // fallback nếu chưa có existsByNameExcept
+            if ($this->productModel->existsByName($name) && strcasecmp($currentProduct['name'], $name) !== 0) {
+                $errors['name'] = 'Tên sản phẩm đã tồn tại!';
+            }
+        }
+    }
+
+    // 2) Giá
+    if ($price_raw === '' || !is_numeric($price_raw)) {
+        $errors['price'] = 'Chưa nhập giá sản phẩm!';
+    } elseif ((float)$price <= 0) {
+        $errors['price'] = 'Giá sản phẩm phải lớn hơn 0!';
+    }
+
+    // 3) Danh mục
+    if ($category_id <= 0) {
+        $errors['category_id'] = 'Chưa chọn danh mục!';
+    }
+
+    // 4) Ảnh chính (edit KHÔNG bắt buộc; chỉ báo lỗi nếu người dùng upload mà fail)
+    $thumbnail_path = $currentProduct['image_thumbnail'] ?? null;
+    if (isset($_FILES['thumbnail']) && $_FILES['thumbnail']['error'] !== UPLOAD_ERR_NO_FILE) {
+        if ($_FILES['thumbnail']['error'] !== UPLOAD_ERR_OK) {
+            $errors['thumbnail'] = 'Upload ảnh thất bại! Vui lòng thử lại.';
+        }
+    }
+
+    // Nếu có lỗi -> trả về form, giữ lại dữ liệu
+    if (!empty($errors)) {
+        $_SESSION['errors_products'] = $errors;
+        $_SESSION['old_products']    = $_POST;
+        header('Location: ?admin=edit_product&id=' . $id);
+        exit;
+    }
+
+    // Upload thumbnail mới (nếu có file hợp lệ)
+    if (isset($_FILES['thumbnail']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
+        try {
+            $new_thumbnail = $this->uploadImage($_FILES['thumbnail'], 'thumbnail');
+            // Xóa ảnh cũ nếu tồn tại file
+            if (!empty($thumbnail_path) && file_exists($thumbnail_path)) {
+                @unlink($thumbnail_path);
+            }
+            $thumbnail_path = $new_thumbnail;
+        } catch (Exception $e) {
+            // Lỗi upload -> trả về form
+            $_SESSION['errors_products'] = ['thumbnail' => 'Không thể tải ảnh: ' . $e->getMessage()];
+            $_SESSION['old_products']    = $_POST;
+            header('Location: ?admin=edit_product&id=' . $id);
+            exit;
+        }
+    }
+
+    // Cập nhật thông tin sản phẩm
+    $updated = $this->productModel->updateProduct($id, $name, $description, $category_id, $thumbnail_path);
+    if (!$updated) {
+        $_SESSION['errors_products'] = ['general' => 'Không thể cập nhật sản phẩm'];
+        $_SESSION['old_products']    = $_POST;
+        header('Location: ?admin=edit_product&id=' . $id);
+        exit;
+    }
+
+    // Cập nhật giá variant đầu tiên (nếu có)
+    $variants = $this->productVariantModel->getVariantsByProductId($id);
+    if (!empty($variants)) {
+        $this->productVariantModel->updateVariant(
+            $variants[0]['id'],
+            (float)$price,
+            $variants[0]['sale_price'],
+            $variants[0]['quantity']
+        );
+    }
+
+    // Xử lý upload ảnh gallery mới (nếu có)
+    if (isset($_FILES['gallery']) && !empty($_FILES['gallery']['name'][0])) {
+        $variant_id = $variants[0]['id'] ?? 0;
+        if (!$variant_id) {
+            $_SESSION['errors_products'] = ['gallery' => 'Không tìm thấy variant mặc định để lưu ảnh.'];
+            $_SESSION['old_products']    = $_POST;
+            header('Location: ?admin=edit_product&id=' . $id);
             exit;
         }
 
         try {
-            $id = (int)($_POST['id'] ?? 0);
-            if ($id <= 0) {
-                throw new Exception('ID sản phẩm không hợp lệ');
+            $uploadedPaths = $this->handleMultipleImageUpload($_FILES['gallery'], $variant_id);
+            if (empty($uploadedPaths)) {
+                $_SESSION['errors_products'] = ['gallery' => 'Không có ảnh nào được upload thành công'];
+                $_SESSION['old_products']    = $_POST;
+                header('Location: ?admin=edit_product&id=' . $id);
+                exit;
             }
 
-            // Validate dữ liệu
-            $name = trim($_POST['name'] ?? '');
-            $description = trim($_POST['description'] ?? '');
-            $category_id = (int)($_POST['category_id'] ?? 0);
-            $price = (float)($_POST['price'] ?? 0);
-
-            if (empty($name)) {
-                throw new Exception('Tên sản phẩm không được để trống');
+            if (!$this->productImageModel->addMultipleImages($variant_id, $uploadedPaths)) {
+                $_SESSION['errors_products'] = ['gallery' => 'Lỗi khi lưu ảnh vào database'];
+                $_SESSION['old_products']    = $_POST;
+                header('Location: ?admin=edit_product&id=' . $id);
+                exit;
             }
-
-            if ($price <= 0) {
-                throw new Exception('Giá sản phẩm phải lớn hơn 0');
-            }
-
-            // Lấy thông tin sản phẩm hiện tại
-            $currentProduct = $this->productModel->getProductById($id);
-            if (!$currentProduct) {
-                throw new Exception('Không tìm thấy sản phẩm');
-            }
-
-            // Xử lý upload thumbnail mới (nếu có)
-            $thumbnail_path = $currentProduct['image_thumbnail']; // Giữ ảnh cũ
-
-            if (isset($_FILES['thumbnail']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
-                // Upload ảnh mới
-                $new_thumbnail = $this->uploadImage($_FILES['thumbnail'], 'thumbnail');
-
-                // Xóa ảnh cũ nếu có
-                if ($thumbnail_path && file_exists($thumbnail_path)) {
-                    unlink($thumbnail_path);
-                }
-
-                $thumbnail_path = $new_thumbnail;
-            }
-
-            // Cập nhật thông tin sản phẩm
-            $result = $this->productModel->updateProduct($id, $name, $description, $category_id, $thumbnail_path);
-
-            if (!$result) {
-                throw new Exception('Không thể cập nhật sản phẩm');
-            }
-
-            // Cập nhật giá của variant đầu tiên (nếu có)
-            $variants = $this->productVariantModel->getVariantsByProductId($id);
-            if (!empty($variants)) {
-                $this->productVariantModel->updateVariant(
-                    $variants[0]['id'],
-                    $price,
-                    $variants[0]['sale_price'],
-                    $variants[0]['quantity']
-                );
-            }
-
-            // Xử lý upload ảnh gallery mới (nếu có)
-            if (!empty($_FILES['gallery']['name'][0])) {
-                $variant_id = $variants[0]['id'] ?? 0;
-                if (!$variant_id) throw new Exception('Không tìm thấy variant mặc định');
-
-                // Re-use hàm đã có – upload & trả về mảng đường dẫn
-                $uploaded = $this->handleMultipleImageUpload($_FILES['gallery'], $variant_id);
-
-                if (empty($uploaded)) {
-                    throw new Exception('Không có ảnh nào được upload thành công');
-                }
-
-                // Ghi DB
-                if (!$this->productImageModel->addMultipleImages($variant_id, $uploaded)) {
-                    throw new Exception('Lỗi khi lưu ảnh vào database');
-                }
-            }
-
-            $_SESSION['success_products'] = '✅ Cập nhật sản phẩm thành công!';
-            header('Location: ?admin=list_products');
-            exit;
         } catch (Exception $e) {
-            $_SESSION['product_error'] = '❌ ' . $e->getMessage();
-            header('Location: ?admin=edit_product&id=' . ($id ?? 0));
+            $_SESSION['errors_products'] = ['gallery' => 'Upload gallery thất bại: ' . $e->getMessage()];
+            $_SESSION['old_products']    = $_POST;
+            header('Location: ?admin=edit_product&id=' . $id);
             exit;
         }
     }
+
+    $_SESSION['success_products'] = '✅ Cập nhật sản phẩm thành công!';
+    header('Location: ?admin=list_products');
+    exit;
+}
+
 
     public function deleteProductGallery()
     {

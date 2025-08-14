@@ -35,6 +35,21 @@ class CategoryModel
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function existsByName(string $name): bool
+    {
+        $sql = "SELECT COUNT(*) FROM categories WHERE name = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$name]);
+        return $stmt->fetchColumn() > 0;
+    }
+    public function existsByNameExceptId(string $name, int $excludeId): bool {
+    $sql = "SELECT COUNT(*) FROM categories WHERE name = ? AND id <> ?";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute([$name, $excludeId]);
+    return $stmt->fetchColumn() > 0;
+}
+
+
 
     /** Lấy 1 danh mục theo id */
     public function getById($id)
