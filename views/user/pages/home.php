@@ -6,19 +6,27 @@ if (!isset($categories) || !is_array($categories)) {
     $categories = $catModel->getAll(); // đã có image_url
 }
 
-// Base path của dự án (ví dụ /DuAnOne). Dùng để build URL cho ảnh tương đối.
+// Base path của dự án (ví dụ /DuAnOne)
 $BASE_PATH = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
 
-// Hàm nhỏ chuẩn hoá đường dẫn ảnh (hỗ trợ cả http(s), bắt đầu bằng '/', hoặc tương đối 'images/...').
+// Hàm chuẩn hoá đường dẫn ảnh
 $toImgSrc = function ($raw) use ($BASE_PATH) {
     if (empty($raw)) {
         return $BASE_PATH . '/assets/images/placeholder-category.png';
     }
-    if (preg_match('#^https?://#', $raw) || str_starts_with($raw, '/')) {
-        return $raw; // đã là URL tuyệt đối hoặc từ root
+    if (preg_match('#^https?://#', $raw) || (function_exists('str_starts_with') && str_starts_with($raw, '/'))) {
+        return $raw; // URL tuyệt đối hoặc từ root
     }
     return $BASE_PATH . '/' . ltrim($raw, '/'); // đường dẫn tương đối
 };
+
+// Map sản phẩm đã ở wishlist để hiển thị trạng thái nút
+$wishlistProductMap = [];
+if (!empty($_SESSION['user_id'])) {
+    include_once 'models/user/WishlistModel.php';
+    $wl = new WishlistModel();
+    $wishlistProductMap = $wl->getProductIdsByUser((int)$_SESSION['user_id']); // [product_id => true]
+}
 ?>
 
 <script defer type="text/javascript" src="./assets/users/web.nvnstatic.net/tp/T0356/js/index5e1f.js?v=2"></script>
@@ -299,11 +307,22 @@ $toImgSrc = function ($raw) use ($BASE_PATH) {
                                             </ul>
                                         </div>
                                     </div>
-                                    <a class="wishlistAdd wishlistItems" href="javascript:void(0)" data-id="<?= $product['id'] ?>">
-                                        <svg width="14px" height="14px" viewBox="0 0 15 12" version="1.1" class="wishlist-icon">
-                                            <!-- SVG icon here -->
-                                        </svg>
-                                    </a>
+                                    <?php
+                                    $pid   = (int)$product['id'];
+                                    $liked = !empty($wishlistProductMap[$pid]);
+                                    ?>
+                                    <form action="index.php?user=toggleWishlist" method="post"
+                                        class="wishlistAdd wishlistItems" style="display:inline">
+                                        <input type="hidden" name="product_id" value="<?= $pid ?>">
+                                        <button type="submit"
+                                            aria-label="<?= $liked ? 'Bỏ thích' : 'Yêu thích' ?>"
+                                            class="wishlist-btn<?= $liked ? ' active' : '' ?>"
+                                            style="background:none;border:none;padding:0;cursor:pointer;">
+                                            <!-- DÙNG FONT AWESOME (site bạn đã có FA) -->
+                                            <i class="<?= $liked ? 'fas' : 'far' ?> fa-heart"></i>
+                                        </button>
+                                    </form>
+
                                 </div>
 
                                 <div class="productPrice">

@@ -28,6 +28,7 @@ include "controllers/user/CartController.php";
 include "controllers/user/OrderController.php";
 include "controllers/user/PurchaseController.php";
 include "controllers/user/ProductByCategoryController.php";
+include "controllers/user/WishlishController.php";
 
 $admin = $_GET['admin'] ?? "";
 $user = $_GET['user'] ?? "";
@@ -149,6 +150,15 @@ if (!empty($user) || (empty($admin) && empty($user))) {
         // ===== Trang đơn hàng =====        
         'purchase'     => (new PurchaseController())->purchase(),
         'cancelOrderItem' => (new PurchaseController())->cancelOrderItem(),
+
+        // ===== Wishlist =====
+        'wishlist'           => (new WishlistController())->index(),          // GET:  index.php?user=wishlist&pg=1&sort=newest
+        'toggleWishlist'     => (new WishlistController())->toggle(),         // POST: index.php?user=toggleWishlist   (variant_id|product_id)
+        'addToWishlist'      => (new WishlistController())->add(),            // GET:  index.php?user=addToWishlist&variant_id=123
+        'removeFromWishlist' => (new WishlistController())->remove(),         // GET:  index.php?user=removeFromWishlist&variant_id=123
+        'clearWishlist'      => (new WishlistController())->clear(),          // POST: index.php?user=clearWishlist
+        'countWishlist'      => (new WishlistController())->count(),          // GET:  index.php?user=countWishlist
+
 
         default => die("Không tìm thấy file nào như thế cả!!!"),
     };

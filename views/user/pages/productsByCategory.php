@@ -5,6 +5,14 @@ $endItem     = $hasProducts ? min($startItem + count($products) - 1, $totalProdu
 
 // giữ lại keyword (nếu có) khi click phân trang
 $qKeyword = ($keyword ?? '') !== '' ? '&keyword=' . urlencode($keyword) : '';
+
+// ===== Map sản phẩm đã có trong wishlist (để hiển thị icon tim đúng trạng thái) =====
+$wishlistProductMap = [];
+if (!empty($_SESSION['user_id'])) {
+    include_once 'models/user/WishlistModel.php';
+    $wl = new WishlistModel();
+    $wishlistProductMap = $wl->getProductIdsByUser((int)$_SESSION['user_id']); // [product_id => true]
+}
 ?>
 <div class="container">
     <div class="headCategory hidden-xs hidden-sm"
@@ -21,7 +29,6 @@ $qKeyword = ($keyword ?? '') !== '' ? '&keyword=' . urlencode($keyword) : '';
         </form>
     </div>
 
-
     <ul class="breadcrumbCate">
         <li><a href="index.php?user=home">Trang chủ</a></li>
         <li>
@@ -31,7 +38,6 @@ $qKeyword = ($keyword ?? '') !== '' ? '&keyword=' . urlencode($keyword) : '';
             </a>
         </li>
     </ul>
-
 
     <h3 class="titleCategory">
         <div class="mobile visible-sm visible-xs">
@@ -67,17 +73,16 @@ $qKeyword = ($keyword ?? '') !== '' ? '&keyword=' . urlencode($keyword) : '';
                                         Từ cao đến thấp
                                     </option>
                                 </select>
-
                             </div>
                             <div class="paginationControl">
                                 Có:
                                 <div class="paginator">
                                     <span class="labelPages"><?php echo count($products); ?> / <?php echo count($products); ?></span>
-
                                 </div> sản phẩm
                             </div>
                         </div>
                     </div>
+
                     <div class="listProductCategory clearfix">
                         <input type="hidden" class="auto-paginator">
                         <?php foreach ($products as $product): ?>
@@ -103,9 +108,24 @@ $qKeyword = ($keyword ?? '') !== '' ? '&keyword=' . urlencode($keyword) : '';
                                                 </ul>
                                             </div>
                                         </div>
-                                        <a class="wishlistAdd wishlistItems" href="javascript:void(0)" data-id="<?php echo $product['id']; ?>">
-                                            <i class="far fa-heart"></i>
-                                        </a>
+
+                                        <!-- ===== WISHLIST (PHP thuần) ===== -->
+                                        <?php
+                                          $pid   = (int)$product['id'];
+                                          $liked = !empty($wishlistProductMap[$pid]);
+                                        ?>
+                                        <form action="index.php?user=toggleWishlist" method="post"
+                                              class="wishlistAdd wishlistItems" style="display:inline">
+                                          <input type="hidden" name="product_id" value="<?= $pid ?>">
+                                          <button type="submit"
+                                                  aria-label="<?= $liked ? 'Bỏ khỏi yêu thích' : 'Thêm vào yêu thích' ?>"
+                                                  class="wishlist-btn<?= $liked ? ' active' : '' ?>"
+                                                  style="background:none;border:none;padding:0;cursor:pointer;">
+                                            <i class="<?= $liked ? 'fas' : 'far' ?> fa-heart"></i>
+                                          </button>
+                                        </form>
+                                        <!-- ===== HẾT WISHLIST ===== -->
+
                                     </div>
                                     <div class="productPrice">
                                         <span class="priceNew onlyPrice tp_product_price">
@@ -133,46 +153,45 @@ $qKeyword = ($keyword ?? '') !== '' ? '&keyword=' . urlencode($keyword) : '';
                                 </div>
                             </div>
                         <?php endforeach; ?>
-                 <ul class="pagination col-lg-12 col-md-12 hidden-sm hidden-xs">
-    <div class="paginator">
-        <span class="labelPages"><?= $startItem ?> - <?= $endItem ?> / <?= $totalProducts ?></span>
-        <span class="titlePages">&nbsp;&nbsp;Trang: </span>
 
-        <?php if ($hasProducts && $currentPage > 1): ?>
-            <a
-                rel="nofollow, noindex"
-                class="paging-previous ico"
-                title="Trang trước"
-                href="index.php?user=productsByCategory&category_id=<?= (int)$categoryId ?>&sort=<?= htmlspecialchars($sort) ?><?= $qKeyword ?>&pg=<?= $currentPage - 1 ?>">
-            </a>
-        <?php endif; ?>
+                        <ul class="pagination col-lg-12 col-md-12 hidden-sm hidden-xs">
+                            <div class="paginator">
+                                <span class="labelPages"><?= $startItem ?> - <?= $endItem ?> / <?= $totalProducts ?></span>
+                                <span class="titlePages">&nbsp;&nbsp;Trang: </span>
 
-        <?php if ($hasProducts): ?>
-            <?php for ($i = 1; $i <= (int)$totalPages; $i++): ?>
-                <?php if ($i == (int)$currentPage): ?>
-                    <span class="currentPage"><?= $i ?></span>
-                <?php else: ?>
-                    <a
-                        rel="nofollow, noindex"
-                        href="index.php?user=productsByCategory&category_id=<?= (int)$categoryId ?>&sort=<?= htmlspecialchars($sort) ?><?= $qKeyword ?>&pg=<?= $i ?>">
-                        <?= $i ?>
-                    </a>
-                <?php endif; ?>
-            <?php endfor; ?>
-        <?php endif; ?>
+                                <?php if ($hasProducts && $currentPage > 1): ?>
+                                    <a
+                                        rel="nofollow, noindex"
+                                        class="paging-previous ico"
+                                        title="Trang trước"
+                                        href="index.php?user=productsByCategory&category_id=<?= (int)$categoryId ?>&sort=<?= htmlspecialchars($sort) ?><?= $qKeyword ?>&pg=<?= $currentPage - 1 ?>">
+                                    </a>
+                                <?php endif; ?>
 
-        <?php if ($hasProducts && $currentPage < (int)$totalPages): ?>
-            <a
-                rel="nofollow, noindex"
-                class="paging-next ico"
-                title="Trang sau"
-                href="index.php?user=productsByCategory&category_id=<?= (int)$categoryId ?>&sort=<?= htmlspecialchars($sort) ?><?= $qKeyword ?>&pg=<?= $currentPage + 1 ?>">
-            </a>
-        <?php endif; ?>
-    </div>
-</ul>
+                                <?php if ($hasProducts): ?>
+                                    <?php for ($i = 1; $i <= (int)$totalPages; $i++): ?>
+                                        <?php if ($i == (int)$currentPage): ?>
+                                            <span class="currentPage"><?= $i ?></span>
+                                        <?php else: ?>
+                                            <a
+                                                rel="nofollow, noindex"
+                                                href="index.php?user=productsByCategory&category_id=<?= (int)$categoryId ?>&sort=<?= htmlspecialchars($sort) ?><?= $qKeyword ?>&pg=<?= $i ?>">
+                                                <?= $i ?>
+                                            </a>
+                                        <?php endif; ?>
+                                    <?php endfor; ?>
+                                <?php endif; ?>
 
-
+                                <?php if ($hasProducts && $currentPage < (int)$totalPages): ?>
+                                    <a
+                                        rel="nofollow, noindex"
+                                        class="paging-next ico"
+                                        title="Trang sau"
+                                        href="index.php?user=productsByCategory&category_id=<?= (int)$categoryId ?>&sort=<?= htmlspecialchars($sort) ?><?= $qKeyword ?>&pg=<?= $currentPage + 1 ?>">
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        </ul>
 
                     </div>
                 </div>
@@ -180,3 +199,8 @@ $qKeyword = ($keyword ?? '') !== '' ? '&keyword=' . urlencode($keyword) : '';
         </div>
     </div>
 </div>
+
+<!-- (tuỳ chọn) Giữ icon tim gọn nhẹ nếu theme đang ẩn -->
+<style>
+.wishlist-btn .fa-heart{font-size:16px;line-height:1}
+</style>
