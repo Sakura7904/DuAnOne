@@ -62,3 +62,23 @@ function getContentPathClient($folder = '', $defaultPage = 'home')
         return 'views/user/pages/' . $page . '.php';
     }
 }
+
+function getCartItemCount()
+{
+    if (!isset($_SESSION['user_id'])) {
+        return 0;
+    }
+
+    try {
+        $cartModel = new CartModel();
+        $cart = $cartModel->getCartByUserId($_SESSION['user_id']);
+
+        if ($cart) {
+            return $cartModel->getCartItemCount($cart['id']);
+        }
+
+        return 0;
+    } catch (Exception $e) {
+        return 0;
+    }
+}

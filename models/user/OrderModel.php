@@ -488,4 +488,49 @@ class OrderModel
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    // ĐÁP ỨNG: orders.payment_status='paid', orders.status='processing'
+    //          và orderitems.status='processing'
+    // Chỉ cần 1 hàm này trong OrderModel
+    public function finalizePaidOrder(int $orderId): bool
+    {
+        try {
+            $this->db->pdo->beginTransaction();
+
+            // 1) Cập nhật bảng orders
+            $sql = "UPDATE orders
+                SET payment_status = 'paid',
+                    status = 'processing'
+                WHERE id = :id";
+            $stmt = $this->db->pdo->prepare($sql);
+            $stmt->bindParam(':id', $orderId, PDO::PARAM_INT);
+            $stmt->execute();
+            $affectedOrders = $stmt->rowCount();
+
+            // 2) Cập nhật orderitems (nếu có cột 'status').
+            //    Nếu lỗi (không có cột/khác tên bảng), KHÔNG rollback.
+            try {
+                $sql2 = "UPDATE orderitems SET status = 'processing' WHERE order_id = :id";
+                $stmt2 = $this->db->pdo->prepare($sql2);
+                $stmt2->bindParam(':id', $orderId, PDO::PARAM_INT);
+                $stmt2->execute();
+            } catch (PDOException $e2) {
+                error_log('[finalizePaidOrder][orderitems] ' . $e2->getMessage());
+                // bỏ qua, vẫn commit nếu orders đã cập nhật
+            }
+
+            $this->db->pdo->commit();
+
+            if ($affectedOrders === 0) {
+                // Không có bản ghi nào bị ảnh hưởng -> sai ID?
+                error_log("[finalizePaidOrder] No order updated for ID={$orderId}");
+                return false;
+            }
+            return true;
+        } catch (PDOException $e) {
+            $this->db->pdo->rollBack();
+            error_log('[finalizePaidOrder] ' . $e->getMessage());
+            return false;
+        }
+    }
 }

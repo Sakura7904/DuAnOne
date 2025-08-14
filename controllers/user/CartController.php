@@ -78,6 +78,10 @@ class CartController
             if ($result) {
                 $this->cartModel->updateCartTimestamp($cart['id']);
                 $_SESSION['alert'] = ['type' => 'success', 'message' => 'Đã thêm sản phẩm vào giỏ hàng thành công!'];
+                if (isset($_POST['buy_now'])) {
+                    header('Location: ?user=cart');
+                    exit;
+                }
             } else {
                 $_SESSION['alert'] = ['type' => 'error', 'message' => 'Có lỗi xảy ra khi thêm sản phẩm'];
             }

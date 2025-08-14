@@ -21,7 +21,7 @@ $amountVn  = number_format((int)($amount ?? 0), 0, ',', '.') . 'đ';
 
         <div style="margin-top:16px">
             <?php if ($orderId): ?>
-                <a class="btn" href="index.php?user=order&id=<?= $orderId ?>" style="padding:10px 16px;border:1px solid #333;border-radius:8px;display:inline-block;margin:4px 8px">Xem đơn hàng</a>
+                <a class="btn" href="index.php?user=purchase" style="padding:10px 16px;border:1px solid #333;border-radius:8px;display:inline-block;margin:4px 8px">Xem đơn hàng</a>
             <?php endif; ?>
             <a class="btn" href="index.php?user=home" style="padding:10px 16px;border:1px solid #333;border-radius:8px;display:inline-block;margin:4px 8px">Về trang chủ</a>
         </div>

@@ -1,5 +1,5 @@
 <div class="absolute p-2 border-neutral right-0 border bg-white rounded-full cursor-pointer duration-300 translate-x-1/2 hover:opacity-75 dark:bg-dark-neutral-bg dark:border-dark-neutral-border" id="sidebar-btn"><img src="./assets/admin/assets/images/icons/icon-arrow-left.svg" alt="left chevron icon"></div>
-<div><a class="mb-10" href="index.html"> <img class="logo-maximize" src="./assets/admin/assets/images/icons/icon-logo.svg" alt="Frox logo"><img class="logo-minimize ml-[10px]" src="./assets/admin/assets/images/icons/icon-favicon.svg" alt="Frox logo"></a>
+<div><a class="mb-10" href="index.html"> <img class="logo-maximize" src="./assets/admin/assets/images/icons/icon-logo.svg" alt=""><img class="logo-minimize ml-[10px]" src="./assets/admin/assets/images/icons/icon-favicon.svg" alt="Frox logo"></a>
     <div class="pt-[106px] lg:pt-[35px] pb-[18px]">
         <div class="sidemenu-item rounded-xl relative">
             <input class="sr-only peer" type="checkbox" value="dashboard" name="sidemenu" id="dashboard">
@@ -46,7 +46,7 @@
         <div class="sidemenu-item rounded-xl relative">
             <a href="index.php?admin=list_categories" class="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none">
                 <div class="flex items-center gap-[10px]">
-                    <img src="./assets/admin/assets/images/icons/icon-products.svg" alt="side menu icon">
+                    <img src="./assets/admin/assets/images/icons/icon-project.svg" alt="side menu icon">
                     <span class="text-normal font-semibold text-gray-500 sidemenu-title dark:text-gray-dark-500">Categories</span>
                 </div>
             </a>
@@ -57,6 +57,15 @@
                 <div class="flex items-center gap-[10px]">
                    <img src="./assets/admin/assets/images/icons/icon-auth.svg" alt="side menu icon">
                     <span class="text-normal font-semibold text-gray-500 sidemenu-title dark:text-gray-dark-500">Accounts</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="sidemenu-item rounded-xl relative">
+            <a href="index.php?admin=list-order" class="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none">
+                <div class="flex items-center gap-[10px]">
+                   <img src="./assets/admin/assets/images/icons/icon-cms.svg" alt="side menu icon">
+                    <span class="text-normal font-semibold text-gray-500 sidemenu-title dark:text-gray-dark-500">Orders</span>
                 </div>
             </a>
         </div>

@@ -107,7 +107,7 @@ if (!empty($_SESSION['user_id']) || (!empty($_SESSION['user']) && !empty($_SESSI
                 <div class="cartBtn btnIcon">
                     <a aria-label="cart" class="cartBtnOpen" href="?user=cart">
                         <i class="far fa-shopping-bag"></i>
-                        <span class="header__cart-count">0</span>
+                        <span class="header__cart-count"><?= getCartItemCount() ?></span>
                     </a>
                     <!-- <a aria-label="cart" class="cartBtnOpen" href="javascript:void(0)">
                         <i class="far fa-shopping-bag"></i>

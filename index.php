@@ -18,6 +18,7 @@ include "controllers/admin/CategoriesController.php";
 include "controllers/admin/AuthController.php";
 include "controllers/admin/AccountsController.php";
 include "controllers/admin/ProductController.php";
+include "controllers/admin/OrdersController.php";
 
 // ========================= Controller client =========================
 include "controllers/user/HomeController.php";
@@ -89,9 +90,17 @@ if (!empty($admin)) {
         'change_status_accounts' => (new AccountsController())->changeStatus($_POST['id']),
         'promote_accounts_role'    => (new AccountsController())->changeRole($_POST['id']),
 
+        // ===== ORDERS (admin) =====
+        'list-order'                    => (new OrdersController())->order(),
+        'order_update_status'       => (new OrdersController())->updateOrderStatus(),
+        'order_item_update_status'  => (new OrdersController())->updateItemStatus(),
+        'order_item_bulk_update'    => (new OrdersController())->bulkUpdateItemStatus(),
+        'order_update_payment'      => (new OrdersController())->updatePaymentStatus(),
+        'order_items_apply_status' => (new OrdersController())->applyStatusByItems(),
+
 
         // ===== Mặc định không tìm thấy =====
-        default => die("Không tìm thấy hành động phù hợp."),
+        default => die("Không tìm file nào như vậy."),
     };
 }
 
@@ -140,6 +149,7 @@ if (!empty($user) || (empty($admin) && empty($user))) {
 
         // ===== Trang đơn hàng =====        
         'purchase'     => (new PurchaseController())->purchase(),
+        'cancelOrderItem' => (new PurchaseController())->cancelOrderItem(),
 
         // ===== Wishlist =====
         'wishlist'           => (new WishlistController())->index(),          // GET:  index.php?user=wishlist&pg=1&sort=newest

@@ -308,8 +308,21 @@ class OrderController
             $this->momoCreateCardPayment($orderId, $total, 'payWithCC', $email, null);
         } else {
             // COD (hoặc cổng khác)
-            $_SESSION['order_alert'] = ['type' => 'success', 'message' => "Đặt hàng thành công. Mã đơn #$orderId • Tổng " . number_format($total, 0, ',', '.') . 'đ'];
-            $this->redirect("index.php?user=order&id={$orderId}");
+            $resultCode = 0;                  // COD = success
+            $amount     = (int)$total;
+            $transId    = 'COD-' . $orderId;    // hoặc '' nếu không dùng
+            $content    = getContentPathClient('', 'payment_result');
+
+            view('user/index', [
+                'content'    => $content,
+                'isSuccess'  => true,
+                'orderId'    => $orderId,
+                'amount'     => $amount,
+                'orderInfo'  => 'Thanh toán khi nhận hàng (COD)',
+                'transId'    => $transId,
+                'payType'    => 'Ship COD',
+                'resultCode' => $resultCode,
+            ]);
         }
     }
 
@@ -321,22 +334,21 @@ class OrderController
         $transId    = $_GET['transId'] ?? '';
         $extraData  = $_GET['extraData'] ?? '';
 
+        // Lấy orderId từ extraData
         $orderId = 0;
         if ($extraData) {
             $j = json_decode(base64_decode($extraData), true);
             if (!empty($j['order_id'])) $orderId = (int)$j['order_id'];
         }
 
-        // ✅ Thành công => set paid ngay (idempotent, IPN vẫn chạy sau)
         if ($resultCode === 0 && $orderId > 0) {
-            // dùng hàm có sẵn:
-            $this->orderModel->updatePaymentStatus($orderId, 'paid');
-
-            // (Nếu muốn lưu thêm transId/amount/payType, dùng hàm dưới trong Model)
-            // $this->orderModel->markOrderPaid($orderId, $transId, $amount, $payType);
+            if (!$this->orderModel->finalizePaidOrder($orderId)) {
+                $_SESSION['alert'] = ['type' => 'error', 'message' => 'Thanh toán thành công nhưng không cập nhật được trạng thái đơn.'];
+            }
         }
 
-        // Không tự động chuyển trang: render trang kết quả
+
+        // Render trang kết quả
         $content = getContentPathClient('', 'payment_result');
         view('user/index', [
             'content'   => $content,
@@ -386,31 +398,27 @@ class OrderController
         }
 
         try {
-            // Lấy session + payment_intent
-            $session = $this->stripe->checkout->sessions->retrieve($sessionId, ['expand' => ['payment_intent']]);
-
+            $session  = $this->stripe->checkout->sessions->retrieve($sessionId, ['expand' => ['payment_intent']]);
             $orderId  = isset($session->metadata['order_id']) ? (int)$session->metadata['order_id'] : 0;
             $pi       = $session->payment_intent;
             $piStatus = $pi->status ?? '';
             $currency = $pi->currency ?? 'vnd';
             $amountRaw = (int)($pi->amount ?? 0);
+            $amount   = ($currency === 'vnd') ? $amountRaw : $amountRaw / 100;
 
-            // ✅ VND là zero-decimal: KHÔNG chia 100
-            $amount = ($currency === 'vnd') ? $amountRaw : $amountRaw / 100;
-
-            $isSuccess = false;
             if ($piStatus === 'succeeded' && $orderId > 0) {
-                $this->orderModel->updatePaymentStatus($orderId, 'paid'); // set paid ngay
-                $isSuccess = true;
+                if (!$this->orderModel->finalizePaidOrder($orderId)) {
+                    $_SESSION['alert'] = ['type' => 'error', 'message' => 'Thanh toán thành công nhưng không cập nhật được trạng thái đơn.'];
+                }
             }
 
-            // Render trang kết quả, không redirect
+
             $content = getContentPathClient('', 'payment_result');
             view('user/index', [
                 'content'   => $content,
-                'isSuccess' => $isSuccess,
+                'isSuccess' => ($piStatus === 'succeeded'),
                 'orderId'   => $orderId,
-                'amount'    => $amount,              // VND: số đồng; USD: số $
+                'amount'    => $amount,
                 'orderInfo' => 'Stripe Checkout',
                 'transId'   => $pi->id ?? '',
                 'payType'   => 'STRIPE',
