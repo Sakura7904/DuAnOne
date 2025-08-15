@@ -183,6 +183,85 @@ if (!function_exists('vnd_format')) {
             <?php endforeach; ?>
         </table>
     </div>
+
+    <?php
+    // ===== Pagination cho list_variant (dùng pg thay vì page) =====
+    $varCur    = max(1, (int)($_GET['pg'] ?? ($variantPage ?? 1)));   // trang hiện tại
+    $varTotal  = max(1, (int)($variantPages ?? 1));                   // tổng số trang
+    $varWindow = 2;                                                   // hiển thị 2 trang trước/sau
+
+    $varStart = max(1, $varCur - $varWindow);
+    $varEnd   = min($varTotal, $varCur + $varWindow);
+    if ($varEnd - $varStart < 4) {
+        $varStart = max(1, min($varStart, $varEnd - 4));
+        $varEnd   = min($varTotal, max($varEnd, $varStart + 4));
+    }
+
+    // build URL giữ filter, đổi sang pg cho list_variant
+    function admin_variant_page_url_pg(int $p): string
+    {
+        $qs = $_GET;
+        $qs['admin'] = 'list_variant'; // đúng route list_variant
+        unset($qs['page']);            // tránh router cũ
+        $qs['pg'] = $p;
+        return '?' . http_build_query($qs);
+    }
+
+    // classes
+    $varBtnBase = 'btn text-sm h-fit min-h-fit capitalize leading-4 border-0 font-semibold py-[11px] px-[18px]';
+    $varBtnAct  = $varBtnBase . ' bg-color-brands hover:bg-color-brands text-white';
+    $varBtnNorm = $varBtnBase . ' bg-transparent text-gray-1100 hover:text-white hover:bg-color-brands dark:text-gray-dark-1100';
+
+    $varGhostBtn = 'items-center justify-center border rounded-lg border-neutral hidden gap-x-[10px] px-[18px] py-[11px] dark:border-dark-neutral-border sm:flex';
+    $varGhostDis = ' opacity-50 pointer-events-none';
+    $varGhostTxt = 'text-gray-400 text-xs font-semibold leading-[18px] dark:text-gray-dark-400';
+
+    // prev/next/first/last
+    $varIsFirst = ($varCur <= 1);
+    $varIsLast  = ($varCur >= $varTotal);
+    $varPrevUrl = admin_variant_page_url_pg(max(1, $varCur - 1));
+    $varNextUrl = admin_variant_page_url_pg(min($varTotal, $varCur + 1));
+    ?>
+
+    <div class="flex items-center gap-x-10">
+
+        <!-- First & Prev -->
+        <div class="hidden sm:flex items-center gap-x-2">
+            <a class="<?= $varGhostBtn . ($varIsFirst ? $varGhostDis : '') ?>" href="<?= htmlspecialchars(admin_variant_page_url_pg(1)) ?>">
+                <span class="<?= $varGhostTxt ?>">« Trang đầu</span>
+            </a>
+            <a class="<?= $varGhostBtn . ($varIsFirst ? $varGhostDis : '') ?>" href="<?= htmlspecialchars($varPrevUrl) ?>">
+                <span class="<?= $varGhostTxt ?>">‹ Trước</span>
+            </a>
+        </div>
+
+        <!-- Dãy số trang -->
+        <div>
+            <?php if ($varStart > 1): ?>
+                <a class="<?= $varCur === 1 ? $varBtnAct : $varBtnNorm ?>" href="<?= htmlspecialchars(admin_variant_page_url_pg(1)) ?>">1</a>
+                <?php if ($varStart > 2): ?><span class="px-2">…</span><?php endif; ?>
+            <?php endif; ?>
+
+            <?php for ($i = $varStart; $i <= $varEnd; $i++): ?>
+                <a class="<?= $varCur === $i ? $varBtnAct : $varBtnNorm ?>" href="<?= htmlspecialchars(admin_variant_page_url_pg($i)) ?>"><?= $i ?></a>
+            <?php endfor; ?>
+
+            <?php if ($varEnd < $varTotal): ?>
+                <?php if ($varEnd < $varTotal - 1): ?><span class="px-2">…</span><?php endif; ?>
+                <a class="<?= $varCur === $varTotal ? $varBtnAct : $varBtnNorm ?>" href="<?= htmlspecialchars(admin_variant_page_url_pg($varTotal)) ?>"><?= $varTotal ?></a>
+            <?php endif; ?>
+        </div>
+
+        <!-- Next & Last -->
+        <div class="hidden sm:flex items-center gap-x-2">
+            <a class="<?= $varGhostBtn . ($varIsLast ? $varGhostDis : '') ?>" href="<?= htmlspecialchars($varNextUrl) ?>">
+                <span class="<?= $varGhostTxt ?>">Sau ›</span>
+            </a>
+            <a class="<?= $varGhostBtn . ($varIsLast ? $varGhostDis : '') ?>" href="<?= htmlspecialchars(admin_variant_page_url_pg($varTotal)) ?>">
+                <span class="<?= $varGhostTxt ?>">Trang cuối »</span>
+            </a>
+        </div>
+    </div>
 </div>
 
 <script>

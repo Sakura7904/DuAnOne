@@ -27,6 +27,38 @@ class VariantModel
     // models/admin/VariantModel.php
     public function listWithDetails(array $filters = [], int $page = 1, int $perPage = 20, string $sort = 'product_asc'): array
     {
+        $page    = max(1, $page);
+        $perPage = max(1, $perPage);
+        $offset  = ($page - 1) * $perPage;
+
+        // --- chung phần FROM/JOIN để tái dùng cho cả COUNT và SELECT ---
+        $from = "
+        FROM productvariants v
+        INNER JOIN products p       ON p.id = v.product_id
+        LEFT  JOIN categories c     ON c.id = p.category_id
+        LEFT  JOIN productvariantvalues pv ON pv.variant_id = v.id
+        LEFT  JOIN attributevalues  av ON av.id = pv.value_id
+        WHERE 1=1
+    ";
+
+        $params = [];
+        if (!empty($filters['product_id'])) {
+            $from .= " AND v.product_id = :product_id";
+            $params[':product_id'] = (int)$filters['product_id'];
+        }
+        if (isset($filters['min_quantity'])) {
+            $from .= " AND v.quantity >= :min_qty";
+            $params[':min_qty'] = (int)$filters['min_quantity'];
+        }
+
+        // --- COUNT tổng số biến thể (không phân trang) ---
+        $countSql = "SELECT COUNT(DISTINCT v.id) " . $from;
+        $stc = $this->db->pdo->prepare($countSql);
+        foreach ($params as $k => $v) $stc->bindValue($k, $v, PDO::PARAM_INT);
+        $stc->execute();
+        $total = (int)$stc->fetchColumn();
+
+        // --- SELECT dữ liệu trang hiện tại ---
         $sql = "
         SELECT 
             v.*,
@@ -37,27 +69,10 @@ class VariantModel
             GROUP_CONCAT(DISTINCT CASE WHEN av.attribute_id = 2 THEN av.value END ORDER BY av.value SEPARATOR ', ') AS size_names,
             (SELECT i.image_url FROM productimages i WHERE i.variant_id = v.id ORDER BY i.id ASC LIMIT 1) AS thumbnail_display,
             CASE WHEN v.sale_price IS NOT NULL AND v.sale_price > 0 THEN v.sale_price ELSE v.price END AS effective_price
-        FROM productvariants v
-        INNER JOIN products p       ON p.id = v.product_id
-        LEFT  JOIN categories c     ON c.id = p.category_id
-        LEFT  JOIN productvariantvalues pv ON pv.variant_id = v.id
-        LEFT  JOIN attributevalues av      ON av.id = pv.value_id
-        WHERE 1=1
+        " . $from . "
+        GROUP BY v.id
     ";
 
-        $params = [];
-        if (!empty($filters['product_id'])) {
-            $sql .= " AND v.product_id = :product_id";
-            $params[':product_id'] = (int)$filters['product_id'];
-        }
-        if (isset($filters['min_quantity'])) {
-            $sql .= " AND v.quantity >= :min_qty";
-            $params[':min_qty'] = (int)$filters['min_quantity'];
-        }
-
-        $sql .= " GROUP BY v.id ";
-
-        // Sắp xếp: mặc định gom theo tên sản phẩm
         switch ($sort) {
             case 'product_desc':
                 $sql .= " ORDER BY p.name DESC, v.id DESC";
@@ -66,22 +81,20 @@ class VariantModel
                 $sql .= " ORDER BY p.name ASC,  v.id DESC";
                 break;
             case 'price_asc':
-                $sql .= " ORDER BY effective_price ASC, v.id DESC";
+                $sql .= " ORDER BY effective_price ASC,  v.id DESC";
                 break;
             case 'price_desc':
                 $sql .= " ORDER BY effective_price DESC, v.id DESC";
                 break;
             default:
-                $sql .= " ORDER BY v.id DESC"; // fallback cũ
+                $sql .= " ORDER BY v.id DESC";
         }
-
         $sql .= " LIMIT :limit OFFSET :offset";
 
-        $offset = max(0, ($page - 1) * $perPage);
         $stmt = $this->db->pdo->prepare($sql);
         foreach ($params as $k => $v) $stmt->bindValue($k, $v, PDO::PARAM_INT);
-        $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->bindValue(':limit',  $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset,  PDO::PARAM_INT);
         $stmt->execute();
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -94,9 +107,9 @@ class VariantModel
                 $r['thumbnail_display'] = $r['image_url'] ?? $r['product_thumbnail'] ?? './assets/admin/assets/images/placeholder.png';
             }
         }
-        return $rows;
-    }
 
+        return ['variants' => $rows, 'total' => $total];
+    }
 
     public function getDetail(int $variantId): ?array
     {

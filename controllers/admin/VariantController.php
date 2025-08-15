@@ -25,23 +25,30 @@ class VariantController
             'product_id'   => $this->input('product_id'),
             'min_quantity' => $this->input('min_quantity'),
         ];
-        $page    = max(1, (int)$this->input('page', 1));
-        $perPage = 20;
-        $sort    = $this->input('sort', 'product_asc'); // mặc định gom theo tên sản phẩm
 
-        $variants = $this->variantModel->listWithDetails($filters, $page, $perPage, $sort);
+        $page    = max(1, (int)$this->input('pg', 1));   // <<< dùng pg cho thống nhất
+        $perPage = 5;
+        $sort    = $this->input('sort', 'product_asc');
+
+        $data = $this->variantModel->listWithDetails($filters, $page, $perPage, $sort);
+        $variants = $data['variants'];
+        $total    = (int)$data['total'];
+        $pages    = max(1, (int)ceil($total / $perPage));
 
         $content  = getContentPath('Variant', 'variantList');
         view('admin/master', [
             'content'        => $content,
             'variants'       => $variants,
-            'totalVariants'  => count($variants),
+            'totalVariants'  => $total,     // tổng toàn bộ, không phải count($variants)
             'filters'        => $filters,
             'page'           => $page,
+            'variantPage'    => $page,      // nếu view dùng tên khác
+            'variantPages'   => $pages,     // <<< để block phân trang hiển thị trang 2,3…
             'perPage'        => $perPage,
             'sort'           => $sort,
         ]);
     }
+
 
     /* ====================== CREATE ====================== */
 

@@ -1,5 +1,5 @@
 <div class="absolute p-2 border-neutral right-0 border bg-white rounded-full cursor-pointer duration-300 translate-x-1/2 hover:opacity-75 dark:bg-dark-neutral-bg dark:border-dark-neutral-border" id="sidebar-btn"><img src="./assets/admin/assets/images/icons/icon-arrow-left.svg" alt="left chevron icon"></div>
-<div><a class="mb-10" href="index.html">
+<div><a class="mb-10" href="?admin=dashboard">
         <img width="77" height="48" alt="logo" class="logo-maximize"
             src="./assets/users/pos.nvncdn.com/4ef0bf-108661/store/20250429_Ya1OrcUS.png">
         <img class="logo-minimize ml-[10px]" src="./assets/admin/assets/images/icons/icon-favicon.svg" alt="Frox logo"></a>
