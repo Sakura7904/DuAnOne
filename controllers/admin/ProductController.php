@@ -18,7 +18,7 @@ class ProductController
     {
         // Lấy trang hiện tại từ URL
         $page  = max(1, (int)($_GET['p'] ?? 1));
-        $limit = 3;
+        $limit = 5;
 
         $totalProducts = $this->productModel->countProducts();
         $totalPages    = (int)ceil($totalProducts / $limit);
@@ -70,6 +70,7 @@ class ProductController
             'content' => $content,
             'data'    => [
                 'products'   => $products,
+                'totalProducts' => $totalProducts,
                 'pagination' => $pagination
             ]
         ]);
