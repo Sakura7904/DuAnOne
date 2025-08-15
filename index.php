@@ -19,6 +19,7 @@ include "controllers/admin/AuthController.php";
 include "controllers/admin/AccountsController.php";
 include "controllers/admin/ProductController.php";
 include "controllers/admin/OrdersController.php";
+include "controllers/admin/CommentsController.php";
 
 // ========================= Controller client =========================
 include "controllers/user/HomeController.php";
@@ -97,6 +98,11 @@ if (!empty($admin)) {
         'order_item_bulk_update'    => (new OrdersController())->bulkUpdateItemStatus(),
         'order_update_payment'      => (new OrdersController())->updatePaymentStatus(),
         'order_items_apply_status' => (new OrdersController())->applyStatusByItems(),
+
+        // ===== QUẢN LÝ BÌNH LUẬN =====
+        'list_comments'        => (new CommentsController())->index(),
+        'delete_comment'       => (new CommentsController())->delete(),
+        'bulk_delete_comments' => (new CommentsController())->bulkDelete(),
 
 
         // ===== Mặc định không tìm thấy =====
