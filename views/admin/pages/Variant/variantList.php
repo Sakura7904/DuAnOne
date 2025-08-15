@@ -24,13 +24,13 @@ if (!function_exists('vnd_format')) {
                         <a href="index.php?admin=dashboard"><span class="capitalize">home</span></a>
                     </div>
                     <img src="./assets/admin/assets/images/icons/icon-arrow-right.svg" alt="arrow right icon">
-                    <span class="capitalize text-color-brands">All Variant</span>
+                    <a href="?admin=list_variant" class="capitalize text-color-brands">All Variant</a>
                 </div>
             </div>
         </div>
         <div class="flex">
             <!-- GIỮ NGUYÊN CLASS, CHỈ ĐỔI LINK TỚI TẠO BIẾN THỂ -->
-            <a href="?admin=variant#create" class="btn flex items-center w-fit normal-case bg-color-brands h-auto border-white rounded-2xl border-gray-100 gap-x-[10.5px] border-[4px] hover:border-[#B2A7FF] hover:bg-color-brands dark:border-black dark:hover:border-[#B2A7FF] p-[17.5px]">
+            <a href="?admin=add_variant" class="btn flex items-center w-fit normal-case bg-color-brands h-auto border-white rounded-2xl border-gray-100 gap-x-[10.5px] border-[4px] hover:border-[#B2A7FF] hover:bg-color-brands dark:border-black dark:hover:border-[#B2A7FF] p-[17.5px]">
                 <img src="./assets/admin/assets/images/icons/icon-add.svg" alt="add icon">
                 <span class="text-white font-semibold text-[14px] leading-[21px]">Thêm biến thể</span>
             </a>
@@ -164,11 +164,11 @@ if (!function_exists('vnd_format')) {
                     <td class="border-b border-neutral py-[26px] dark:border-dark-neutral-border">
                         <div class="flex flex-col items-start items-center gap-y-2">
                             <!-- Xem/Sửa: trỏ về form edit của biến thể -->
-                            <a href="?admin=variant#edit&id=<?= (int)$v['id'] ?>"
+                            <a href="?admin=edit_variant&id=<?= (int)$v['id'] ?>"
                                 class="btn normal-case h-fit min-h-fit transition-all duration-300 px-6 border-0 bg-[#E8EDF2] text-[#B8B1E4] hover:!bg-[#bdbec0] hover:text-white dark:bg-[#313442] dark:hover:!bg-[#424242] py-[9px]">
                                 Xem
                             </a>
-                            <a href="?admin=variant#edit&id=<?= (int)$v['id'] ?>"
+                            <a href="?admin=edit_variant&id=<?= (int)$v['id'] ?>"
                                 class="btn normal-case h-fit min-h-fit transition-all duration-300 border-4 bg-color-brands hover:bg-color-brands hover:border-[#B2A7FF] dark:hover:border-[#B2A7FF] border-neutral-bg px-6 dark:border-dark-neutral-bg py-[9px]">Sửa</a>
 
                             <!-- XÓA: GIỮ NGUYÊN STYLE, NHƯNG SUBMIT BẰNG POST TỚI variant#delete -->
@@ -221,7 +221,7 @@ if (!function_exists('vnd_format')) {
                 // Tạo form POST ẩn để khớp controller delete()
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = '?admin=variant#delete';
+                form.action = '?admin=delete_variant';
 
                 const input = document.createElement('input');
                 input.type = 'hidden';
@@ -235,6 +235,7 @@ if (!function_exists('vnd_format')) {
         });
     }
 </script>
+
 <style>
     .product-thumbnail {
         border-radius: 8px;
@@ -280,3 +281,26 @@ if (!function_exists('vnd_format')) {
         color: #dc3545 !important;
     }
 </style>
+
+<?php if (!empty($_SESSION['alert'])): ?>
+    <?php
+    $a = $_SESSION['alert'];
+    unset($_SESSION['alert']);
+    $icon  = in_array($a['type'] ?? '', ['success', 'error', 'warning', 'info', 'question']) ? $a['type'] : 'info';
+    $title = $icon === 'success' ? 'Thành công'
+        : ($icon === 'error'   ? 'Có lỗi xảy ra'
+            : ($icon === 'warning' ? 'Cảnh báo' : 'Thông báo'));
+    $msg   = $a['message'] ?? '';
+    ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: <?= json_encode($icon) ?>,
+                title: <?= json_encode($title) ?>,
+                html: <?= json_encode($msg) ?>,
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#7C4DFF' // màu brand của bạn
+            });
+        });
+    </script>
+<?php endif; ?>

@@ -24,7 +24,8 @@ class VariantModel
 
     // models/admin/VariantModel.php
 
-    public function listWithDetails(array $filters = [], int $page = 1, int $perPage = 20): array
+    // models/admin/VariantModel.php
+    public function listWithDetails(array $filters = [], int $page = 1, int $perPage = 20, string $sort = 'product_asc'): array
     {
         $sql = "
         SELECT 
@@ -32,14 +33,10 @@ class VariantModel
             p.name AS product_name,
             p.image_thumbnail AS product_thumbnail,
             c.name AS category_name,
-            -- attribute_id: 1 = Màu Sắc, 2 = Kích Thước
             GROUP_CONCAT(DISTINCT CASE WHEN av.attribute_id = 1 THEN av.value END ORDER BY av.value SEPARATOR ', ') AS color_names,
             GROUP_CONCAT(DISTINCT CASE WHEN av.attribute_id = 2 THEN av.value END ORDER BY av.value SEPARATOR ', ') AS size_names,
             (SELECT i.image_url FROM productimages i WHERE i.variant_id = v.id ORDER BY i.id ASC LIMIT 1) AS thumbnail_display,
-            CASE 
-                WHEN v.sale_price IS NOT NULL AND v.sale_price > 0 THEN v.sale_price
-                ELSE v.price
-            END AS effective_price
+            CASE WHEN v.sale_price IS NOT NULL AND v.sale_price > 0 THEN v.sale_price ELSE v.price END AS effective_price
         FROM productvariants v
         INNER JOIN products p       ON p.id = v.product_id
         LEFT  JOIN categories c     ON c.id = p.category_id
@@ -58,23 +55,36 @@ class VariantModel
             $params[':min_qty'] = (int)$filters['min_quantity'];
         }
 
-        $sql .= "
-        GROUP BY v.id
-        ORDER BY v.id DESC
-        LIMIT :limit OFFSET :offset
-    ";
+        $sql .= " GROUP BY v.id ";
+
+        // Sắp xếp: mặc định gom theo tên sản phẩm
+        switch ($sort) {
+            case 'product_desc':
+                $sql .= " ORDER BY p.name DESC, v.id DESC";
+                break;
+            case 'product_asc':
+                $sql .= " ORDER BY p.name ASC,  v.id DESC";
+                break;
+            case 'price_asc':
+                $sql .= " ORDER BY effective_price ASC, v.id DESC";
+                break;
+            case 'price_desc':
+                $sql .= " ORDER BY effective_price DESC, v.id DESC";
+                break;
+            default:
+                $sql .= " ORDER BY v.id DESC"; // fallback cũ
+        }
+
+        $sql .= " LIMIT :limit OFFSET :offset";
 
         $offset = max(0, ($page - 1) * $perPage);
         $stmt = $this->db->pdo->prepare($sql);
-        foreach ($params as $k => $v) {
-            $stmt->bindValue($k, $v, PDO::PARAM_INT);
-        }
+        foreach ($params as $k => $v) $stmt->bindValue($k, $v, PDO::PARAM_INT);
         $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
         foreach ($rows as &$r) {
             $r['variant_name']  = $r['variant_name'] ?? ('Biến thể #' . (int)$r['id']);
             $r['price_display'] = number_format((float)$r['effective_price'], 0, ',', '.') . 'đ';
@@ -86,6 +96,7 @@ class VariantModel
         }
         return $rows;
     }
+
 
     public function getDetail(int $variantId): ?array
     {
@@ -166,43 +177,37 @@ class VariantModel
     public function getById(int $variantId): ?array
     {
         $sql = "SELECT v.*
-                FROM productvariants v
-                WHERE v.id = :id";
+            FROM productvariants v
+            WHERE v.id = :id";
         $stmt = $this->db->pdo->prepare($sql);
         $stmt->bindValue(':id', $variantId, PDO::PARAM_INT);
         $stmt->execute();
         $variant = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$variant) return null;
 
-        if (!$variant) {
-            return null;
-        }
-
-        // Lấy danh sách giá trị thuộc tính (value + thuộc tính cha)
+        // Lấy màu/size kèm value_id + attribute_id
         $sqlAttr = "SELECT pv.value_id,
-                           av.value,
-                           av.color_code,
-                           av.attribute_id
-                    FROM productvariantvalues pv
-                    INNER JOIN attributevalues av ON av.id = pv.value_id
-                    WHERE pv.variant_id = :vid";
-        $stmt = $this->db->pdo->prepare($sqlAttr);
-        $stmt->bindValue(':vid', $variantId, PDO::PARAM_INT);
-        $stmt->execute();
-        $variant['attribute_values'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                       av.value,
+                       av.color_code,
+                       av.attribute_id
+                FROM productvariantvalues pv
+                INNER JOIN attributevalues av ON av.id = pv.value_id
+                WHERE pv.variant_id = :vid";
+        $stm2 = $this->db->pdo->prepare($sqlAttr);
+        $stm2->bindValue(':vid', $variantId, PDO::PARAM_INT);
+        $stm2->execute();
+        $variant['attribute_values'] = $stm2->fetchAll(PDO::FETCH_ASSOC);
 
-        // Lấy ảnh của biến thể
-        // productimages có FK CASCADE về productvariants (xóa biến thể sẽ xóa ảnh) :contentReference[oaicite:3]{index=3} :contentReference[oaicite:4]{index=4}
-        $sqlImg = "SELECT id, image_url, created_at
-                   FROM productimages
-                   WHERE variant_id = :vid
-                   ORDER BY id ASC";
-        $stmt = $this->db->pdo->prepare($sqlImg);
-        $stmt->bindValue(':vid', $variantId, PDO::PARAM_INT);
-        $stmt->execute();
-        $variant['images'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Ảnh hiện có (nếu cần hiển thị)
+        $sqlImg = "SELECT id, image_url FROM productimages WHERE variant_id = :vid ORDER BY id ASC";
+        $stm3 = $this->db->pdo->prepare($sqlImg);
+        $stm3->bindValue(':vid', $variantId, PDO::PARAM_INT);
+        $stm3->execute();
+        $variant['images'] = $stm3->fetchAll(PDO::FETCH_ASSOC);
 
         return $variant;
     }
+
 
     /**
      * Lấy tất cả biến thể theo product_id kèm thuộc tính và số ảnh.
@@ -244,38 +249,129 @@ class VariantModel
      * - Bảng productvariants có AUTO_INCREMENT id. :contentReference[oaicite:7]{index=7}
      * - Bảng productvariantvalues có PK (variant_id, value_id). :contentReference[oaicite:8]{index=8}
      */
-    public function create(array $data, array $valueIds = []): int
+
+    // Lấy map ảnh theo product_id từ productimages (qua productvariants)
+    public function getImagesGroupedByProduct(array $productIds): array
     {
-        // $data: product_id, price, sale_price (nullable), quantity, image_url (nullable)
-        $this->db->pdo->beginTransaction();
+        $productIds = array_values(array_unique(array_filter(array_map('intval', $productIds))));
+        if (empty($productIds)) return [];
+
+        // placeholders
+        $in = implode(',', array_fill(0, count($productIds), '?'));
+        $sql = "
+        SELECT v.product_id, i.image_url
+        FROM productvariants v
+        INNER JOIN productimages i ON i.variant_id = v.id
+        WHERE v.product_id IN ($in)
+        ORDER BY i.id ASC
+    ";
+        $stmt = $this->db->pdo->prepare($sql);
+        foreach ($productIds as $k => $pid) {
+            $stmt->bindValue($k + 1, $pid, PDO::PARAM_INT);
+        }
+        $stmt->execute();
+
+        $map = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $pid = (int)$row['product_id'];
+            if (!isset($map[$pid])) $map[$pid] = [];
+            $map[$pid][] = ['url' => $row['image_url']];
+        }
+        return $map;
+    }
+    // Lấy tất cả sản phẩm (id, name)
+    public function getAllProducts(): array
+    {
+        $sql = "SELECT id, name FROM products ORDER BY name ASC";
+        $stmt = $this->db->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Lấy tất cả màu (attribute_id = 1)
+    public function getAllColors(): array
+    {
+        $sql = "SELECT id, value, color_code FROM attributevalues WHERE attribute_id = 1 ORDER BY value ASC";
+        $stmt = $this->db->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Lấy tất cả size (attribute_id = 2)
+    public function getAllSizes(): array
+    {
+        $sql = "SELECT id, value FROM attributevalues WHERE attribute_id = 2 ORDER BY value ASC";
+        $stmt = $this->db->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    // models/admin/VariantModel.php
+    public function existsCombination(int $productId, int $colorValueId, int $sizeValueId, ?int $excludeVariantId = null): ?int
+    {
+        $sql = "
+        SELECT v.id
+        FROM productvariants v
+        JOIN productvariantvalues pv ON pv.variant_id = v.id
+        WHERE v.product_id = :pid
+          AND pv.value_id IN (:c, :s)
+          " . ($excludeVariantId ? "AND v.id <> :ex " : "") . "
+        GROUP BY v.id
+        HAVING COUNT(DISTINCT pv.value_id) = 2
+        LIMIT 1
+    ";
+        $stmt = $this->db->pdo->prepare($sql);
+        $stmt->bindValue(':pid', $productId, PDO::PARAM_INT);
+        $stmt->bindValue(':c',   $colorValueId, PDO::PARAM_INT);
+        $stmt->bindValue(':s',   $sizeValueId,  PDO::PARAM_INT);
+        if ($excludeVariantId) $stmt->bindValue(':ex', $excludeVariantId, PDO::PARAM_INT);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ? (int)$row['id'] : null;
+    }
+
+    // (khuyến nghị) xác thực value_id thuộc đúng nhóm thuộc tính
+    public function getAttributeMapForValues(int $colorValueId, int $sizeValueId): array
+    {
+        $stmt = $this->db->pdo->prepare(
+            "SELECT id, attribute_id FROM attributevalues WHERE id IN (:c,:s)"
+        );
+        $stmt->execute([':c' => $colorValueId, ':s' => $sizeValueId]);
+        $map = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) $map[(int)$r['id']] = (int)$r['attribute_id'];
+        return $map; // [value_id => attribute_id]
+    }
+
+    public function create(array $data, array $valueIds): int
+    {
+        $pdo = $this->db->pdo;
+        $pdo->beginTransaction();
         try {
+            // 1) Tạo dòng trong productvariants
             $sql = "INSERT INTO productvariants (product_id, price, sale_price, quantity, image_url)
                     VALUES (:product_id, :price, :sale_price, :quantity, :image_url)";
-            $stmt = $this->db->pdo->prepare($sql);
-            $stmt->bindValue(':product_id', (int)$data['product_id'], PDO::PARAM_INT);
-            $stmt->bindValue(':price', $data['price']);
-            $stmt->bindValue(':sale_price', $data['sale_price'] ?? null);
-            $stmt->bindValue(':quantity', (int)($data['quantity'] ?? 0), PDO::PARAM_INT);
-            $stmt->bindValue(':image_url', $data['image_url'] ?? null);
-            $stmt->execute();
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                ':product_id' => $data['product_id'],
+                ':price'      => $data['price'],
+                ':sale_price' => $data['sale_price'],
+                ':quantity'   => $data['quantity'],
+                ':image_url'  => $data['image_url'],
+            ]);
+            $variantId = (int)$pdo->lastInsertId();
 
-            $variantId = (int)$this->db->pdo->lastInsertId();
-
+            // 2) Ghi mapping vào productvariantvalues (màu/size)
             if (!empty($valueIds)) {
-                $ins = $this->db->pdo->prepare(
-                    "INSERT INTO productvariantvalues (variant_id, value_id) VALUES (:vid, :val)"
+                $valueIds = array_unique(array_filter(array_map('intval', $valueIds)));
+                $ins = $pdo->prepare(
+                    "INSERT INTO productvariantvalues (variant_id, value_id)
+                     VALUES (:variant_id, :value_id)"
                 );
-                foreach (array_unique($valueIds) as $val) {
-                    $ins->bindValue(':vid', $variantId, PDO::PARAM_INT);
-                    $ins->bindValue(':val', (int)$val, PDO::PARAM_INT);
-                    $ins->execute();
+                foreach ($valueIds as $vid) {
+                    $ins->execute([':variant_id' => $variantId, ':value_id' => $vid]);
                 }
             }
 
-            $this->db->pdo->commit();
+            $pdo->commit();
             return $variantId;
         } catch (Throwable $e) {
-            $this->db->pdo->rollBack();
+            $pdo->rollBack();
             throw $e;
         }
     }

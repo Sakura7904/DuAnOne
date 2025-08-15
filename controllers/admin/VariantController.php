@@ -17,7 +17,8 @@ class VariantController
 
     /* ====================== LIST ====================== */
 
-    // GET ?admin=variant#index&product_id=&min_quantity=&page=
+    // GET ?admin=list_variant&product_id=&min_quantity=&page=
+    // controllers/admin/VariantController.php
     public function index()
     {
         $filters = [
@@ -26,21 +27,21 @@ class VariantController
         ];
         $page    = max(1, (int)$this->input('page', 1));
         $perPage = 20;
+        $sort    = $this->input('sort', 'product_asc'); // mặc định gom theo tên sản phẩm
 
-
-        $variants = $this->variantModel->listWithDetails($filters, $page, $perPage);
+        $variants = $this->variantModel->listWithDetails($filters, $page, $perPage, $sort);
 
         $content  = getContentPath('Variant', 'variantList');
         view('admin/master', [
             'content'        => $content,
             'variants'       => $variants,
-            'totalVariants'  => count($variants), // hoặc query COUNT riêng nếu bạn cần tổng all trang
+            'totalVariants'  => count($variants),
             'filters'        => $filters,
             'page'           => $page,
             'perPage'        => $perPage,
+            'sort'           => $sort,
         ]);
     }
-
 
     /* ====================== CREATE ====================== */
 
@@ -48,19 +49,31 @@ class VariantController
     // GET ?admin=variant#create&product_id=
     public function create()
     {
-        $content = getContentPath('Variant', 'variantForm');
+        // Lấy danh sách sản phẩm, màu, size
+        $products = $this->variantModel->getAllProducts();
+        $colors   = $this->variantModel->getAllColors();
+        $sizes    = $this->variantModel->getAllSizes();
+
+        // Lấy map ảnh cho từng sản phẩm
+        $productIds      = array_column($products, 'id');
+        $imagesByProduct = $this->variantModel->getImagesGroupedByProduct($productIds);
+
+        $content = getContentPath('Variant', 'variantAdd');
         view('admin/master', [
-            'content' => $content,
-            'mode'    => 'create',
-            'variant' => [
-                'product_id' => $this->input('product_id'),
+            'content'         => $content,
+            'mode'            => 'create',
+            'products'        => $products,
+            'colors'          => $colors,
+            'sizes'           => $sizes,
+            'imagesByProduct' => $imagesByProduct,
+            'variant'         => [
+                'product_id' => '',
                 'price'      => '',
                 'sale_price' => '',
                 'quantity'   => 0,
                 'image_url'  => '',
             ],
-            // view sẽ hiển thị các checkbox/select cho value_ids (màu/size) nếu bạn có sẵn
-            'value_ids' => [],
+            'value_ids'       => [],
         ]);
     }
 
@@ -70,45 +83,87 @@ class VariantController
     {
         $this->ensurePost();
 
-        $data = [
-            'product_id' => (int)$this->input('product_id'),
-            'price'      => $this->toDecimal($this->input('price')),
-            'sale_price' => $this->nullableDecimal($this->input('sale_price')),
-            'quantity'   => (int)$this->input('quantity', 0),
-            'image_url'  => $this->nullIfEmpty($this->input('image_url')),
-        ];
-        $valueIds = $this->inputArray('value_ids'); // từ form: name="value_ids[]"
+        $productId    = (int)$this->input('product_id');
+        $colorValueId = (int)$this->input('color_value_id');
+        $sizeValueId  = (int)$this->input('size_value_id');
+        $price        = $this->toDecimal($this->input('price'));
+        $salePrice    = $this->nullableDecimal($this->input('sale_price'));
+        $quantity     = (int)$this->input('quantity', 0);
+        $imageUrl     = $this->nullIfEmpty($this->input('image_url'));
 
-        $errors = $this->validateVariant($data, true);
-        if ($errors) {
-            $_SESSION['alert'] = ['type' => 'error', 'message' => implode('<br>', $errors)];
-            // đẩy lại form cùng dữ liệu cũ
-            $content = getContentPath('Variant', 'variantForm');
-            return view('admin/master', [
-                'content'  => $content,
-                'mode'     => 'create',
-                'variant'  => $data,
-                'value_ids' => $valueIds,
-            ]);
+        $data = compact('productId', 'price', 'salePrice', 'quantity', 'imageUrl');
+        $data = [
+            'product_id' => $productId,
+            'price'      => $price,
+            'sale_price' => $salePrice,
+            'quantity'   => $quantity,
+            'image_url'  => $imageUrl,
+        ];
+
+        // Validate cơ bản
+        $errors = [];
+        if ($productId <= 0)                $errors['product_id']     = 'Vui lòng chọn sản phẩm.';
+        if ($colorValueId <= 0)             $errors['color_value_id'] = 'Vui lòng chọn màu.';
+        if ($sizeValueId  <= 0)             $errors['size_value_id']  = 'Vui lòng chọn size.';
+        if ($price < 0)                     $errors['price']          = 'Giá bán không hợp lệ.';
+        if ($salePrice !== null && $salePrice < 0) $errors['sale_price'] = 'Giá khuyến mãi không hợp lệ.';
+        if ($salePrice !== null && $salePrice > $price) $errors['sale_price'] = 'sale_price không được lớn hơn price.';
+        if ($quantity < 0)                  $errors['quantity']       = 'Số lượng không hợp lệ.';
+
+        // (khuyến nghị) đảm bảo chọn đúng nhóm thuộc tính
+        $attrMap = $this->variantModel->getAttributeMapForValues($colorValueId, $sizeValueId);
+        if (($attrMap[$colorValueId] ?? 0) !== 1) $errors['color_value_id'] = 'Màu không hợp lệ.';
+        if (($attrMap[$sizeValueId]  ?? 0) !== 2) $errors['size_value_id']  = 'Size không hợp lệ.';
+
+        if (!empty($errors)) {
+            $_SESSION['errors_variants'] = $errors;
+            $_SESSION['old_variants'] = [
+                'product_id' => $productId,
+                'color_value_id' => $colorValueId,
+                'size_value_id' => $sizeValueId,
+                'price' => $this->input('price'),
+                'sale_price' => $this->input('sale_price'),
+                'quantity' => $this->input('quantity'),
+                'image_url' => $imageUrl
+            ];
+            return $this->redirect('index.php?admin=add_variant' . ($productId ? "&product_id=$productId" : ''));
         }
 
+        // ===== CHẶN TRÙNG (product + color + size) =====
+        if ($dup = $this->variantModel->existsCombination($productId, $colorValueId, $sizeValueId)) {
+            $_SESSION['alert'] = ['type' => 'error', 'message' => "Biến thể (màu & size) đã tồn tại: #$dup"];
+            $_SESSION['old_variants'] = [
+                'product_id' => $productId,
+                'color_value_id' => $colorValueId,
+                'size_value_id' => $sizeValueId,
+                'price' => $this->input('price'),
+                'sale_price' => $this->input('sale_price'),
+                'quantity' => $this->input('quantity'),
+                'image_url' => $imageUrl
+            ];
+            return $this->redirect("index.php?admin=add_variant&product_id=$productId");
+        }
+
+        // Tạo
+        $valueIds = [$colorValueId, $sizeValueId];
         try {
             $vid = $this->variantModel->create($data, $valueIds);
-
-            // (Tuỳ chọn) nhận nhiều image_urls[] (text) để add vào bảng productimages
-            $imageUrls = $this->inputArray('image_urls'); // name="image_urls[]"
-            if (!empty($imageUrls)) {
-                $this->variantModel->addImages($vid, $imageUrls);
-            }
-
             $_SESSION['alert'] = ['type' => 'success', 'message' => "Đã tạo biến thể #$vid"];
-            $this->redirect('index.php?admin=variant#index&product_id=' . (int)$data['product_id']);
+            return $this->redirect("index.php?admin=list_variant&product_id=$productId");
         } catch (Throwable $e) {
             $_SESSION['alert'] = ['type' => 'error', 'message' => 'Tạo biến thể thất bại: ' . $e->getMessage()];
-            $this->redirect('index.php?admin=variant#create&product_id=' . (int)$data['product_id']);
+            $_SESSION['old_variants'] = [
+                'product_id' => $productId,
+                'color_value_id' => $colorValueId,
+                'size_value_id' => $sizeValueId,
+                'price' => $this->input('price'),
+                'sale_price' => $this->input('sale_price'),
+                'quantity' => $this->input('quantity'),
+                'image_url' => $imageUrl
+            ];
+            return $this->redirect("index.php?admin=add_variant&product_id=$productId");
         }
     }
-
     /* ====================== EDIT ====================== */
 
     // GET form edit
@@ -118,84 +173,74 @@ class VariantController
         $id = (int)$this->input('id');
         if ($id <= 0) {
             $_SESSION['alert'] = ['type' => 'error', 'message' => 'Thiếu ID biến thể'];
-            return $this->redirect('index.php?admin=variant#index');
+            return $this->redirect('index.php?admin=list_variant');
         }
 
         try {
-            $variant = $this->variantModel->getById($id);
+            $variant  = $this->variantModel->getById($id);
             if (!$variant) {
                 $_SESSION['alert'] = ['type' => 'error', 'message' => 'Biến thể không tồn tại'];
-                return $this->redirect('index.php?admin=variant#index');
+                return $this->redirect('index.php?admin=list_variant');
             }
 
-            $content = getContentPath('Variant', 'variantForm');
+            $products = $this->variantModel->getAllProducts();
+            $colors   = $this->variantModel->getAllColors();
+            $sizes    = $this->variantModel->getAllSizes();
+
+            // Map ảnh theo sản phẩm để view fill khi chọn product
+            $imagesByProduct = $this->variantModel->getImagesGroupedByProduct(array_column($products, 'id'));
+
+            $content = getContentPath('Variant', 'variantEdit');
             view('admin/master', [
-                'content'   => $content,
-                'mode'      => 'edit',
-                'variant'   => $variant,
-                'value_ids' => array_column($variant['attribute_values'] ?? [], 'value_id'),
+                'content'         => $content,
+                'variant'         => $variant,
+                'products'        => $products,
+                'colors'          => $colors,
+                'sizes'           => $sizes,
+                'imagesByProduct' => $imagesByProduct,
             ]);
         } catch (Throwable $e) {
-            $_SESSION['alert'] = ['type' => 'error', 'message' => 'Không tải được biến thể: ' . $e->getMessage()];
-            $this->redirect('index.php?admin=variant#index');
+            $_SESSION['alert'] = ['type' => 'error', 'message' => 'Không tải được dữ liệu: ' . $e->getMessage()];
+            $this->redirect('index.php?admin=list_variant');
         }
     }
-
     // POST cập nhật
     // POST ?admin=variant#update
     public function update()
     {
         $this->ensurePost();
+        $id           = (int)$this->input('id');
+        $productId    = (int)$this->input('product_id');
+        $colorValueId = (int)$this->input('color_value_id');
+        $sizeValueId  = (int)$this->input('size_value_id');
 
-        $id = (int)$this->input('id');
-        if ($id <= 0) {
-            $_SESSION['alert'] = ['type' => 'error', 'message' => 'Thiếu ID biến thể'];
-            return $this->redirect('index.php?admin=variant#index');
+        $data = [
+            'product_id' => $productId,
+            'price'      => $this->toDecimal($this->input('price')),
+            'sale_price' => $this->nullableDecimal($this->input('sale_price')),
+            'quantity'   => (int)$this->input('quantity', 0),
+            'image_url'  => $this->nullIfEmpty($this->input('image_url')),
+        ];
+
+        // chặn trùng tổ hợp (bỏ qua chính nó)
+        if ($dup = $this->variantModel->existsCombination($productId, $colorValueId, $sizeValueId, $id)) {
+            $_SESSION['alert'] = ['type' => 'error', 'message' => "Biến thể (màu & size) đã tồn tại: #$dup"];
+            $_SESSION['old_variants'] = $_POST;
+            return $this->redirect("index.php?admin=edit_variant&id=$id");
         }
 
-        $data = [];
-        // chỉ update những field có trong form
-        foreach (['product_id', 'price', 'sale_price', 'quantity', 'image_url'] as $f) {
-            if (isset($_POST[$f])) {
-                $data[$f] = $_POST[$f];
-            }
-        }
-
-        if (isset($data['product_id'])) $data['product_id'] = (int)$data['product_id'];
-        if (isset($data['price']))      $data['price']      = $this->toDecimal($data['price']);
-        if (array_key_exists('sale_price', $data)) $data['sale_price'] = $this->nullableDecimal($data['sale_price']);
-        if (isset($data['quantity']))   $data['quantity']   = (int)$data['quantity'];
-        if (isset($data['image_url']))  $data['image_url']  = $this->nullIfEmpty($data['image_url']);
-
-        $valueIds = isset($_POST['value_ids']) ? $this->inputArray('value_ids') : null;
-
-        $errors = $this->validateVariant($data, false);
-        if ($errors) {
-            $_SESSION['alert'] = ['type' => 'error', 'message' => implode('<br>', $errors)];
-            return $this->redirect("index.php?admin=variant#edit&id={$id}");
-        }
-
+        // cập nhật + ghi lại mapping value_ids
+        $valueIds = [$colorValueId, $sizeValueId];
         try {
-            $ok = $this->variantModel->update($id, $data, $valueIds);
-            if (!$ok) {
-                $_SESSION['alert'] = ['type' => 'warning', 'message' => 'Không có thay đổi nào được áp dụng'];
-            } else {
-                // (Tuỳ chọn) thêm mới ảnh từ image_urls[]
-                $imageUrls = $this->inputArray('image_urls');
-                if (!empty($imageUrls)) {
-                    $this->variantModel->addImages($id, $imageUrls);
-                }
-                $_SESSION['alert'] = ['type' => 'success', 'message' => "Đã cập nhật biến thể #$id"];
-            }
-            $productId = $data['product_id'] ?? 0;
-            $goto = $productId ? "index.php?admin=variant#index&product_id={$productId}" : "index.php?admin=variant#index";
-            $this->redirect($goto);
+            $this->variantModel->update($id, $data, $valueIds);
+            $_SESSION['alert'] = ['type' => 'success', 'message' => "Đã cập nhật biến thể #$id"];
+            return $this->redirect('index.php?admin=list_variant' . ($productId ? "&product_id=$productId" : ''));
         } catch (Throwable $e) {
             $_SESSION['alert'] = ['type' => 'error', 'message' => 'Cập nhật thất bại: ' . $e->getMessage()];
-            $this->redirect("index.php?admin=variant#edit&id={$id}");
+            $_SESSION['old_variants'] = $_POST;
+            return $this->redirect("index.php?admin=edit_variant&id=$id");
         }
     }
-
     /* ====================== DELETE ====================== */
 
     // POST ?admin=variant#delete
@@ -205,7 +250,7 @@ class VariantController
         $id = (int)$this->input('id');
         if ($id <= 0) {
             $_SESSION['alert'] = ['type' => 'error', 'message' => 'Thiếu ID biến thể'];
-            return $this->redirect('index.php?admin=variant#index');
+            return $this->redirect('index.php?admin=list_variant');
         }
 
         try {
@@ -216,7 +261,7 @@ class VariantController
         } catch (Throwable $e) {
             $_SESSION['alert'] = ['type' => 'error', 'message' => 'Xoá thất bại: ' . $e->getMessage()];
         }
-        $this->redirect('index.php?admin=variant#index');
+        $this->redirect('index.php?admin=list_variant');
     }
 
     /* ================== IMAGES & STOCK ================== */
@@ -230,7 +275,7 @@ class VariantController
 
         if ($variantId <= 0) {
             $_SESSION['alert'] = ['type' => 'error', 'message' => 'Thiếu variant_id'];
-            return $this->redirect('index.php?admin=variant#index');
+            return $this->redirect('index.php?admin=list_variant');
         }
 
         try {
@@ -239,7 +284,7 @@ class VariantController
         } catch (Throwable $e) {
             $_SESSION['alert'] = ['type' => 'error', 'message' => 'Thêm ảnh thất bại: ' . $e->getMessage()];
         }
-        $this->redirect("index.php?admin=variant#edit&id={$variantId}");
+        $this->redirect("index.php?admin=add_variant#edit&id={$variantId}");
     }
 
     // POST ?admin=variant#removeImage
@@ -251,7 +296,7 @@ class VariantController
 
         if ($imageId <= 0) {
             $_SESSION['alert'] = ['type' => 'error', 'message' => 'Thiếu image_id'];
-            return $this->redirect('index.php?admin=variant#index');
+            return $this->redirect('index.php?admin=list_variant');
         }
 
         try {
@@ -262,7 +307,7 @@ class VariantController
         } catch (Throwable $e) {
             $_SESSION['alert'] = ['type' => 'error', 'message' => 'Xoá ảnh thất bại: ' . $e->getMessage()];
         }
-        $to = $variantId > 0 ? "index.php?admin=variant#edit&id={$variantId}" : "index.php?admin=variant#index";
+        $to = $variantId > 0 ? "index.php?admin=variant#edit&id={$variantId}" : "index.php?admin=list_variant";
         $this->redirect($to);
     }
 
@@ -275,7 +320,7 @@ class VariantController
 
         if ($variantId <= 0) {
             $_SESSION['alert'] = ['type' => 'error', 'message' => 'Thiếu variant_id'];
-            return $this->redirect('index.php?admin=variant#index');
+            return $this->redirect('index.php?admin=list_variant');
         }
 
         try {
