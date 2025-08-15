@@ -44,6 +44,15 @@
         </div>
 
         <div class="sidemenu-item rounded-xl relative">
+            <a href="index.php?admin=list_variant" class="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none">
+                <div class="flex items-center gap-[10px]">
+                    <img src="./assets/admin/assets/images/icons/icon-network.svg" alt="side menu icon">
+                    <span class="text-normal font-semibold text-gray-500 sidemenu-title dark:text-gray-dark-500">Variant</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="sidemenu-item rounded-xl relative">
             <a href="index.php?admin=list_categories" class="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none">
                 <div class="flex items-center gap-[10px]">
                     <img src="./assets/admin/assets/images/icons/icon-project.svg" alt="side menu icon">
