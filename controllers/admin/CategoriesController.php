@@ -12,13 +12,6 @@ class CategoriesController
         $this->model = new CategoryModel();
     }
 
-    /* ======================= UPLOAD ẢNH DANH MỤC ======================= */
-    /**
-     * Xử lý upload ảnh cho category
-     * @param array        $file     Mảng $_FILES['image']
-     * @param string|null  $oldPath  URL ảnh cũ (vd: /images/categories/abc.jpg) để xoá khi cập nhật
-     * @return string|null           URL public để lưu DB (vd: /images/categories/abc.jpg) hoặc null
-     */
     private function handleImageUpload(array $file, ?string $oldPath = null): ?string
     {
         // Không chọn file -> giữ nguyên ảnh cũ
@@ -113,12 +106,12 @@ public function store()
         $errors['name'] = 'Tên danh mục đã tồn tại!';
     }
 
-    // Validate ảnh (bắt buộc có)
+    // Validate ảnh 
     if (empty($_FILES['image']['name'])) {
         $errors['image'] = 'Chưa thêm ảnh!';
     }
 
-    // Nếu có lỗi → quay lại form
+    // Nếu có lỗi quay lại form
     if (!empty($errors)) {
         $_SESSION['errors'] = $errors;
         $_SESSION['old'] = $old;
@@ -180,7 +173,7 @@ public function update($id)
         $errors['name'] = 'Tên danh mục đã tồn tại!';
     }
 
-    // Nếu có lỗi -> quay lại form và hiển thị
+    // Nếu có lỗi quay lại form và hiển thị
     if (!empty($errors)) {
         $_SESSION['errors'] = $errors;
         $_SESSION['old'] = $old;

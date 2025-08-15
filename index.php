@@ -19,7 +19,9 @@ include "controllers/admin/AuthController.php";
 include "controllers/admin/AccountsController.php";
 include "controllers/admin/ProductController.php";
 include "controllers/admin/OrdersController.php";
+include "controllers/admin/CommentsController.php";
 include "controllers/admin/VariantController.php";
+
 
 // ========================= Controller client =========================
 include "controllers/user/HomeController.php";
@@ -99,6 +101,13 @@ if (!empty($admin)) {
         'order_update_payment'      => (new OrdersController())->updatePaymentStatus(),
         'order_items_apply_status' => (new OrdersController())->applyStatusByItems(),
 
+
+        // ===== QUẢN LÝ BÌNH LUẬN =====
+        'list_comments'        => (new CommentsController())->index(),
+        'delete_comment'       => (new CommentsController())->delete(),
+        'bulk_delete_comments' => (new CommentsController())->bulkDelete(),
+
+
         // ===== QUẢN LÝ BIẾN THỂ =====
         'list_variant'   => (new VariantController())->index(),
         'add_variant'    => (new VariantController())->create(),
@@ -111,6 +120,7 @@ if (!empty($admin)) {
         'variant_add_images'    => (new VariantController())->addImages(),
         'variant_remove_image'  => (new VariantController())->removeImage(),
         'variant_adjust_stock'  => (new VariantController())->adjustStock(),
+
 
         // ===== Mặc định không tìm thấy =====
         default => die("Không tìm file nào như vậy."),

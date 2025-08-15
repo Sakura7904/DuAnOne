@@ -33,7 +33,7 @@
                 </div>
             </a>
         </div>
-        
+
         <div class="sidemenu-item rounded-xl relative">
             <a href="index.php?admin=product_images" class="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none">
                 <div class="flex items-center gap-[10px]">
@@ -60,11 +60,11 @@
                 </div>
             </a>
         </div>
-        
+
         <div class="sidemenu-item rounded-xl relative">
             <a href="index.php?admin=list_accounts" class="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none">
                 <div class="flex items-center gap-[10px]">
-                   <img src="./assets/admin/assets/images/icons/icon-auth.svg" alt="side menu icon">
+                    <img src="./assets/admin/assets/images/icons/icon-auth.svg" alt="side menu icon">
                     <span class="text-normal font-semibold text-gray-500 sidemenu-title dark:text-gray-dark-500">Accounts</span>
                 </div>
             </a>
@@ -73,11 +73,23 @@
         <div class="sidemenu-item rounded-xl relative">
             <a href="index.php?admin=list-order" class="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none">
                 <div class="flex items-center gap-[10px]">
-                   <img src="./assets/admin/assets/images/icons/icon-cms.svg" alt="side menu icon">
+                    <img src="./assets/admin/assets/images/icons/icon-cms.svg" alt="side menu icon">
                     <span class="text-normal font-semibold text-gray-500 sidemenu-title dark:text-gray-dark-500">Orders</span>
                 </div>
             </a>
         </div>
+        <div class="sidemenu-item rounded-xl relative">
+            <a href="index.php?admin=list_comments"
+                class="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none">
+                <div class="flex items-center gap-[10px]">
+                    <img src="./assets/admin/assets/images/icons/icon-cms.svg" alt="side menu icon">
+                    <span class="text-normal font-semibold text-gray-500 sidemenu-title dark:text-gray-dark-500">
+                        Comments
+                    </span>
+                </div>
+            </a>
+        </div>
+
 
         <div class="sidemenu-item rounded-xl relative">
             <input class="sr-only peer" type="checkbox" value="jobs" name="sidemenu" id="jobs">

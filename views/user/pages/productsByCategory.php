@@ -11,7 +11,7 @@ $wishlistProductMap = [];
 if (!empty($_SESSION['user_id'])) {
     include_once 'models/user/WishlistModel.php';
     $wl = new WishlistModel();
-    $wishlistProductMap = $wl->getProductIdsByUser((int)$_SESSION['user_id']); // [product_id => true]
+    $wishlistProductMap = $wl->getProductIdsByUser((int)$_SESSION['user_id']); 
 }
 ?>
 <div class="container">
@@ -109,7 +109,7 @@ if (!empty($_SESSION['user_id'])) {
                                             </div>
                                         </div>
 
-                                        <!-- ===== WISHLIST (PHP thuần) ===== -->
+                                        <!-- ===== WISHLIST ===== -->
                                         <?php
                                           $pid   = (int)$product['id'];
                                           $liked = !empty($wishlistProductMap[$pid]);
@@ -124,7 +124,7 @@ if (!empty($_SESSION['user_id'])) {
                                             <i class="<?= $liked ? 'fas' : 'far' ?> fa-heart"></i>
                                           </button>
                                         </form>
-                                        <!-- ===== HẾT WISHLIST ===== -->
+                                       
 
                                     </div>
                                     <div class="productPrice">
