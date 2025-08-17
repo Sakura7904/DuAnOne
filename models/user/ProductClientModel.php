@@ -195,72 +195,106 @@ class ProductClientModel
     /**
      * Lấy sản phẩm liên quan kèm màu sắc
      */
-    public function getRelatedProducts($productId, $categoryId, $limit = 4)
-    {
-        $sql = "SELECT p.id,
-                   p.name,
-                   p.image_thumbnail,
-                   MIN(CASE 
-                       WHEN pv.sale_price IS NOT NULL AND pv.sale_price > 0 
-                       THEN pv.sale_price 
-                       ELSE pv.price 
-                   END) as min_price,
-                   MAX(CASE 
-                       WHEN pv.sale_price IS NOT NULL AND pv.sale_price > 0 
-                       THEN pv.sale_price 
-                       ELSE pv.price 
-                   END) as max_price,
-                   GROUP_CONCAT(
-                       DISTINCT CASE 
-                           WHEN LOWER(a.name) IN ('color', 'màu', 'màu sắc', 'mau', 'mau sac')
-                           THEN CONCAT(av.value, ':', COALESCE(av.color_code, ''))
-                           ELSE NULL
-                       END
-                       ORDER BY av.id
-                       SEPARATOR '|'
-                   ) as colors
+public function getRelatedProducts($productId, $categoryId, $limit = 4)
+{
+    $sql = "SELECT 
+                p.id,
+                p.name,
+                /* Ảnh: ưu tiên thumbnail, fallback ảnh variant đầu tiên có ảnh */
+                COALESCE(
+                    p.image_thumbnail,
+                    (
+                        SELECT v.image_url
+                        FROM productvariants v
+                        WHERE v.product_id = p.id 
+                          AND v.image_url IS NOT NULL AND v.image_url <> ''
+                        ORDER BY v.id ASC
+                        LIMIT 1
+                    )
+                ) AS image_thumbnail,
+
+                /* Giá min/max như logic của bạn */
+                MIN(
+                    CASE 
+                        WHEN pv.sale_price IS NOT NULL AND pv.sale_price > 0 
+                        THEN pv.sale_price 
+                        ELSE pv.price 
+                    END
+                ) AS min_price,
+                MAX(
+                    CASE 
+                        WHEN pv.sale_price IS NOT NULL AND pv.sale_price > 0 
+                        THEN pv.sale_price 
+                        ELSE pv.price 
+                    END
+                ) AS max_price,
+
+                /* Tổng đã bán: chỉ tính item hoàn tất hoặc đơn hoàn tất + đã trả */
+                COALESCE(SUM(
+                    CASE 
+                        WHEN (oi.status IN ('completed','delivered')
+                              OR (o.status IN ('completed','delivered') AND o.payment_status = 'paid'))
+                        THEN oi.quantity 
+                        ELSE 0 
+                    END
+                ), 0) AS sold_count,
+
+                /* Màu sắc gom về một cột để xử lý phía PHP */
+                GROUP_CONCAT(
+                    DISTINCT CASE 
+                        WHEN LOWER(a.name) IN ('color','màu','màu sắc','mau','mau sac')
+                        THEN CONCAT(av.value, ':', COALESCE(av.color_code, ''))
+                        ELSE NULL
+                    END
+                    ORDER BY av.id
+                    SEPARATOR '|'
+                ) AS colors
+
             FROM products p
-            LEFT JOIN productvariants pv ON p.id = pv.product_id
+            LEFT JOIN productvariants pv     ON p.id = pv.product_id
             LEFT JOIN productvariantvalues pvv ON pv.id = pvv.variant_id
-            LEFT JOIN attributevalues av ON pvv.value_id = av.id
-            LEFT JOIN attributes a ON av.attribute_id = a.id
-            WHERE p.category_id = :category_id 
-            AND p.id != :product_id
-            GROUP BY p.id
+            LEFT JOIN attributevalues av     ON pvv.value_id = av.id
+            LEFT JOIN attributes a           ON av.attribute_id = a.id
+
+            /* Join để đếm đã bán */
+            LEFT JOIN orderitems oi ON oi.variant_id = pv.id
+            LEFT JOIN orders o      ON o.id = oi.order_id
+
+            WHERE p.category_id = :category_id
+              AND p.id != :product_id
+
+            GROUP BY p.id, p.name, p.image_thumbnail
             ORDER BY RAND()
             LIMIT :limit";
 
-        $stmt = $this->db->pdo->prepare($sql);
-        $stmt->bindParam(':category_id', $categoryId, PDO::PARAM_INT);
-        $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
-        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
+    $stmt = $this->db->pdo->prepare($sql);
+    $stmt->bindParam(':category_id', $categoryId, PDO::PARAM_INT);
+    $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
+    $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+    $stmt->execute();
 
-        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Xử lý dữ liệu màu sắc cho từng sản phẩm
-        foreach ($products as &$product) {
-            $product['color_options'] = [];
-            if (!empty($product['colors'])) {
-                $colors = explode('|', $product['colors']);
-                foreach ($colors as $color) {
-                    if (!empty($color)) {
-                        $parts = explode(':', $color);
-                        if (count($parts) >= 1) {
-                            $product['color_options'][] = [
-                                'name' => $parts[0],
-                                'color_code' => $parts[1] ?? null
-                            ];
-                        }
-                    }
-                }
+    // Xử lý color_options
+    foreach ($products as &$product) {
+        $product['color_options'] = [];
+        if (!empty($product['colors'])) {
+            $colors = explode('|', $product['colors']);
+            foreach ($colors as $color) {
+                if ($color === '' || $color === null) continue;
+                $parts = explode(':', $color);
+                $product['color_options'][] = [
+                    'name'       => $parts[0] ?? '',
+                    'color_code' => $parts[1] ?? null,
+                ];
             }
-            // Xóa cột colors gốc không cần thiết
-            unset($product['colors']);
         }
-
-        return $products;
+        unset($product['colors']);
     }
+
+    return $products;
+}
+
 
 
     /**

@@ -10,7 +10,7 @@ class CommentsController {
     public function index() {
         // Dùng ?p= (như bạn đã đổi)
         $page    = isset($_GET['p']) ? max(1, (int)$_GET['p']) : 1;
-        $perPage = 2;
+        $perPage = 20;
 
         $result   = $this->model->paginate($page, $perPage);
         $comments = $result['data'] ?? [];

@@ -449,29 +449,13 @@
                                 <?php endif; ?>
                             </div>
                         </div>
-                        <div class="hook-reviews">
-                            <div class="starbaprv-widget">
-                                <div class="starbap-prev-badge voteView0">
-                                    <a class="starbap-star starbap--off star-1">
-                                        <i class="fas fa-star fa-fw"></i>
-                                    </a>
-                                    <a class="starbap-star starbap--off star-2">
-                                        <i class="fas fa-star fa-fw"></i>
-                                    </a>
-                                    <a class="starbap-star starbap--off star-3">
-                                        <i class="fas fa-star fa-fw"></i>
-                                    </a>
-                                    <a class="starbap-star starbap--off star-4">
-                                        <i class="fas fa-star fa-fw"></i>
-                                    </a>
-                                    <a class="starbap-star starbap--off star-5">
-                                        <i class="fas fa-star fa-fw"></i>
-                                    </a>
-                                    <span class="starbap-prev-badgetext">(0)</span>
-                                </div>
-                            </div>
-                            <span class="number-purchase">(322 đã bán)</span>
-                        </div>
+                       <div class="hook-reviews">
+    <?php $sold = (int)($related['sold_count'] ?? 0); ?>
+    <?php if ($sold > 0): ?>
+        <span class="number-purchase">(<?= number_format($sold, 0, ',', '.') ?> đã bán)</span>
+    <?php endif; ?>
+</div>
+
                     </div>
                 <?php endforeach; ?>
             </div>
