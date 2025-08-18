@@ -4,13 +4,14 @@ include_once "models/user/PurchaseClientModel.php";
 class PurchaseController
 {
     private array $statusMap = [
-        'all'       => null,
-        'pending'   => 'pending',
-        'processing' => 'processing',
-        'shipping'  => 'shipped',     // map “Chờ giao hàng” sang shipped
-        'done'      => 'delivered',   // map “Hoàn thành” sang delivered
-        'cancelled' => 'cancelled',
-        'refund'    => 'refunded',
+        'all'        => null,
+        'pending'    => 'pending',     // Chờ thanh toán
+        'processing' => 'processing',  // Đang xử lý
+        'shipping'   => 'shipped',     // Chờ giao hàng
+        'delivered'  => 'delivered',   // ĐÃ GIAO HÀNG  ← mới tách riêng
+        'done'       => 'completed',   // HOÀN THÀNH   ← đổi từ delivered sang completed
+        'cancelled'  => 'cancelled',   // Đã hủy
+        'refund'     => 'refunded',    // Hoàn tiền (nếu có)
     ];
 
     private array $tabToItemStatuses = [
@@ -18,7 +19,8 @@ class PurchaseController
         'pending'   => ['pending'],          // Chờ thanh toán (item)
         'processing' => ['processing'],        // Đang xử lý (item)
         'shipping'  => ['shipped'],          // Chờ giao hàng (item)
-        'done'      => ['delivered'],        // Hoàn thành (item)
+        'delivered'  => ['delivered'],          // Chờ giao hàng (item)
+        'done'      => ['completed'],        // Hoàn thành (item)
         'cancelled' => ['cancelled'],        // Đã hủy (item)
         'refund'    => ['refunded'],         // Trả hàng/Hoàn tiền (item)
     ];
@@ -64,12 +66,29 @@ class PurchaseController
         view('user/index', [
             'content'      => $content,
             'orders'       => $orders,
-            'total'        => count($orders),  
-            'counts'       => $counts,          
+            'total'        => count($orders),
+            'counts'       => $counts,
             'activeTab'    => $tab,
             'itemsByOrder' => $itemsByOrder,
-            'customer'     => $customer, 
+            'customer'     => $customer,
         ]);
+    }
+
+    public function completeItem()
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST' || empty($_SESSION['user_id'])) {
+            header('Location: ?user=purchase');
+            exit;
+        }
+        $userId = (int)$_SESSION['user_id'];
+        $itemId = (int)($_POST['order_item_id'] ?? 0);
+
+        $m  = new PurchaseClientModel();
+        $ok = $m->markItemCompleted($itemId, $userId);   // chỉ cho từ delivered → completed
+
+        $_SESSION['flash_success'] = $ok ? 'Đã xác nhận hoàn thành sản phẩm.' : 'Thao tác không hợp lệ.';
+        header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? '?user=purchase'));
+        exit;
     }
 
     public function cancelOrderItem(): void

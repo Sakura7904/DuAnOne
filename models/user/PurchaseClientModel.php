@@ -109,7 +109,75 @@ class PurchaseClientModel
 
         return $summary;
     }
+    public function markItemCompleted(int $itemId, int $userId): bool
+    {
+        $pdo = $this->db->pdo;
+        $pdo->beginTransaction();
+        try {
+            // item thuộc về user & đang delivered?
+            $check = $pdo->prepare("
+                SELECT oi.order_id
+                FROM orderitems oi
+                JOIN orders o ON o.id = oi.order_id
+                WHERE oi.id = :iid AND o.user_id = :uid AND oi.status = 'delivered'
+                LIMIT 1
+            ");
+            $check->execute([':iid' => $itemId, ':uid' => $userId]);
+            $orderId = (int)$check->fetchColumn();
+            if (!$orderId) {
+                $pdo->rollBack();
+                return false;
+            }
 
+            // set completed
+            $pdo->prepare("UPDATE orderitems SET status = 'completed' WHERE id = :iid LIMIT 1")
+                ->execute([':iid' => $itemId]);
+
+            // đồng bộ orders.status
+            $this->recomputeOrderStatus($orderId);
+
+            $pdo->commit();
+            return true;
+        } catch (\Throwable $e) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            return false;
+        }
+    }
+
+    private function recomputeOrderStatus(int $orderId): void
+    {
+        $s = $this->db->pdo->prepare("
+            SELECT status, COUNT(*) c
+            FROM orderitems
+            WHERE order_id = :oid
+            GROUP BY status
+        ");
+        $s->execute([':oid' => $orderId]);
+        $stats = $s->fetchAll(PDO::FETCH_KEY_PAIR);
+        if (!$stats) return;
+
+        $total = array_sum(array_map('intval', $stats));
+        $new = null;
+
+        if (($stats['completed'] ?? 0) == $total) {
+            $new = 'completed';
+        } elseif (($stats['delivered'] ?? 0) == $total) {
+            $new = 'delivered';
+        } elseif ((($stats['cancelled'] ?? 0) + ($stats['refunded'] ?? 0)) == $total) {
+            $new = 'cancelled';
+        } elseif (!empty($stats['shipped'])) {
+            $new = 'shipped';
+        } elseif (!empty($stats['processing'])) {
+            $new = 'processing';
+        } elseif (!empty($stats['pending'])) {
+            $new = 'pending';
+        }
+
+        if ($new) {
+            $this->db->pdo->prepare("UPDATE orders SET status = :st, updated_at = NOW() WHERE id = :oid LIMIT 1")
+                ->execute([':st' => $new, ':oid' => $orderId]);
+        }
+    }
     /**
      * Lấy chi tiết item của 1 đơn (đảm bảo đơn thuộc về user).
      */
@@ -322,6 +390,8 @@ class PurchaseClientModel
                 return 'Đang giao';
             case 'delivered':
                 return 'Đã giao';
+            case 'completed':
+                return 'Hoàn thành';
             case 'cancelled':
                 return 'Đã hủy';
             case 'refunded':

@@ -80,8 +80,8 @@
                                                                     <!-- nút trừ -->
                                                                     <form method="POST" action="?user=updateCartQuantity" style="display:inline;">
                                                                         <input type="hidden" name="cart_item_id" value="<?= $item['cart_item_id'] ?>">
-                                                                        <input type="hidden" name="quantity" value="<?= max(1, $qty - 1) ?>">
-                                                                        <button class="btnAction btn-minus" type="submit" <?= $qty <= 1 ? 'disabled' : '' ?>>-</button>
+                                                                        <input type="hidden" name="quantity" value="<?= $item['quantity'] - 1 ?>">
+                                                                        <button class="btnAction btn-minus" type="button" <?= $item['quantity'] <= 1 ? 'disabled' : '' ?>>-</button>
                                                                     </form>
 
                                                                     <!-- ô nhập -->
@@ -94,7 +94,7 @@
                                                                     <form method="POST" action="?user=updateCartQuantity" style="display:inline;">
                                                                         <input type="hidden" name="cart_item_id" value="<?= $item['cart_item_id'] ?>">
                                                                         <input type="hidden" name="quantity" value="<?= $qty + 1 ?>">
-                                                                        <button class="btnAction btn-plus" type="submit">+</button>
+                                                                        <button class="btnAction btn-plus" type="button">+</button>
                                                                     </form>
                                                                 </div>
                                                             </td>
@@ -188,6 +188,153 @@
     </section>
 </section>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const DEBOUNCE_MS = 3000;
+        const toInt = (v, d = 0) => {
+            const n = parseInt(v, 10);
+            return Number.isFinite(n) ? n : d;
+        };
+        const toast = (m) => alert(m);
+        const timers = new Map(); // per cart_item_id
+
+        document.querySelectorAll('.cart-qty, [data-max]').forEach(row => {
+            const qtyInput = row.querySelector('.js-quantity-product');
+            if (!qtyInput) return;
+
+            // Lấy tồn kho
+            const getMax = () => toInt(row.dataset.max ?? qtyInput.dataset.max ?? 0, 0);
+
+            // Form dùng để submit (lấy 1 form update trong row)
+            const forms = row.querySelectorAll('form[action*="updateCartQuantity"]');
+            const formSubmit = forms[0] || row.querySelector('form');
+
+            // Hiển thị: “SL: x / y” + trạng thái chờ
+            let indicator = row.querySelector('.qty-indicator');
+            if (!indicator) {
+                indicator = document.createElement('small');
+                indicator.className = 'qty-indicator';
+                indicator.style.cssText = 'display:inline-block;margin-left:8px;opacity:.9;';
+                qtyInput.insertAdjacentElement('afterend', indicator);
+            }
+            let pending = row.querySelector('.qty-pending');
+            if (!pending) {
+                pending = document.createElement('small');
+                pending.className = 'qty-pending';
+                pending.style.cssText = 'display:none;margin-left:6px;opacity:.7;';
+                indicator.insertAdjacentElement('afterend', pending);
+            }
+            const updateIndicator = (val) => {
+                const max = getMax();
+                indicator.textContent = max ? `SL: ${val} / ${max}` : `SL: ${val}`;
+            };
+            const showPending = (msg = 'Đang chờ cập nhật…') => {
+                pending.textContent = msg;
+                pending.style.display = 'inline';
+            };
+            const hidePending = () => {
+                pending.style.display = 'none';
+            };
+
+            // Kẹp min/max
+            function clamp(val, notify = true) {
+                const max = getMax();
+                let v = toInt(val, 1);
+                if (v < 1) {
+                    v = 1;
+                    if (notify) toast('Tối thiểu là 1 sản phẩm.');
+                }
+                if (max && v > max) {
+                    v = max;
+                    if (notify) toast(`Vượt quá tồn kho. Chỉ còn ${max} sản phẩm.`);
+                }
+                return v;
+            }
+
+            // Lên lịch submit sau 3s không ấn
+            function scheduleSubmit(targetQty) {
+                if (!formSubmit) return;
+                const id = qtyInput.dataset.id || row.dataset.id || (formSubmit.querySelector('input[name="cart_item_id"]')?.value);
+
+                // clear cũ + set hidden qty
+                if (id && timers.has(id)) clearTimeout(timers.get(id));
+                let hidden = formSubmit.querySelector('input[name="quantity"]');
+                if (!hidden) {
+                    hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = 'quantity';
+                    formSubmit.appendChild(hidden);
+                }
+                hidden.value = String(targetQty);
+                showPending();
+
+                // đặt timer
+                const t = setTimeout(() => {
+                    hidePending();
+                    formSubmit.submit(); // native, né handler của template
+                    if (id) timers.delete(id);
+                }, DEBOUNCE_MS);
+                if (id) timers.set(id, t);
+            }
+
+            // Bắt click nút +/- (debounce 3s)
+            row.querySelectorAll('.btn-plus, .btn-minus').forEach(btn => {
+                btn.addEventListener('click', (ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    ev.stopImmediatePropagation();
+
+                    const isPlus = btn.classList.contains('btn-plus');
+                    const isMinus = btn.classList.contains('btn-minus');
+
+                    const cur = toInt(qtyInput.value, 1);
+                    let next = cur + (isPlus ? 1 : (isMinus ? -1 : 0));
+                    next = clamp(next, true);
+
+                    qtyInput.value = String(next);
+                    updateIndicator(next);
+                    scheduleSubmit(next); // vẫn submit form updateCartQuantity sau 3s như cũ
+                }, true);
+            });
+
+            // Nhập tay: Enter => cập nhật ngay (không debounce)
+            qtyInput.addEventListener('keydown', (e) => {
+                if (e.key !== 'Enter') return;
+                e.preventDefault();
+
+                const next = clamp(qtyInput.value, true);
+                qtyInput.value = String(next);
+                updateIndicator(next);
+
+                // hủy timer nếu đang chờ từ nút +/-
+                const id = qtyInput.dataset.id || row.dataset.id || (formSubmit.querySelector('input[name="cart_item_id"]')?.value);
+                if (id && timers.has(id)) {
+                    clearTimeout(timers.get(id));
+                    timers.delete(id);
+                }
+
+                hidePending();
+                if (formSubmit) {
+                    let hidden = formSubmit.querySelector('input[name="quantity"]');
+                    if (!hidden) {
+                        hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = 'quantity';
+                        formSubmit.appendChild(hidden);
+                    }
+                    hidden.value = String(next);
+                    formSubmit.submit();
+                }
+            });
+
+            // Cập nhật hiển thị ban đầu
+            const initVal = clamp(qtyInput.value || '1', false);
+            qtyInput.value = String(initVal);
+            updateIndicator(initVal);
+        });
+    });
+</script>
+
 <script script>
     document.addEventListener('DOMContentLoaded', () => {
         const fmt = (n) => (n || 0).toLocaleString('vi-VN') + 'đ';
@@ -259,23 +406,23 @@
         });
 
         // Chặn submit nếu chưa chọn
-        if ($form) {
-            $form.addEventListener('submit', (e) => {
-                const hasAny = document.querySelector('.select-item:checked');
-                if (!hasAny) {
-                    e.preventDefault();
-                    if (typeof Swal !== 'undefined') {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Chưa chọn sản phẩm',
-                            text: 'Vui lòng tick chọn ít nhất 1 sản phẩm để tiến hành đặt hàng.'
-                        });
-                    } else {
-                        alert('Vui lòng chọn ít nhất 1 sản phẩm.');
-                    }
+
+        $form.addEventListener('submit', (e) => {
+            const hasAny = document.querySelector('.select-item:checked');
+            if (!hasAny) {
+                e.preventDefault();
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Chưa chọn sản phẩm',
+                        text: 'Vui lòng tick chọn ít nhất 1 sản phẩm để tiến hành đặt hàng.'
+                    });
+                } else {
+                    alert('Vui lòng chọn ít nhất 1 sản phẩm.');
                 }
-            });
-        }
+            }
+        });
+
 
         // Khởi tạo
         updateSelectedSummary();

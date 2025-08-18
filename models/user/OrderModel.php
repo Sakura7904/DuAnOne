@@ -281,7 +281,7 @@ class OrderModel
 
             // Tạo order
             $sql = "INSERT INTO orders (user_id, total_amount, receiver_name, receiver_phone, shipping_address, status, payment_method, payment_status)
-                    VALUES (:user_id, :total_amount, :receiver_name, :receiver_phone, :shipping_address, 'pending', :payment_method, 'unpaid')";
+                    VALUES (:user_id, :total_amount, :receiver_name, :receiver_phone, :shipping_address, 'processing', :payment_method, 'unpaid')";
             $stmt = $this->db->pdo->prepare($sql);
             $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
             $stmt->bindParam(':total_amount', $total);
@@ -293,8 +293,8 @@ class OrderModel
             $orderId = (int)$this->db->pdo->lastInsertId();
 
             // Insert order items
-            $sqlItem = "INSERT INTO orderitems (order_id, variant_id, quantity, price)
-                        VALUES (:order_id, :variant_id, :quantity, :price)";
+            $sqlItem = "INSERT INTO orderitems (order_id, variant_id, quantity, price, status)
+                        VALUES (:order_id, :variant_id, :quantity, :price, 'processing')";
             $stmtItem = $this->db->pdo->prepare($sqlItem);
 
             foreach ($items as $it) {
