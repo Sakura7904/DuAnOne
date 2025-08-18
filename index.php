@@ -164,6 +164,7 @@ if (!empty($user) || (empty($admin) && empty($user))) {
         'updateCartQuantity' => (new CartController())->updateCartQuantity(),
         'removeFromCart' => (new CartController())->removeFromCart(),
         'clearCart' => (new CartController())->clearCart(),
+        'orderSelected' => (new CartController())->orderSelected(),
 
         // ===== Trang thanh toán =====
         'order'              => (new OrderController())->order(),

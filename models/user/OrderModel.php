@@ -10,6 +10,16 @@ class OrderModel
         $this->db = new Database(); // $this->db->pdo là PDO
     }
 
+    private function _selectedIdsFromSession(): array
+    {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $mode = $_SESSION['checkout_mode'] ?? 'all';
+        $ids  = ($mode === 'selected') ? ($_SESSION['selected_cart_items'] ?? []) : [];
+        $ids  = array_values(array_unique(array_map('intval', (array)$ids)));
+        return array_filter($ids, fn($v) => $v > 0);
+    }
+
+
     /* =======================
      * Helpers (private)
      * ======================= */
@@ -18,7 +28,6 @@ class OrderModel
     // ======================
     public function getCartItemsDetailed($userId)
     {
-        // lấy cart_id
         $sql = "SELECT id FROM carts WHERE user_id = :user_id LIMIT 1";
         $stmt = $this->db->pdo->prepare($sql);
         $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
@@ -26,12 +35,25 @@ class OrderModel
         $cartId = (int)$stmt->fetchColumn();
         if (!$cartId) return [];
 
+        // nếu có danh sách cart_item_id đã chọn -> chỉ lấy các item đó
+        $ids = $this->_selectedIdsFromSession();
+        $inCond = '';
+        $binds  = [':cart_id' => $cartId];
+        if (!empty($ids)) {
+            $ph = [];
+            foreach ($ids as $k => $id) {
+                $ph[] = ":cid$k";
+                $binds[":cid$k"] = $id;
+            }
+            $inCond = ' AND ci.id IN (' . implode(',', $ph) . ')';
+        }
+
         $sql = "
         SELECT 
             ci.variant_id,
             ci.quantity,
             p.name AS product_name,
-            p.image_thumbnail AS image_url,           -- ảnh thumbnail từ products
+            p.image_thumbnail AS image_url,
             pv.price       AS original_price,
             pv.sale_price  AS sale_price,
             COALESCE(pv.sale_price, pv.price) AS effective_price,
@@ -42,31 +64,29 @@ class OrderModel
         INNER JOIN products p             ON p.id = pv.product_id
         LEFT JOIN productvariantvalues vv ON vv.variant_id = pv.id
         LEFT JOIN attributevalues av      ON av.id = vv.value_id
-        WHERE ci.cart_id = :cart_id
+        WHERE ci.cart_id = :cart_id $inCond
         GROUP BY ci.variant_id, ci.quantity, p.name, p.image_thumbnail, pv.price, pv.sale_price
         ORDER BY ci.variant_id ASC
     ";
         $stmt = $this->db->pdo->prepare($sql);
-        $stmt->bindParam(':cart_id', $cartId, PDO::PARAM_INT);
+        foreach ($binds as $k => $v) $stmt->bindValue($k, $v, PDO::PARAM_INT);
         $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($rows as &$r) {
-            $r['quantity']           = (int)$r['quantity'];
-            $r['original_price']     = (float)$r['original_price'];
-            $r['sale_price']         = $r['sale_price'] !== null ? (float)$r['sale_price'] : null;
-            $r['effective_price']    = (float)$r['effective_price'];
-            $r['original_price_fmt'] = number_format($r['original_price'], 0, ',', '.') . 'đ';
-            $r['sale_price_fmt']     = $r['sale_price'] !== null ? number_format($r['sale_price'], 0, ',', '.') . 'đ' : null;
+            $r['quantity']            = (int)$r['quantity'];
+            $r['original_price']      = (float)$r['original_price'];
+            $r['sale_price']          = $r['sale_price'] !== null ? (float)$r['sale_price'] : null;
+            $r['effective_price']     = (float)$r['effective_price'];
+            $r['original_price_fmt']  = number_format($r['original_price'], 0, ',', '.') . 'đ';
+            $r['sale_price_fmt']      = $r['sale_price'] !== null ? number_format($r['sale_price'], 0, ',', '.') . 'đ' : null;
             $r['effective_price_fmt'] = number_format($r['effective_price'], 0, ',', '.') . 'đ';
-            $r['image_url']          = $r['image_url'] ?? '';
+            $r['image_url']           = $r['image_url'] ?? '';
         }
         unset($r);
 
         return $rows;
     }
-
-
 
     // ===================================
     // TÍNH TỔNG: gốc, giảm giá, phải trả
@@ -135,6 +155,24 @@ class OrderModel
         return (int)$this->db->pdo->lastInsertId();
     }
 
+    private function clearCartItemsByIds($userId, array $ids)
+    {
+        if (empty($ids)) return false;
+        $cartId = $this->getOrCreateCartId($userId);
+
+        $ph = [];
+        $binds = [':cart_id' => $cartId];
+        foreach ($ids as $k => $id) {
+            $ph[] = ":cid$k";
+            $binds[":cid$k"] = (int)$id;
+        }
+
+        $sql = "DELETE FROM cartitems WHERE cart_id = :cart_id AND id IN (" . implode(',', $ph) . ")";
+        $stmt = $this->db->pdo->prepare($sql);
+        foreach ($binds as $k => $v) $stmt->bindValue($k, $v, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
     // Lấy giá bán thực tế của 1 variant (ưu tiên sale_price)
     private function getVariantPrice($variantId)
     {
@@ -177,16 +215,29 @@ class OrderModel
     public function getCartItemsWithPrice($userId)
     {
         $cartId = $this->getOrCreateCartId($userId);
+        $cartId = $this->getOrCreateCartId($userId);
+
+        $ids = $this->_selectedIdsFromSession();
+        $inCond = '';
+        $binds  = [':cart_id' => $cartId];
+        if (!empty($ids)) {
+            $ph = [];
+            foreach ($ids as $k => $id) {
+                $ph[] = ":cid$k";
+                $binds[":cid$k"] = $id;
+            }
+            $inCond = ' AND ci.id IN (' . implode(',', $ph) . ')';
+        }
 
         $sql = "SELECT ci.variant_id, ci.quantity,
-                       COALESCE(pv.sale_price, pv.price) AS unit_price
-                FROM cartitems ci
-                INNER JOIN productvariants pv ON pv.id = ci.variant_id
-                WHERE ci.cart_id = :cart_id";
+                   COALESCE(pv.sale_price, pv.price) AS unit_price
+            FROM cartitems ci
+            INNER JOIN productvariants pv ON pv.id = ci.variant_id
+            WHERE ci.cart_id = :cart_id $inCond";
         $stmt = $this->db->pdo->prepare($sql);
-        $stmt->bindParam(':cart_id', $cartId, PDO::PARAM_INT);
+        foreach ($binds as $k => $v) $stmt->bindValue($k, $v, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC); // [ ['variant_id'=>..., 'quantity'=>..., 'unit_price'=>...], ... ]
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // Xóa toàn bộ items của cart
@@ -260,7 +311,12 @@ class OrderModel
             }
 
             // Xóa giỏ
-            $this->clearCart($userId);
+            $selectedIds = $this->_selectedIdsFromSession();
+            if (!empty($selectedIds)) {
+                $this->clearCartItemsByIds($userId, $selectedIds);
+            } else {
+                $this->clearCart($userId);
+            }
 
             $this->db->pdo->commit();
             return ['success' => true, 'order_id' => $orderId, 'total' => $total];

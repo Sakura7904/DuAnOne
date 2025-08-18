@@ -292,6 +292,7 @@
             </div>
         </div>
     </div>
+
     <div id="box-rating" class="inner-box-content-detail box-review boxItem" data-name="comment">
         <div class="container">
             <div class="starbap-widget starbap-review-widget">
@@ -373,12 +374,11 @@
             </div>
         </div>
     </div>
+
     <div class="productSuggest-wrapper tp_product_detail_suggest boxItem" data-name="product">
-        <h2 class="titleBox">
-            Có thể bạn sẽ thích </h2>
+        <h2 class="titleBox"> Có thể bạn sẽ thích </h2>
         <div class="container-fluid">
             <div class="productSuggest productList clearfix owl-carousel">
-
                 <?php foreach ($relatedProducts as $related): ?>
                     <div class="productItem prd40768686" data-id="40768686">
                         <div class="productImage">
@@ -475,7 +475,6 @@
                     </div>
                 <?php endforeach; ?>
             </div>
-            <div id="flip"><span>Xem thêm <i class="far fa-angle-right"></i></div>
         </div>
     </div>
 </section>
@@ -967,3 +966,4 @@
     unset($_SESSION['alert']);
 endif;
 ?>
+
