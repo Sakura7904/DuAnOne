@@ -292,6 +292,7 @@
             </div>
         </div>
     </div>
+
     <div id="box-rating" class="inner-box-content-detail box-review boxItem" data-name="comment">
         <div class="container">
             <div class="starbap-widget starbap-review-widget">
@@ -367,7 +368,6 @@
                                 </ul>
                             </div>
                         </div>
-
                         <?php $meId = (int)($_SESSION['user_id'] ?? 0); ?>
 
                         <div class="product-comments">
@@ -406,6 +406,36 @@
                             <ul style="list-style:none;padding:0;margin:0;">
                                 <?php if (!empty($comments)): ?>
                                     <?php foreach ($comments as $c): ?>
+                        <!--                        <a href="javascript:void(0);" class="starbap-write-rev-link">Chấm điểm và viết đánh giá sản phẩm</a>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="productSuggest-wrapper tp_product_detail_suggest boxItem" data-name="product">
+        <h2 class="titleBox"> Có thể bạn sẽ thích </h2>
+        <div class="container-fluid">
+            <div class="productSuggest productList clearfix owl-carousel">
+                <?php foreach ($relatedProducts as $related): ?>
+                    <div class="productItem prd40768686" data-id="40768686">
+                        <div class="productImage">
+                            <a
+                                href="?user=detailProduct&id=<?= $related['id'] ?>">
+                                <img loading="lazy"
+                                    src="<?= $related['image_thumbnail'] ?>"
+                                    alt="<?= $related['name'] ?>" data-hover="">
+                            </a>
+                            <!-- <span class="saleLabel">-50%</span> -->
+                        </div>
+                        <div class="productInfo">
+                            <a
+                                href="?user=productDetail&id=<?= $related['id'] ?>">
+                                <h4 class="productName tp_product_name"><?= $related['name'] ?></h4>
+                            </a>
+                            <div class="wrappMidInfo">
+                                <div class="pro-color-selector">
+                                    <div class="frameImageChilds">
                                         <?php
                                         $cid     = (int)$c['id'];
                                         $isOwner = ((int)$c['user_id'] === $meId);
@@ -1109,3 +1139,4 @@
     unset($_SESSION['alert']);
 endif;
 ?>
+

@@ -210,4 +210,46 @@ class CartController
         header('Location: ?user=cart');
         exit;
     }
+
+    public function orderSelected()
+    {
+        if (!isset($_SESSION['user_id'])) {
+            $_SESSION['alert'] = ['type' => 'error', 'message' => 'Vui lòng đăng nhập'];
+            header('Location: ?user=login');
+            exit;
+        }
+
+        $selected = $_POST['selected_items'] ?? [];
+        if (empty($selected)) {
+            $_SESSION['alert'] = ['type' => 'warning', 'message' => 'Bạn chưa chọn sản phẩm nào'];
+            header('Location: ?user=cart');
+            exit;
+        }
+
+        // chuẩn hoá id
+        $selectedIds = array_map('intval', $selected);
+        $selectedIds = array_filter($selectedIds, fn($id) => $id > 0);
+
+        if (empty($selectedIds)) {
+            $_SESSION['alert'] = ['type' => 'error', 'message' => 'Dữ liệu không hợp lệ'];
+            header('Location: ?user=cart');
+            exit;
+        }
+
+        $userId = $_SESSION['user_id'];
+        $cart   = $this->cartModel->getOrCreateCart($userId);
+
+        if (!$cart) {
+            $_SESSION['alert'] = ['type' => 'error', 'message' => 'Không tìm thấy giỏ hàng'];
+            header('Location: ?user=cart');
+            exit;
+        }
+
+        // lưu vào session để trang order xử lý
+        $_SESSION['checkout_mode']       = 'selected';
+        $_SESSION['selected_cart_items'] = $selectedIds;
+
+        header('Location: ?user=order');
+        exit;
+    }
 }

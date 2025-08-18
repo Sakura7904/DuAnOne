@@ -300,7 +300,7 @@ class OrderController
 
         $orderId = (int)$res['order_id'];
         $total   = (int)round((float)$res['total']);
-
+        unset($_SESSION['checkout_mode'], $_SESSION['selected_cart_items']);
         if ($paymentMethod === 'STRIPE') {
             $this->stripeCreateCheckoutDetailed($orderId, $itemsForStripe, $email, /*shippingFeeVnd*/ 0);
         } elseif ($paymentMethod === 'MOMO_CC') {
@@ -312,6 +312,7 @@ class OrderController
             $amount     = (int)$total;
             $transId    = 'COD-' . $orderId;    // hoặc '' nếu không dùng
             $content    = getContentPathClient('', 'payment_result');
+
 
             view('user/index', [
                 'content'    => $content,

@@ -15,17 +15,26 @@ function asset_url($p)
     if (!$p) return '';
     return (stripos($p, 'http') === 0) ? $p : ('/' . ltrim($p, '/'));
 }
-function vnItemStatus(string $s): string
+function vnItemStatus(string $st): string
 {
-    return match ($s) {
-        'pending'   => 'Chờ thanh toán',
+    return [
+        'pending'    => 'Chờ thanh toán',
         'processing' => 'Đang xử lý',
-        'shipped'   => 'Chờ giao hàng',
-        'delivered' => 'Hoàn thành',
-        'cancelled' => 'Đã hủy',
-        'refunded'  => 'Đã hoàn tiền',
-        default     => ucfirst($s),
-    };
+        'shipped'    => 'Chờ giao hàng',
+        'delivered'  => 'Đã giao hàng',
+        'completed'  => 'Hoàn thành',
+        'cancelled'  => 'Đã hủy',
+        'refunded'   => 'Hoàn tiền',
+    ][$st] ?? ucfirst($st);
+}
+$active = $activeTab ?? 'all';
+$counts  = $counts ?? [];
+function tabUrl($key)
+{
+    $qs = $_GET;
+    $qs['status'] = $key;
+    unset($qs['page']);
+    return '?' . http_build_query($qs);
 }
 ?>
 <div role="main" id="MainContent" class="main-content">
@@ -49,14 +58,14 @@ function vnItemStatus(string $s): string
                         <a class="tab <?= ($activeTab === 'shipping' ? 'active' : '') ?>"
                             href="?user=purchase&status=shipping">Chờ giao hàng</a>
 
+                        <a class="tab <?= ($activeTab === 'delivered' ? 'active' : '') ?>"
+                            href="?user=purchase&status=delivered">Đã giao hàng</a>
+
                         <a class="tab <?= ($activeTab === 'done' ? 'active' : '') ?>"
                             href="?user=purchase&status=done">Hoàn thành</a>
 
                         <a class="tab <?= ($activeTab === 'cancelled' ? 'active' : '') ?>"
                             href="?user=purchase&status=cancelled">Đã hủy</a>
-
-                        <a class="tab <?= ($activeTab === 'refund' ? 'active' : '') ?>"
-                            href="?user=purchase&status=refund">Trả hàng/Hoàn tiền</a>
                     </nav>
                     <div class="col-xs-12 col-sm-12 col-lg-12 noPadding mt-3 mb-3">
                         <div class="page-content orderIndex">
@@ -200,8 +209,15 @@ function vnItemStatus(string $s): string
                                                                         <input type="hidden" name="order_item_id" value="<?= $orderItemId ?>">
                                                                         <button type="button" class="btn tab btn-sm btn-danger btn-cancel-item">Hủy đơn</button>
                                                                     </form>
-                                                                <?php elseif (in_array($itemStatus, ['cancelled', 'delivered'], true)): ?>
+                                                                <?php elseif (in_array($itemStatus, ['cancelled', 'completed'], true)): ?>
                                                                     <a href="?user=detailProduct&id=<?= $it['product_id'] ?>" class="btn tab btn-sm btn-success">Mua lại</a>
+
+                                                                <?php elseif (in_array($itemStatus, ['delivered'], true)): ?>
+                                                                    <form action="?user=completeItem<?= isset($_GET['status']) ? '&status=' . urlencode($_GET['status']) : '' ?>"
+                                                                        method="post" class="complete-item-form" style="margin-top:6px;">
+                                                                        <input type="hidden" name="order_item_id" value="<?= $orderItemId ?>">
+                                                                        <button type="button" class="btn tab btn-sm btn-primary btn-complete-item">Xác nhận</button>
+                                                                    </form>
                                                                 <?php endif; ?>
                                                             </div>
                                                         </div>
@@ -364,5 +380,60 @@ function vnItemStatus(string $s): string
             });
             <?php unset($_SESSION['flash_error']); ?>
         <?php endif; ?>
+    });
+</script>
+
+<script>
+    document.addEventListener('click', function(e) {
+        // Hoàn thành
+        if (e.target.classList.contains('btn-complete-item')) {
+            const btn = e.target,
+                form = btn.closest('form');
+            if (window.Swal) {
+                Swal.fire({
+                    title: 'Xác nhận hoàn thành?',
+                    text: 'Bạn đã nhận đủ hàng.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Hoàn thành',
+                    cancelButtonText: 'Để sau'
+                }).then(r => {
+                    if (r.isConfirmed) {
+                        btn.disabled = true;
+                        form.submit();
+                    }
+                });
+            } else {
+                if (confirm('Xác nhận đã nhận hàng và hoàn thành?')) {
+                    btn.disabled = true;
+                    form.submit();
+                }
+            }
+        }
+
+        // Hủy
+        if (e.target.classList.contains('btn-cancel-item')) {
+            const btn = e.target,
+                form = btn.closest('form');
+            if (window.Swal) {
+                Swal.fire({
+                    title: 'Hủy sản phẩm này?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Hủy',
+                    cancelButtonText: 'Không'
+                }).then(r => {
+                    if (r.isConfirmed) {
+                        btn.disabled = true;
+                        form.submit();
+                    }
+                });
+            } else {
+                if (confirm('Hủy sản phẩm này?')) {
+                    btn.disabled = true;
+                    form.submit();
+                }
+            }
+        }
     });
 </script>
