@@ -300,7 +300,7 @@ if (!empty($_SESSION['user_id'])) {
                                             <ul class="color-swatches text-center" data-hover="true" psId="<?= $product['id'] ?>">
                                                 <?php foreach ($product['colors'] as $color): ?>
                                                     <li class="color-item"
-                                                    
+
                                                         value="<?= $color['variant_id'] ?>">
                                                         <span style="background-color: <?= htmlspecialchars($color['color_code']) ?>"></span>
                                                     </li>
@@ -342,9 +342,12 @@ if (!empty($_SESSION['user_id'])) {
                                 </div>
                             </div>
 
-                            <div class="hook-reviews">
-                                <span class="number-purchase">(322 đã bán)</span>
-                            </div>
+                            <?php if (!empty($product['sold_count']) && (int)$product['sold_count'] > 0): ?>
+                                <div class="hook-reviews">
+                                    <span class="number-purchase">(<?= number_format((int)$product['sold_count'], 0, ',', '.') ?> đã bán)</span>
+                                </div>
+                            <?php endif; ?>
+
                         </div>
                     <?php endforeach; ?>
                 </div>

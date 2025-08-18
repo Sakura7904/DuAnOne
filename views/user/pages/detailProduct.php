@@ -124,168 +124,168 @@
                 </form>
                 <!-- === HẾT NÚT WISHLIST === -->
             </div>
-        </div>
 
-        <div class="col-xs-12 col-sm-12 col-lg-6 col-md-6 details-pro noPadding">
-            <div class="popupBuyMobile">
-                <div class="boxProductMobile">
-                    <div class="infoProductMobile">
-                        <h1 class="title-head"><?= $product['name'] ?></h1>
-                        <div class="boxHeadViewProduct">
-                            <div class="product-code">Danh mục: <span><?= $product['category_name'] ?></span></div>
-                            <div class="starbaprv-widget">
-                                <div class="starbap-prev-badge voteView0">
-                                    <a class="starbap-star starbap--off star-1">
-                                        <i class="fas fa-star fa-fw"></i>
-                                    </a>
-                                    <a class="starbap-star starbap--off star-2">
-                                        <i class="fas fa-star fa-fw"></i>
-                                    </a>
-                                    <a class="starbap-star starbap--off star-3">
-                                        <i class="fas fa-star fa-fw"></i>
-                                    </a>
-                                    <a class="starbap-star starbap--off star-4">
-                                        <i class="fas fa-star fa-fw"></i>
-                                    </a>
-                                    <a class="starbap-star starbap--off star-5">
-                                        <i class="fas fa-star fa-fw"></i>
-                                    </a>
-                                    <span class="starbap-prev-badgetext">(0)</span>
+            <div class="col-xs-12 col-sm-12 col-lg-6 col-md-6 details-pro noPadding">
+                <div class="popupBuyMobile">
+                    <div class="boxProductMobile">
+                        <div class="infoProductMobile">
+                            <h1 class="title-head"><?= $product['name'] ?></h1>
+                            <div class="boxHeadViewProduct">
+                                <div class="product-code">Danh mục: <span><?= $product['category_name'] ?></span></div>
+                                <div class="starbaprv-widget">
+                                    <div class="starbap-prev-badge voteView0">
+                                        <a class="starbap-star starbap--off star-1">
+                                            <i class="fas fa-star fa-fw"></i>
+                                        </a>
+                                        <a class="starbap-star starbap--off star-2">
+                                            <i class="fas fa-star fa-fw"></i>
+                                        </a>
+                                        <a class="starbap-star starbap--off star-3">
+                                            <i class="fas fa-star fa-fw"></i>
+                                        </a>
+                                        <a class="starbap-star starbap--off star-4">
+                                            <i class="fas fa-star fa-fw"></i>
+                                        </a>
+                                        <a class="starbap-star starbap--off star-5">
+                                            <i class="fas fa-star fa-fw"></i>
+                                        </a>
+                                        <span class="starbap-prev-badgetext">(0)</span>
+                                    </div>
                                 </div>
+                                <a href="#box-rating" class="number-purchase">0 Nhận xét</a>
                             </div>
-                            <a href="#box-rating" class="number-purchase">0 Nhận xét</a>
                         </div>
-                    </div>
-                    <div class="price-box" id="priceDisplay">
-                        <?php if ($defaultVariant['sale_price'] && $defaultVariant['sale_price'] > 0): ?>
-                            <span class="discountPrice tp_product_detail_price"><?= number_format($defaultVariant['sale_price']) ?>đ</span>
-                            <del class="product-price-old tp_product_detail_price_old"><?= number_format($defaultVariant['price']) ?>đ</del>
-                        <?php else: ?>
-                            <span class="discountPrice tp_product_detail_price"><?= number_format($defaultVariant['price']) ?>đ</span>
-                        <?php endif; ?>
-                    </div>
-                    <input type="hidden" id="prdInfo" data-category="Thu Đông 1F" data-id="40768009"
-                        data-name="Đầm sát nách dáng ôm dài buộc nơ"
-                        data-price="<?= $defaultVariant['sale_price'] && $defaultVariant['sale_price'] > 0 ? number_format($defaultVariant['sale_price']) : number_format($defaultVariant['price']) ?>">
-
-                </div>
-                <?php
-                // Tách riêng các thuộc tính
-                $colorAttribute = null;
-                $sizeAttribute = null;
-                $otherAttributes = [];
-
-                foreach ($attributes as $attribute) {
-                    $attributeName = strtolower($attribute['name']);
-
-                    if (in_array($attributeName, ['color', 'màu', 'màu sắc', 'mau', 'mau sac'])) {
-                        $colorAttribute = $attribute;
-                    } elseif (in_array($attributeName, ['size', 'kích thước', 'kich thuoc', 'kích cỡ', 'kich co'])) {
-                        $sizeAttribute = $attribute;
-                    } else {
-                        $otherAttributes[] = $attribute;
-                    }
-                }
-                ?>
-
-                <!-- ==== FORM ADD TO CART ==== -->
-                <form id="addToCartForm" action="?user=addToCart" method="POST">
-
-                    <!-- Các thuộc tính chọn (giữ nguyên của bạn) -->
-                    <div class="attr">
-                        <!-- Chọn màu sắc -->
-                        <div class="colorPicker clearfix">
-                            <label class="control-label options-title">Màu sắc: </label>
-                            <?php if (isset($colorAttribute['values'])) : ?>
-                                <?php foreach ($colorAttribute['values'] as $value): ?>
-                                    <p class="color req" column="i1">
-                                        <span class="itemColor">
-                                            <a rel="nofollow" href="javascript:"
-                                                class="color-option-new"
-                                                data-color-value="<?= htmlspecialchars($value['value']) ?>"
-                                                title="<?= htmlspecialchars($value['value']) ?>"
-                                                style="background-color: <?= $value['color_code'] ?>">
-                                                <img src="https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg" alt="" />
-                                            </a>
-                                        </span>
-                                    </p>
-                                <?php endforeach; ?>
+                        <div class="price-box" id="priceDisplay">
+                            <?php if ($defaultVariant['sale_price'] && $defaultVariant['sale_price'] > 0): ?>
+                                <span class="discountPrice tp_product_detail_price"><?= number_format($defaultVariant['sale_price']) ?>đ</span>
+                                <del class="product-price-old tp_product_detail_price_old"><?= number_format($defaultVariant['price']) ?>đ</del>
                             <?php else: ?>
-                                <p>Chưa có màu sắc</p>
+                                <span class="discountPrice tp_product_detail_price"><?= number_format($defaultVariant['price']) ?>đ</span>
                             <?php endif; ?>
                         </div>
+                        <input type="hidden" id="prdInfo" data-category="Thu Đông 1F" data-id="40768009"
+                            data-name="Đầm sát nách dáng ôm dài buộc nơ"
+                            data-price="<?= $defaultVariant['sale_price'] && $defaultVariant['sale_price'] > 0 ? number_format($defaultVariant['sale_price']) : number_format($defaultVariant['price']) ?>">
 
-                        <!-- Size -->
-                        <div class="sizePicker clearfix" id="sizeSection" style="display:none;">
-                            <label class="control-label options-title">Size: </label>
-                            <div id="sizeContainer" class="size-options-inline"></div>
-                        </div>
-
-                        <!-- Tồn kho -->
-                        <div class="stockInfo clearfix" id="stockSection" style="display:none;">
-                            <label class="control-label options-title">Còn: </label>
-                            <div id="stockContainer" class="stock-options-inline"></div>
-                        </div>
                     </div>
+                    <?php
+                    // Tách riêng các thuộc tính
+                    $colorAttribute = null;
+                    $sizeAttribute = null;
+                    $otherAttributes = [];
 
-                    <!-- Số lượng -->
-                    <div class="form-product">
-                        <div class="clearfix form-group">
-                            <div class="qty-ant clearfix custom-btn-number">
-                                <label>Số lượng:</label>
-                                <div class="custom custom-btn-numbers">
-                                    <button type="button" class="btn-cts btn-minus-view">–</button>
-                                    <input type="number" name="quantity" class="qty-detail input-text qty-view"
-                                        value="1" id="quantityInput" min="1">
-                                    <button type="button" class="btn-cts btn-plus-view">+</button>
+                    foreach ($attributes as $attribute) {
+                        $attributeName = strtolower($attribute['name']);
+
+                        if (in_array($attributeName, ['color', 'màu', 'màu sắc', 'mau', 'mau sac'])) {
+                            $colorAttribute = $attribute;
+                        } elseif (in_array($attributeName, ['size', 'kích thước', 'kich thuoc', 'kích cỡ', 'kich co'])) {
+                            $sizeAttribute = $attribute;
+                        } else {
+                            $otherAttributes[] = $attribute;
+                        }
+                    }
+                    ?>
+
+                    <!-- ==== FORM ADD TO CART ==== -->
+                    <form id="addToCartForm" action="?user=addToCart" method="POST">
+
+                        <!-- Các thuộc tính chọn (giữ nguyên của bạn) -->
+                        <div class="attr">
+                            <!-- Chọn màu sắc -->
+                            <div class="colorPicker clearfix">
+                                <label class="control-label options-title">Màu sắc: </label>
+                                <?php if (isset($colorAttribute['values'])) : ?>
+                                    <?php foreach ($colorAttribute['values'] as $value): ?>
+                                        <p class="color req" column="i1">
+                                            <span class="itemColor">
+                                                <a rel="nofollow" href="javascript:"
+                                                    class="color-option-new"
+                                                    data-color-value="<?= htmlspecialchars($value['value']) ?>"
+                                                    title="<?= htmlspecialchars($value['value']) ?>"
+                                                    style="background-color: <?= $value['color_code'] ?>">
+                                                    <img src="https://pos.nvncdn.com/4ef0bf-108661/ps/20241107_TBLDN5nPSM.jpeg" alt="" />
+                                                </a>
+                                            </span>
+                                        </p>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <p>Chưa có màu sắc</p>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- Size -->
+                            <div class="sizePicker clearfix" id="sizeSection" style="display:none;">
+                                <label class="control-label options-title">Size: </label>
+                                <div id="sizeContainer" class="size-options-inline"></div>
+                            </div>
+
+                            <!-- Tồn kho -->
+                            <div class="stockInfo clearfix" id="stockSection" style="display:none;">
+                                <label class="control-label options-title">Còn: </label>
+                                <div id="stockContainer" class="stock-options-inline"></div>
+                            </div>
+                        </div>
+
+                        <!-- Số lượng -->
+                        <div class="form-product">
+                            <div class="clearfix form-group">
+                                <div class="qty-ant clearfix custom-btn-number">
+                                    <label>Số lượng:</label>
+                                    <div class="custom custom-btn-numbers">
+                                        <button type="button" class="btn-cts btn-minus-view">–</button>
+                                        <input type="number" name="quantity" class="qty-detail input-text qty-view"
+                                            value="1" id="quantityInput" min="1">
+                                        <button type="button" class="btn-cts btn-plus-view">+</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Nút -->
+                            <div class="btn-mua">
+                                <div class="buttonWrapp">
+                                    <button type="submit" class="btnAddToCart btnAtc unsel btn-outline tp_button mr-3">
+                                        <span>Thêm vào giỏ hàng</span>
+                                    </button>
+                                    <button type="submit" name="buy_now" value="1" class="btnAddToCart btnAtc btn-outline tp_button">
+                                        Mua ngay
+                                    </button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Nút -->
-                        <div class="btn-mua">
-                            <div class="buttonWrapp">
-                                <button type="submit" class="btnAddToCart btnAtc unsel btn-outline tp_button mr-3">
-                                    <span>Thêm vào giỏ hàng</span>
-                                </button>
-                                <button type="submit" name="buy_now" value="1" class="btnAddToCart btnAtc btn-outline tp_button">
-                                    Mua ngay
-                                </button>
+
+                        <!-- ==== HIDDEN INPUTS để POST ==== -->
+                        <input type="hidden" name="product_id" id="productIdHidden" value="<?= (int)$product['id'] ?>">
+                        <input type="hidden" name="variant_id" id="variantIdHidden" value="">
+                        <input type="hidden" name="color_value" id="colorValueHidden" value="">
+                        <input type="hidden" name="size_value" id="sizeValueHidden" value="">
+                        <input type="hidden" name="stock_qty" id="stockHidden" value="">
+                        <input type="hidden" name="variant_image" id="variantImageHidden" value="">
+
+                    </form>
+
+                    <div class="accordion-wrapper">
+                        <div class="content descriptionProduct boxItem" data-name="information">
+                            <div class="title-content">
+                                <h2>Thông tin chi tiết</h2>
+                                <i class="far fa-plus"></i>
+                            </div>
+                            <div class="descriptionContent">
+                                <p><?= $product['description'] ?> </p>
                             </div>
                         </div>
-                    </div>
-
-
-                    <!-- ==== HIDDEN INPUTS để POST ==== -->
-                    <input type="hidden" name="product_id" id="productIdHidden" value="<?= (int)$product['id'] ?>">
-                    <input type="hidden" name="variant_id" id="variantIdHidden" value="">
-                    <input type="hidden" name="color_value" id="colorValueHidden" value="">
-                    <input type="hidden" name="size_value" id="sizeValueHidden" value="">
-                    <input type="hidden" name="stock_qty" id="stockHidden" value="">
-                    <input type="hidden" name="variant_image" id="variantImageHidden" value="">
-
-                </form>
-
-                <div class="accordion-wrapper">
-                    <div class="content descriptionProduct boxItem" data-name="information">
-                        <div class="title-content">
-                            <h2>Thông tin chi tiết</h2>
-                            <i class="far fa-plus"></i>
-                        </div>
-                        <div class="descriptionContent">
-                            <p><?= $product['description'] ?> </p>
-                        </div>
-                    </div>
-                    <div class="content descriptionProduct">
-                        <div class="title-content">
-                            <h2>Bảng size</h2>
-                            <i class="far fa-plus"></i>
-                        </div>
-                        <div class="descriptionContent">
-                            <p><img src="https://pos.nvncdn.com/4ef0bf-108661/contentKey/20230428_sxfyDIA1.jpg"
-                                    alt="20230428_sxfyDIA1.jpg" /><img
-                                    src="https://pos.nvncdn.com/4ef0bf-108661/contentKey/20230531_D9iytd2BVuMY.png"
-                                    alt="" /></p>
+                        <div class="content descriptionProduct">
+                            <div class="title-content">
+                                <h2>Bảng size</h2>
+                                <i class="far fa-plus"></i>
+                            </div>
+                            <div class="descriptionContent">
+                                <p><img src="https://pos.nvncdn.com/4ef0bf-108661/contentKey/20230428_sxfyDIA1.jpg"
+                                        alt="20230428_sxfyDIA1.jpg" /><img
+                                        src="https://pos.nvncdn.com/4ef0bf-108661/contentKey/20230531_D9iytd2BVuMY.png"
+                                        alt="" /></p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -368,6 +368,44 @@
                                 </ul>
                             </div>
                         </div>
+                        <?php $meId = (int)($_SESSION['user_id'] ?? 0); ?>
+
+                        <div class="product-comments">
+                            <h3 style="font-size:18px;font-weight:600;margin-bottom:10px;">
+                                Bình luận (<?= (int)($totalComments ?? 0) ?>)
+                            </h3>
+
+                            <?php if (!empty($_SESSION['msg'])): ?>
+                                <div class="<?= (($_SESSION['msg_type'] ?? '') === 'success') ? 'alert-success' : 'alert-error' ?>"
+                                    style="padding:8px 10px;border:1px solid #eee;border-radius:6px;margin-bottom:10px;">
+                                    <?= htmlspecialchars($_SESSION['msg']) ?>
+                                </div>
+                                <?php unset($_SESSION['msg'], $_SESSION['msg_type']); ?>
+                            <?php endif; ?>
+
+                            <!-- THÊM bình luận -->
+                            <div style="border:1px solid #eee;padding:12px;border-radius:8px;margin-bottom:14px;">
+                                <?php if ($meId > 0): ?>
+                                    <form method="post" action="index.php?user=addComment">
+                                        <input type="hidden" name="product_id" value="<?= (int)$product['id'] ?>">
+                                        <input type="hidden" name="cmt_page" value="<?= (int)($cmt_page ?? 1) ?>">
+                                        <textarea name="content" rows="3" placeholder="Viết bình luận..."
+                                            style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;"></textarea>
+                                        <div style="text-align:right;margin-top:8px;">
+                                            <button type="submit" style="padding:8px 12px;border:none;border-radius:6px;background:#111;color:#fff;">
+                                                Đăng bình luận
+                                            </button>
+                                        </div>
+                                    </form>
+                                <?php else: ?>
+                                    <div>Bạn cần <a href="index.php?user=loginForm">đăng nhập</a> để bình luận.</div>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- DANH SÁCH bình luận -->
+                            <ul style="list-style:none;padding:0;margin:0;">
+                                <?php if (!empty($comments)): ?>
+                                    <?php foreach ($comments as $c): ?>
                         <!--                        <a href="javascript:void(0);" class="starbap-write-rev-link">Chấm điểm và viết đánh giá sản phẩm</a>-->
                     </div>
                 </div>
@@ -399,84 +437,219 @@
                                 <div class="pro-color-selector">
                                     <div class="frameImageChilds">
                                         <?php
-                                        $maxColors = 3; // Tối đa 3 màu
-                                        $totalColors = count($related['color_options']);
-                                        $remainingColors = max(0, $totalColors - $maxColors);
+                                        $cid     = (int)$c['id'];
+                                        $isOwner = ((int)$c['user_id'] === $meId);
+                                        $name    = $c['full_name'] ?? 'Người dùng';
+                                        $initial = mb_strtoupper(mb_substr($name, 0, 1, 'UTF-8'));
                                         ?>
-                                        <ul class="color-swatches text-center" data-hover="true" psId="40768686"
-                                            data-handle="/dam-co-beo-ngan-tay-chan-xep-ly-chum-tay-ngan-p40768686.html"
-                                            column="">
-                                            <?php for ($i = 0; $i < min($maxColors, $totalColors); $i++): ?>
-                                                <?php $color = $related['color_options'][$i]; ?>
-                                                <!-- data-img="https://pos.nvncdn.com/4ef0bf-108661/ps/20250217_5TYb8DULPB.jpeg" -->
-                                                <li class="color-item"
-                                                    value="40768687">
-                                                    <span style="background-color: <?= htmlspecialchars($color['color_code']) ?>; "></span>
+                                        <li style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid #f0f0f0;">
+                                            <div style="min-width:36px;height:36px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-weight:600;">
+                                                <?= htmlspecialchars($initial) ?>
+                                            </div>
 
-                                                </li>
-                                            <?php endfor; ?>
-                                        </ul>
-                                        <?php if ($remainingColors > 0): ?>
-                                            <!-- href="https://jm.com.vn/dam-co-beo-ngan-tay-chan-xep-ly-chum-tay-ngan-p40768686.html" -->
-                                            <a
-                                                class="numberColor">
-                                                +<?= $remainingColors ?>
-                                            </a>
+                                            <div style="flex:1;">
+                                                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                                                    <div style="display:flex;align-items:center;gap:8px;">
+                                                        <span style="font-weight:600;"><?= htmlspecialchars($name) ?></span>
+                                                        <span style="color:#aaa;">•</span>
+                                                        <time style="color:#888;font-size:13px;">
+                                                            <?= date('H:i d/m/Y', strtotime($c['created_at'] ?? 'now')) ?>
+                                                        </time>
+                                                    </div>
+
+                                                    <?php if ($isOwner): ?>
+                                                        <div style="display:flex;gap:8px;">
+                                                            <button type="button" class="btn-edit" data-target="#edit-<?= $cid ?>"
+                                                                style="padding:4px 8px;border:1px solid #ddd;background:#fff;border-radius:6px;cursor:pointer;">
+                                                                Sửa
+                                                            </button>
+                                                            <form method="post" action="index.php?user=deleteComment" onsubmit="return confirm('Xóa bình luận này?');">
+                                                                <input type="hidden" name="product_id" value="<?= (int)$product['id'] ?>">
+                                                                <input type="hidden" name="comment_id" value="<?= $cid ?>">
+                                                                <input type="hidden" name="cmt_page" value="<?= (int)($cmt_page ?? 1) ?>">
+                                                                <button type="submit"
+                                                                    style="padding:4px 8px;border:1px solid #f66;color:#c00;background:#fff;border-radius:6px;cursor:pointer;">
+                                                                    Xóa
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+
+                                                <!-- Nội dung -->
+                                                <div id="view-<?= $cid ?>" style="margin-top:6px;line-height:1.6;">
+                                                    <?= nl2br(htmlspecialchars($c['content'] ?? '')) ?>
+                                                </div>
+
+                                                <!-- Form SỬA (ẩn) -->
+                                                <?php if ($isOwner): ?>
+                                                    <form id="edit-<?= $cid ?>" method="post" action="index.php?user=updateComment"
+                                                        style="display:none;margin-top:8px;">
+                                                        <input type="hidden" name="product_id" value="<?= (int)$product['id'] ?>">
+                                                        <input type="hidden" name="comment_id" value="<?= $cid ?>">
+                                                        <input type="hidden" name="cmt_page" value="<?= (int)($cmt_page ?? 1) ?>">
+                                                        <textarea name="content" rows="3"
+                                                            style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;"><?= htmlspecialchars($c['content'] ?? '') ?></textarea>
+                                                        <div style="margin-top:6px;display:flex;gap:8px;justify-content:flex-end;">
+                                                            <button type="button" class="btn-cancel" data-target="#edit-<?= $cid ?>"
+                                                                style="padding:6px 10px;border:1px solid #ddd;background:#fff;border-radius:6px;cursor:pointer;">
+                                                                Hủy
+                                                            </button>
+                                                            <button type="submit"
+                                                                style="padding:6px 12px;border:none;border-radius:6px;background:#111;color:#fff;">
+                                                                Lưu
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                <?php endif; ?>
+                                            </div>
+                                        </li>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <li style="padding:8px 0;color:#666;">Chưa có bình luận nào. Hãy là người đầu tiên!</li>
+                                <?php endif; ?>
+                                <!-- PHÂN TRANG -->
+                                <?php if (($cmt_totalPages ?? 1) > 1): ?>
+                                    <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                                        <?php if (($cmt_page ?? 1) > 1): ?>
+                                            <a href="index.php?user=detailProduct&id=<?= (int)$product['id'] ?>&cmt_page=<?= (int)$cmt_page - 1 ?>"
+                                                style="padding:6px 10px;border:1px solid #ddd;border-radius:6px;text-decoration:none;">← Trước</a>
+                                        <?php endif; ?>
+
+                                        <?php for ($i = 1; $i <= (int)$cmt_totalPages; $i++): ?>
+                                            <?php if ($i == (int)$cmt_page): ?>
+                                                <span style="padding:6px 10px;border-radius:6px;background:#111;color:#fff;"><?= $i ?></span>
+                                            <?php else: ?>
+                                                <a href="index.php?user=detailProduct&id=<?= (int)$product['id'] ?>&cmt_page=<?= $i ?>"
+                                                    style="padding:6px 10px;border:1px solid #ddd;border-radius:6px;text-decoration:none;"><?= $i ?></a>
+                                            <?php endif; ?>
+                                        <?php endfor; ?>
+
+                                        <?php if ((int)$cmt_page < (int)$cmt_totalPages): ?>
+                                            <a href="index.php?user=detailProduct&id=<?= (int)$product['id'] ?>&cmt_page=<?= (int)$cmt_page + 1 ?>"
+                                                style="padding:6px 10px;border:1px solid #ddd;border-radius:6px;text-decoration:none;">Sau →</a>
                                         <?php endif; ?>
                                     </div>
-                                </div>
-                                <a class="wishlistAdd wishlistItems" href="javascript:void(0)" data-id="40768686">
-                                    <!--                                        <i class="far fa-heart"></i>-->
-                                    <svg width="14px" height="14px" viewBox="0 0 15 12" version="1.1"
-                                        class="wishlist-icon">
-                                        <g stroke-width="1" fill-rule="evenodd" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <g transform="translate(-384.000000, -173.000000)">
-                                                <g transform="translate(373.000000, 160.000000)">
-                                                    <path
-                                                        d="M24.1870486,15.1337994 C23.0156479,13.7915995 21.0146777,13.6174702 19.6357465,14.7377957 C19.0576454,15.2115959 18.655296,15.8713213 18.4944667,16.6082814 C18.3352955,15.8721638 17.9348804,15.2124384 17.3587137,14.7377957 C15.9806115,13.6211213 13.9837864,13.7949698 12.8129383,15.1337994 C11.6169435,16.5248678 11.756771,18.6380112 13.125754,19.853546 C13.1564276,19.8807888 13.1873776,19.9074699 13.2191566,19.9335893 L17.900338,23.7840937 C18.2510121,24.0719688 18.7517383,24.0719688 19.1024124,23.7840937 L23.7808304,19.9335893 C25.1929223,18.7705741 25.4101247,16.6641713 24.2658052,15.228728 C24.2401057,15.1967106 24.2138535,15.1649742 24.1870486,15.1337994 L24.1870486,15.1337994 Z">
-                                                    </path>
-                                                </g>
-                                            </g>
-                                        </g>
-                                    </svg>
-                                </a>
-                            </div>
-                            <div class="productPrice">
-                                <span class="priceNew tp_product_price"> <?= number_format($related['min_price']) ?>đ</span>
-                                <?php if ($related['min_price'] != $related['max_price']): ?>
-                                    <del class="oldPrice tp_product_price_old"> <?= number_format($related['max_price']) ?>đ</del>
                                 <?php endif; ?>
-                            </div>
-                        </div>
-                        <div class="hook-reviews">
-                            <div class="starbaprv-widget">
-                                <div class="starbap-prev-badge voteView0">
-                                    <a class="starbap-star starbap--off star-1">
-                                        <i class="fas fa-star fa-fw"></i>
-                                    </a>
-                                    <a class="starbap-star starbap--off star-2">
-                                        <i class="fas fa-star fa-fw"></i>
-                                    </a>
-                                    <a class="starbap-star starbap--off star-3">
-                                        <i class="fas fa-star fa-fw"></i>
-                                    </a>
-                                    <a class="starbap-star starbap--off star-4">
-                                        <i class="fas fa-star fa-fw"></i>
-                                    </a>
-                                    <a class="starbap-star starbap--off star-5">
-                                        <i class="fas fa-star fa-fw"></i>
-                                    </a>
-                                    <span class="starbap-prev-badgetext">(0)</span>
+                            </ul>
+                            <div class="productSuggest-wrapper tp_product_detail_suggest boxItem" data-name="product">
+                                <h2 class="titleBox">
+                                    Có thể bạn sẽ thích </h2>
+                                <div class="container-fluid">
+                                    <div class="productSuggest productList clearfix owl-carousel">
+
+                                        <?php foreach ($relatedProducts as $related): ?>
+                                            <div class="productItem prd40768686" data-id="40768686">
+                                                <div class="productImage">
+                                                    <a
+                                                        href="?user=detailProduct&id=<?= $related['id'] ?>">
+                                                        <img loading="lazy"
+                                                            src="<?= $related['image_thumbnail'] ?>"
+                                                            alt="<?= $related['name'] ?>" data-hover="">
+                                                    </a>
+                                                    <!-- <span class="saleLabel">-50%</span> -->
+                                                </div>
+                                                <div class="productInfo">
+                                                    <a
+                                                        href="?user=productDetail&id=<?= $related['id'] ?>">
+                                                        <h4 class="productName tp_product_name"><?= $related['name'] ?></h4>
+                                                    </a>
+                                                    <div class="wrappMidInfo">
+                                                        <div class="pro-color-selector">
+                                                            <div class="frameImageChilds">
+                                                                <?php
+                                                                $maxColors = 3; // Tối đa 3 màu
+                                                                $totalColors = count($related['color_options']);
+                                                                $remainingColors = max(0, $totalColors - $maxColors);
+                                                                ?>
+                                                                <ul class="color-swatches text-center" data-hover="true" psId="40768686"
+                                                                    data-handle="/dam-co-beo-ngan-tay-chan-xep-ly-chum-tay-ngan-p40768686.html"
+                                                                    column="">
+                                                                    <?php for ($i = 0; $i < min($maxColors, $totalColors); $i++): ?>
+                                                                        <?php $color = $related['color_options'][$i]; ?>
+                                                                        <!-- data-img="https://pos.nvncdn.com/4ef0bf-108661/ps/20250217_5TYb8DULPB.jpeg" -->
+                                                                        <li class="color-item"
+                                                                            value="40768687">
+                                                                            <span style="background-color: <?= htmlspecialchars($color['color_code']) ?>; "></span>
+
+                                                                        </li>
+                                                                    <?php endfor; ?>
+                                                                </ul>
+                                                                <?php if ($remainingColors > 0): ?>
+                                                                    <!-- href="https://jm.com.vn/dam-co-beo-ngan-tay-chan-xep-ly-chum-tay-ngan-p40768686.html" -->
+                                                                    <a
+                                                                        class="numberColor">
+                                                                        +<?= $remainingColors ?>
+                                                                    </a>
+                                                                <?php endif; ?>
+                                                            </div>
+                                                        </div>
+                                                        <a class="wishlistAdd wishlistItems" href="javascript:void(0)" data-id="40768686">
+                                                            <!--                                        <i class="far fa-heart"></i>-->
+                                                            <svg width="14px" height="14px" viewBox="0 0 15 12" version="1.1"
+                                                                class="wishlist-icon">
+                                                                <g stroke-width="1" fill-rule="evenodd" stroke-linecap="round"
+                                                                    stroke-linejoin="round">
+                                                                    <g transform="translate(-384.000000, -173.000000)">
+                                                                        <g transform="translate(373.000000, 160.000000)">
+                                                                            <path
+                                                                                d="M24.1870486,15.1337994 C23.0156479,13.7915995 21.0146777,13.6174702 19.6357465,14.7377957 C19.0576454,15.2115959 18.655296,15.8713213 18.4944667,16.6082814 C18.3352955,15.8721638 17.9348804,15.2124384 17.3587137,14.7377957 C15.9806115,13.6211213 13.9837864,13.7949698 12.8129383,15.1337994 C11.6169435,16.5248678 11.756771,18.6380112 13.125754,19.853546 C13.1564276,19.8807888 13.1873776,19.9074699 13.2191566,19.9335893 L17.900338,23.7840937 C18.2510121,24.0719688 18.7517383,24.0719688 19.1024124,23.7840937 L23.7808304,19.9335893 C25.1929223,18.7705741 25.4101247,16.6641713 24.2658052,15.228728 C24.2401057,15.1967106 24.2138535,15.1649742 24.1870486,15.1337994 L24.1870486,15.1337994 Z">
+                                                                            </path>
+                                                                        </g>
+                                                                    </g>
+                                                                </g>
+                                                            </svg>
+                                                        </a>
+                                                    </div>
+                                                    <div class="productPrice">
+                                                        <span class="priceNew tp_product_price"> <?= number_format($related['min_price']) ?>đ</span>
+                                                        <?php if ($related['min_price'] != $related['max_price']): ?>
+                                                            <del class="oldPrice tp_product_price_old"> <?= number_format($related['max_price']) ?>đ</del>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="hook-reviews">
+                                                    <?php $sold = (int)($related['sold_count'] ?? 0); ?>
+                                                    <?php if ($sold > 0): ?>
+                                                        <span class="number-purchase">(<?= number_format($sold, 0, ',', '.') ?> đã bán)</span>
+                                                    <?php endif; ?>
+                                                </div>
+
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    <div id="flip"><span>Xem thêm <i class="far fa-angle-right"></i></div>
                                 </div>
                             </div>
-                            <span class="number-purchase">(322 đã bán)</span>
+
                         </div>
+
+                        <script>
+                            // Toggle form sửa
+                            document.querySelectorAll('.btn-edit').forEach(btn => {
+                                btn.addEventListener('click', function() {
+                                    const sel = this.getAttribute('data-target');
+                                    const form = document.querySelector(sel);
+                                    if (!form) return;
+                                    form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+                                });
+                            });
+                            document.querySelectorAll('.btn-cancel').forEach(btn => {
+                                btn.addEventListener('click', function() {
+                                    const sel = this.getAttribute('data-target');
+                                    const form = document.querySelector(sel);
+                                    if (form) form.style.display = 'none';
+                                });
+                            });
+                        </script>
+
+                        <!--                        <a href="javascript:void(0);" class="starbap-write-rev-link">Chấm điểm và viết đánh giá sản phẩm</a>-->
                     </div>
-                <?php endforeach; ?>
+                </div>
             </div>
         </div>
     </div>
+
 </section>
 
 <script>

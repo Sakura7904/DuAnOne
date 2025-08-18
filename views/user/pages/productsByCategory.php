@@ -11,7 +11,7 @@ $wishlistProductMap = [];
 if (!empty($_SESSION['user_id'])) {
     include_once 'models/user/WishlistModel.php';
     $wl = new WishlistModel();
-    $wishlistProductMap = $wl->getProductIdsByUser((int)$_SESSION['user_id']); 
+    $wishlistProductMap = $wl->getProductIdsByUser((int)$_SESSION['user_id']);
 }
 ?>
 <div class="container">
@@ -86,73 +86,88 @@ if (!empty($_SESSION['user_id'])) {
                     <div class="listProductCategory clearfix">
                         <input type="hidden" class="auto-paginator">
                         <?php foreach ($products as $product): ?>
-                            <div class="productItem mb-4 col-lg-3 col-md-3 col-xs-6 col-sm-6" data-id="<?php echo $product['id']; ?>">
+                            <div class="productItem mb-4 col-lg-3 col-md-3 col-xs-6 col-sm-6"
+                                data-id="<?= (int)$product['id']; ?>">
+
                                 <div class="productImage">
-                                    <a href="index.php?user=detailProduct&id=<?php echo $product['id']; ?>">
-                                        <img loading="lazy" src="<?php echo $product['image_url']; ?>" alt="<?php echo $product['name']; ?>">
+                                    <a href="index.php?user=detailProduct&id=<?= (int)$product['id']; ?>">
+                                        <img loading="lazy"
+                                            src="<?= htmlspecialchars($product['image_thumbnail'] ?? $product['image_url'] ?? '') ?>"
+                                            alt="<?= htmlspecialchars($product['name']) ?>">
                                     </a>
                                 </div>
+
                                 <div class="productInfo">
-                                    <a href="index.php?user=detailProduct&id=<?php echo $product['id']; ?>">
-                                        <h3 class="productName tp_product_name"><?php echo $product['name']; ?></h3>
+                                    <a href="index.php?user=detailProduct&id=<?= (int)$product['id']; ?>">
+                                        <h3 class="productName tp_product_name"><?= htmlspecialchars($product['name']) ?></h3>
                                     </a>
+
                                     <div class="wrappMidInfo">
                                         <div class="pro-color-selector">
                                             <div class="frameImageChilds">
-                                                <ul class="color-swatches text-center">
-                                                    <?php foreach ($product['colors'] as $color): ?>
-                                                        <li class="color-item" data-img="<?php echo $color['image_url']; ?>">
-                                                            <span style="background-color: <?php echo $color['color_code']; ?>"></span>
-                                                        </li>
-                                                    <?php endforeach; ?>
-                                                </ul>
+                                                <?php
+                                                $colors = $product['color_options'] ?? [];
+                                                $maxColors = 3;
+                                                $totalColors = is_array($colors) ? count($colors) : 0;
+                                                $remainingColors = max(0, $totalColors - $maxColors);
+                                                ?>
+
+                                                <?php if ($totalColors > 0): ?>
+                                                    <ul class="color-swatches text-center">
+                                                        <?php for ($i = 0; $i < min($maxColors, $totalColors); $i++):
+                                                            $color = $colors[$i];
+                                                        ?>
+                                                            <li class="color-item">
+                                                                <span style="background-color: <?= htmlspecialchars($color['color_code'] ?? '#ccc') ?>"></span>
+                                                            </li>
+                                                        <?php endfor; ?>
+                                                    </ul>
+                                                    <?php if ($remainingColors > 0): ?>
+                                                        <a class="numberColor">+<?= $remainingColors ?></a>
+                                                    <?php endif; ?>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
 
+
                                         <!-- ===== WISHLIST ===== -->
                                         <?php
-                                          $pid   = (int)$product['id'];
-                                          $liked = !empty($wishlistProductMap[$pid]);
+                                        $pid   = (int)$product['id'];
+                                        $liked = !empty($wishlistProductMap[$pid]);
                                         ?>
                                         <form action="index.php?user=toggleWishlist" method="post"
-                                              class="wishlistAdd wishlistItems" style="display:inline">
-                                          <input type="hidden" name="product_id" value="<?= $pid ?>">
-                                          <button type="submit"
-                                                  aria-label="<?= $liked ? 'Bỏ khỏi yêu thích' : 'Thêm vào yêu thích' ?>"
-                                                  class="wishlist-btn<?= $liked ? ' active' : '' ?>"
-                                                  style="background:none;border:none;padding:0;cursor:pointer;">
-                                            <i class="<?= $liked ? 'fas' : 'far' ?> fa-heart"></i>
-                                          </button>
+                                            class="wishlistAdd wishlistItems" style="display:inline">
+                                            <input type="hidden" name="product_id" value="<?= $pid ?>">
+                                            <button type="submit"
+                                                aria-label="<?= $liked ? 'Bỏ khỏi yêu thích' : 'Thêm vào yêu thích' ?>"
+                                                class="wishlist-btn<?= $liked ? ' active' : '' ?>"
+                                                style="background:none;border:none;padding:0;cursor:pointer;">
+                                                <i class="<?= $liked ? 'fas' : 'far' ?> fa-heart"></i>
+                                            </button>
                                         </form>
-                                       
-
                                     </div>
+
                                     <div class="productPrice">
                                         <span class="priceNew onlyPrice tp_product_price">
-                                            <?php echo number_format($product['sale_price'] ?? $product['price'], 0, ',', '.') . 'đ'; ?>
+                                            <?= number_format($product['sale_price'] ?? $product['price'], 0, ',', '.') ?>đ
                                         </span>
                                         <?php if (!empty($product['sale_price'])): ?>
                                             <del class="product-price-old tp_product_detail_price_old">
-                                                <?php echo number_format($product['price'], 0, ',', '.') . 'đ'; ?>
+                                                <?= number_format($product['price'], 0, ',', '.') ?>đ
                                             </del>
                                         <?php endif; ?>
                                     </div>
                                 </div>
-                                <div class="hook-reviews">
-                                    <div class="starbaprv-widget">
-                                        <div class="starbap-prev-badge voteView0">
-                                            <?php for ($i = 1; $i <= 5; $i++): ?>
-                                                <a class="starbap-star starbap--off star-<?php echo $i; ?>">
-                                                    <i class="fas fa-star fa-fw"></i>
-                                                </a>
-                                            <?php endfor; ?>
-                                            <span class="starbap-prev-badgetext">(0)</span>
-                                        </div>
+
+                                <?php $sold = (int)($product['sold_count'] ?? 0); ?>
+                                <?php if ($sold > 0): ?>
+                                    <div class="hook-reviews">
+                                        <span class="number-purchase">(<?= number_format($sold, 0, ',', '.') ?> đã bán)</span>
                                     </div>
-                                    <span class="number-purchase">(322 đã bán)</span>
-                                </div>
+                                <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
+
 
                         <ul class="pagination col-lg-12 col-md-12 hidden-sm hidden-xs">
                             <div class="paginator">
@@ -202,5 +217,8 @@ if (!empty($_SESSION['user_id'])) {
 
 <!-- (tuỳ chọn) Giữ icon tim gọn nhẹ nếu theme đang ẩn -->
 <style>
-.wishlist-btn .fa-heart{font-size:16px;line-height:1}
+    .wishlist-btn .fa-heart {
+        font-size: 16px;
+        line-height: 1
+    }
 </style>
