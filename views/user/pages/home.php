@@ -225,6 +225,7 @@ if (!empty($_SESSION['user_id'])) {
         </div>
     </div>
 </div>
+
 <section class="bannerPromotion bannerPromotion-home hidden-xs hidden-sm">
     <div class="container">
         <div class="row">

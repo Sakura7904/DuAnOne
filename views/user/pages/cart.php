@@ -27,207 +27,159 @@
                     </div>
                     <div class="my-account">
                         <div class="dashboard">
-                            <div class="recent-orders hidden-sm hidden-xs col-md-8 col-lg-8">
-                                <div class="tableResponsivetab">
-                                    <table class="table">
-                                        <thead>
-                                            <tr class="tt">
-                                                <td class="image">Hình ảnh</td>
-                                                <td class="infoTable">Thông tin</td>
-                                                <td>Số lượng</td>
-                                                <td>Giá tiền</td>
-                                                <td></td>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="wishlist-row40" class="cart">
-                                            <?php if (!empty($cartItems)): ?>
-                                                <?php foreach ($cartItems as $item): ?>
-                                                    <tr class="idProduct" data-id="<?= $item['cart_item_id'] ?>" data-storeid="<?= $item['variant_id'] ?>">
-                                                        <td class="imageWislist">
-                                                            <a href="?user=product-detail&id=<?= $item['product_id'] ?>">
-                                                                <img src="<?= $item['image_thumbnail'] ?>" alt="<?= htmlspecialchars($item['product_name']) ?>" />
-                                                            </a>
-                                                        </td>
-                                                        <td class="nameWislist">
-                                                            <a href="?user=product-detail&id=<?= $item['product_id'] ?>"><?= htmlspecialchars($item['product_name']) ?></a>
-                                                            <?php if (!empty($item['variant_attributes'])): ?>
-                                                                <div style="font-size: 12px; color: #666; margin-top: 5px;">
-                                                                    <?= htmlspecialchars($item['variant_attributes']) ?>
-                                                                </div>
-                                                            <?php endif; ?>
-                                                            <a class="btn-buyNow quickView" data-id="<?= $item['product_id'] ?>"
-                                                                href="?user=detailProduct&id=<?= $item['product_id'] ?>">Xem lại</a>
-                                                        </td>
-                                                        <td class="quantityProduct">
-                                                            <div class="input-groupBtn cart-qty" data-max="<?= (int)$item['stock'] ?>">
-                                                                <!-- nút trừ -->
-                                                                <form method="POST" action="?user=updateCartQuantity" style="display:inline;">
-                                                                    <input type="hidden" name="cart_item_id" value="<?= $item['cart_item_id'] ?>">
-                                                                    <input type="hidden" name="quantity" value="<?= max(1, $item['quantity'] - 1) ?>">
-                                                                    <button class="btnAction btn-minus" type="submit" <?= $item['quantity'] <= 1 ? 'disabled' : '' ?>>-</button>
-                                                                </form>
-
-                                                                <!-- ô nhập -->
-                                                                <input class="form-control js-quantity-product number-sidebar"
-                                                                    value="<?= $item['quantity'] ?>"
-                                                                    data-id="<?= $item['cart_item_id'] ?>"
-                                                                    type="text">
-
-                                                                <!-- nút cộng -->
-                                                                <form method="POST" action="?user=updateCartQuantity" style="display:inline;">
-                                                                    <input type="hidden" name="cart_item_id" value="<?= $item['cart_item_id'] ?>">
-                                                                    <input type="hidden" name="quantity" value="<?= $item['quantity'] + 1 ?>">
-                                                                    <button class="btnAction btn-plus" type="submit">+</button>
-                                                                </form>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div class="priceWislist">
-                                                                <?php if ($item['sale_price'] && $item['sale_price'] < $item['price']): ?>
-                                                                    <span class="priceNew onlyPrice tp_product_price"><?= number_format($item['sale_price'], 0, ',', '.') ?>đ</span>
-                                                                <?php else: ?>
-                                                                    <span class="priceNew onlyPrice tp_product_price"><?= number_format($item['price'], 0, ',', '.') ?>đ</span>
+                            <form id="cartSelectForm" method="POST" action="?user=orderSelected">
+                                <div class="recent-orders hidden-sm hidden-xs col-md-8 col-lg-8">
+                                    <div class="tableResponsivetab">
+                                        <table class="table">
+                                            <thead>
+                                                <tr class="tt">
+                                                    <td style="width:46px;">
+                                                        <input type="checkbox" id="select-all">
+                                                    </td>
+                                                    <td class="image">Hình ảnh</td>
+                                                    <td class="infoTable">Thông tin</td>
+                                                    <td>Số lượng</td>
+                                                    <td>Giá tiền</td>
+                                                    <td></td>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="wishlist-row40" class="cart">
+                                                <?php if (!empty($cartItems)): ?>
+                                                    <?php foreach ($cartItems as $item): ?>
+                                                        <?php
+                                                        $unitPrice = ($item['sale_price'] && $item['sale_price'] < $item['price']) ? (int)$item['sale_price'] : (int)$item['price'];
+                                                        $qty = (int)$item['quantity'];
+                                                        ?>
+                                                        <tr class="idProduct"
+                                                            data-id="<?= $item['cart_item_id'] ?>"
+                                                            data-storeid="<?= $item['variant_id'] ?>"
+                                                            data-unit-price="<?= $unitPrice ?>">
+                                                            <td>
+                                                                <input class="select-item"
+                                                                    type="checkbox"
+                                                                    name="selected_items[]"
+                                                                    value="<?= $item['cart_item_id'] ?>">
+                                                            </td>
+                                                            <td class="imageWislist">
+                                                                <a href="?user=detailProduct&id=<?= $item['product_id'] ?>">
+                                                                    <img src="<?= $item['image_thumbnail'] ?>" alt="<?= htmlspecialchars($item['product_name']) ?>" />
+                                                                </a>
+                                                            </td>
+                                                            <td class="nameWislist">
+                                                                <a href="?user=product-detail&id=<?= $item['product_id'] ?>"><?= htmlspecialchars($item['product_name']) ?></a>
+                                                                <?php if (!empty($item['variant_attributes'])): ?>
+                                                                    <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                                                                        <?= htmlspecialchars($item['variant_attributes']) ?>
+                                                                    </div>
                                                                 <?php endif; ?>
-                                                            </div>
-                                                        </td>
-                                                        <td class="actitonWislist">
-                                                            <a href="javascript:void(0);"
-                                                                class="btn-remove-item"
-                                                                data-href="?user=removeFromCart&cart_item_id=<?= $item['cart_item_id'] ?>">
-                                                                <i class="fal fa-times"></i>
-                                                            </a>
+                                                                <a class="btn-buyNow quickView" data-id="<?= $item['product_id'] ?>"
+                                                                    href="?user=detailProduct&id=<?= $item['product_id'] ?>">Xem lại</a>
+                                                            </td>
+                                                            <td class="quantityProduct">
+                                                                <div class="input-groupBtn cart-qty" data-max="<?= (int)$item['stock'] ?>">
+                                                                    <!-- nút trừ -->
+                                                                    <form method="POST" action="?user=updateCartQuantity" style="display:inline;">
+                                                                        <input type="hidden" name="cart_item_id" value="<?= $item['cart_item_id'] ?>">
+                                                                        <input type="hidden" name="quantity" value="<?= $item['quantity'] - 1 ?>">
+                                                                        <button class="btnAction btn-minus" type="button" <?= $item['quantity'] <= 1 ? 'disabled' : '' ?>>-</button>
+                                                                    </form>
 
+                                                                    <!-- ô nhập -->
+                                                                    <input class="form-control js-quantity-product number-sidebar"
+                                                                        value="<?= $qty ?>"
+                                                                        data-id="<?= $item['cart_item_id'] ?>"
+                                                                        type="text">
+
+                                                                    <!-- nút cộng -->
+                                                                    <form method="POST" action="?user=updateCartQuantity" style="display:inline;">
+                                                                        <input type="hidden" name="cart_item_id" value="<?= $item['cart_item_id'] ?>">
+                                                                        <input type="hidden" name="quantity" value="<?= $qty + 1 ?>">
+                                                                        <button class="btnAction btn-plus" type="button">+</button>
+                                                                    </form>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="priceWislist">
+                                                                    <?php if ($item['sale_price'] && $item['sale_price'] < $item['price']): ?>
+                                                                        <span class="priceNew onlyPrice tp_product_price"><?= number_format($item['sale_price'], 0, ',', '.') ?>đ</span>
+                                                                    <?php else: ?>
+                                                                        <span class="priceNew onlyPrice tp_product_price"><?= number_format($item['price'], 0, ',', '.') ?>đ</span>
+                                                                    <?php endif; ?>
+                                                                </div>
+                                                            </td>
+                                                            <td class="actitonWislist">
+                                                                <a href="javascript:void(0);"
+                                                                    class="btn-remove-item"
+                                                                    data-href="?user=removeFromCart&cart_item_id=<?= $item['cart_item_id'] ?>">
+                                                                    <i class="fal fa-times"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                <?php else: ?>
+                                                    <tr>
+                                                        <td colspan="6" class="text-center" style="padding: 50px;">
+                                                            <p>Giỏ hàng của bạn đang trống</p>
+                                                            <a href="?user=shop" class="btn-large btn-buy">Tiếp tục mua sắm</a>
                                                         </td>
                                                     </tr>
-                                                <?php endforeach; ?>
-                                            <?php else: ?>
-                                                <tr>
-                                                    <td colspan="5" class="text-center" style="padding: 50px;">
-                                                        <p>Giỏ hàng của bạn đang trống</p>
-                                                        <a href="?user=shop" class="btn-large btn-buy">Tiếp tục mua sắm</a>
-                                                    </td>
-                                                </tr>
-                                            <?php endif; ?>
-                                        </tbody>
-                                    </table>
+                                                <?php endif; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- Mobile View -->
-                            <div class="hidden-lg hidden-md col-sm-12 col-xs-12 noPadding">
-                                <div class="listProductWislist cart">
-                                    <?php if (!empty($cartItems)): ?>
-                                        <?php foreach ($cartItems as $item): ?>
-                                            <div class="idProduct" data-id="<?= $item['cart_item_id'] ?>" data-storeid="<?= $item['variant_id'] ?>">
-                                                <div class="wislistItem">
-                                                    <div class="mediaImage">
-                                                        <a href="?user=product-detail&id=<?= $item['product_id'] ?>">
-                                                            <img class="productImg" src="<?= $item['variant_image'] ?: $item['image_thumbnail'] ?>" alt="<?= htmlspecialchars($item['product_name']) ?>">
-                                                        </a>
-                                                    </div>
-                                                    <div class="mediaBody">
-                                                        <h3 class="productName">
-                                                            <a href="?user=product-detail&id=<?= $item['product_id'] ?>"><?= htmlspecialchars($item['product_name']) ?></a>
-                                                        </h3>
-                                                        <div class="vendorName">
-                                                            <?php if (!empty($item['variant_attributes'])): ?>
-                                                                <?= htmlspecialchars($item['variant_attributes']) ?>
-                                                            <?php endif; ?>
-                                                        </div>
-                                                        <div class="priceProductWislist">
-                                                            <?php if ($item['sale_price'] && $item['sale_price'] < $item['price']): ?>
-                                                                <span class="priceNew onlyPrice tp_product_price"><?= number_format($item['sale_price'], 0, ',', '.') ?>đ</span>
-                                                            <?php else: ?>
-                                                                <span class="priceNew onlyPrice tp_product_price"><?= number_format($item['price'], 0, ',', '.') ?>đ</span>
-                                                            <?php endif; ?>
-                                                        </div>
-                                                        <div class="quantityProduct">
-                                                            <div class="input-groupBtn">
-                                                                <form method="POST" action="?user=updateCartQuantity" class="frm-minus" style="display:inline;">
-                                                                    <input type="hidden" name="cart_item_id" value="<?= $item['cart_item_id'] ?>">
-                                                                    <input type="hidden" name="quantity" value="<?= $item['quantity'] - 1 ?>">
-                                                                    <button class="btnAction" type="submit" <?= $item['quantity'] <= 1 ? 'disabled' : '' ?>>-</button>
-                                                                </form>
-
-                                                                <!-- input -->
-                                                                <input class="form-control js-quantity-product number-sidebar"
-                                                                    value="<?= $item['quantity'] ?>"
-                                                                    data-id="<?= $item['cart_item_id'] ?>"
-                                                                    type="text">
-
-                                                                <!-- form cộng -->
-                                                                <form method="POST" action="?user=updateCartQuantity" class="frm-plus" style="display:inline;">
-                                                                    <input type="hidden" name="cart_item_id" value="<?= $item['cart_item_id'] ?>">
-                                                                    <input type="hidden" name="quantity" value="<?= $item['quantity'] + 1 ?>">
-                                                                    <button class="btnAction" type="submit">+</button>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                        <a class="btn-buyNow viewAgain" href="?user=product-detail&id=<?= $item['product_id'] ?>">Xem lại</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <div style="text-align: center; padding: 50px;">
-                                            <p>Giỏ hàng của bạn đang trống</p>
-                                            <a href="?user=shop" class="btn-large btn-buy">Tiếp tục mua sắm</a>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-
-                            <!-- Order Summary -->
-                            <div class="col-md-4 col-lg-4 col-sm-12 col-xs-12 noPadding">
-                                <div class="orderWrapp">
-                                    <div class="each-row">
-                                        <h3>Tóm tắt đơn hàng</h3>
-                                    </div>
-                                    <div class="each-row">
-                                        <div class="box-style">
-                                            <span class="text-label">Tổng tiền hàng: </span>
-                                            <strong class="totals_price1"><?= number_format($cartTotal, 0, ',', '.') ?>đ</strong>
-                                        </div>
-                                    </div>
-                                    <div class="each-row">
-                                        <div class="box-style">
-                                            <span class="text-label">Giảm giá: </span>
-                                            <strong class="totals_price1">- 0đ</strong>
-                                        </div>
-                                    </div>
-                                    <div class="each-row">
-                                        <div class="box-style">
-                                            <span class="text-label">Tạm tính: </span>
-                                            <strong class="totals_price1"><?= number_format($cartTotal, 0, ',', '.') ?>đ</strong>
-                                        </div>
-                                    </div>
-                                    <div class="each-row">
-                                        <div class="box-style">
-                                            <span class="text-label" style="font-weight: 600">Tổng tiền: </span>
-                                            <strong class="totals_price2"><?= number_format($cartTotal, 0, ',', '.') ?>đ</strong>
-                                        </div>
-                                    </div>
-
-                                    <?php if (!empty($cartItems)): ?>
+                                <!-- Order Summary -->
+                                <div class="col-md-4 col-lg-4 col-sm-12 col-xs-12 noPadding">
+                                    <div class="orderWrapp">
                                         <div class="each-row">
-                                            <a class="btn-large btn-checkout" title="Tiến hành đặt hàng" href="?user=order">Tiến hành đặt hàng</a>
-                                            <a class="btn-large btn-buy" title="Mua thêm sản phẩm" href="?user=shop">Mua thêm sản phẩm</a>
+                                            <h3>Tóm tắt đơn hàng</h3>
                                         </div>
-                                    <?php endif; ?>
 
-                                    <?php if (!empty($cartItems)): ?>
-                                        <div class="each-row" style="margin-top: 15px;">
-                                            <a class="btn-large btn-buy btn-clear-cart"
-                                                style="background: #dc3545; border-color: #dc3545;"
-                                                title="Xóa toàn bộ giỏ hàng"
-                                                href="javascript:void(0);"
-                                                data-href="?user=clearCart">
-                                                Xóa toàn bộ giỏ hàng
-                                            </a>
+                                        <div class="each-row">
+                                            <div class="box-style">
+                                                <span class="text-label">Tổng tiền hàng (toàn bộ giỏ): </span>
+                                                <strong class="totals_price1"><?= number_format($cartTotal, 0, ',', '.') ?>đ</strong>
+                                            </div>
                                         </div>
-                                    <?php endif; ?>
+
+                                        <div class="each-row">
+                                            <div class="box-style">
+                                                <span class="text-label">Đã chọn: </span>
+                                                <strong class="totals_price1"><span id="selected-count">0</span> sản phẩm</strong>
+                                            </div>
+                                        </div>
+
+                                        <div class="each-row">
+                                            <div class="box-style">
+                                                <span class="text-label" style="font-weight:600">Tổng tiền (đã chọn): </span>
+                                                <strong class="totals_price2" id="selected-amount">0đ</strong>
+                                            </div>
+                                        </div>
+
+                                        <?php if (!empty($cartItems)): ?>
+                                            <div class="each-row">
+                                                <button type="submit" class="btn-large btn-checkout" id="btn-buy-selected" style="width: 100%;">
+                                                    Mua sản phẩm đã chọn
+                                                </button>
+                                                <a class="btn-large btn-buy" title="Mua thêm sản phẩm" href="?user=shop">Mua thêm sản phẩm</a>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <?php if (!empty($cartItems)): ?>
+                                            <div class="each-row" style="margin-top: 15px;">
+                                                <a class="btn-large btn-buy btn-clear-cart"
+                                                    style="background: #dc3545; border-color: #dc3545;"
+                                                    title="Xóa toàn bộ giỏ hàng"
+                                                    href="javascript:void(0);"
+                                                    data-href="?user=clearCart">
+                                                    Xóa toàn bộ giỏ hàng
+                                                </a>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
-                            </div>
+                            </form> <!-- đóng form ở đây -->
                         </div>
                     </div>
                 </div>
@@ -326,7 +278,7 @@
             }
 
             // Bắt click nút +/- (debounce 3s)
-            row.querySelectorAll('form[action*="updateCartQuantity"] button[type="submit"]').forEach(btn => {
+            row.querySelectorAll('.btn-plus, .btn-minus').forEach(btn => {
                 btn.addEventListener('click', (ev) => {
                     ev.preventDefault();
                     ev.stopPropagation();
@@ -341,8 +293,8 @@
 
                     qtyInput.value = String(next);
                     updateIndicator(next);
-                    scheduleSubmit(next);
-                }, true); // capture để chặn handler template
+                    scheduleSubmit(next); // vẫn submit form updateCartQuantity sau 3s như cũ
+                }, true);
             });
 
             // Nhập tay: Enter => cập nhật ngay (không debounce)
@@ -380,6 +332,100 @@
             qtyInput.value = String(initVal);
             updateIndicator(initVal);
         });
+    });
+</script>
+
+<script script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const fmt = (n) => (n || 0).toLocaleString('vi-VN') + 'đ';
+
+        const $form = document.getElementById('cartSelectForm');
+        const $selectAll = document.getElementById('select-all');
+        const $count = document.getElementById('selected-count');
+        const $amount = document.getElementById('selected-amount');
+        const $buyBtn = document.getElementById('btn-buy-selected');
+
+        function getRowQty(row) {
+            const qtyInput = row.querySelector('.js-quantity-product');
+            const v = parseInt(qtyInput ? qtyInput.value : '0', 10);
+            return Number.isFinite(v) && v > 0 ? v : 0;
+        }
+
+        function updateSelectedSummary() {
+            const rows = Array.from(document.querySelectorAll('.idProduct'));
+            let sum = 0;
+            let cnt = 0;
+            rows.forEach(row => {
+                const cb = row.querySelector('.select-item');
+                if (!cb || !cb.checked) return;
+                const unit = parseInt(row.getAttribute('data-unit-price') || '0', 10);
+                const qty = getRowQty(row);
+                if (unit > 0 && qty > 0) {
+                    sum += unit * qty;
+                    cnt += 1;
+                }
+            });
+            if ($count) $count.textContent = String(cnt);
+            if ($amount) $amount.textContent = fmt(sum);
+            if ($buyBtn) $buyBtn.disabled = (cnt === 0);
+        }
+
+        // “Chọn tất cả”
+        if ($selectAll) {
+            $selectAll.addEventListener('change', () => {
+                document.querySelectorAll('.select-item').forEach(cb => cb.checked = $selectAll.checked);
+                updateSelectedSummary();
+            });
+        }
+
+        // Tick từng dòng
+        document.addEventListener('change', (e) => {
+            if (e.target && e.target.classList.contains('select-item')) {
+                // sync trạng thái chọn tất cả
+                const all = document.querySelectorAll('.select-item');
+                const checked = document.querySelectorAll('.select-item:checked');
+                if ($selectAll) $selectAll.checked = (all.length && checked.length === all.length);
+                updateSelectedSummary();
+            }
+        });
+
+        // Khi đổi số lượng (gõ tay), tính lại ngay
+        document.addEventListener('input', (e) => {
+            if (e.target && e.target.classList.contains('js-quantity-product')) {
+                updateSelectedSummary();
+            }
+        });
+
+        // Với nút +/- trong script trước, sau khi set value xong ta vẫn tính lại
+        // (script cũ đã gán sự kiện click; ở đây chỉ nghe nổi bọt sau cùng)
+        document.addEventListener('click', (e) => {
+            if (e.target && (e.target.classList.contains('btn-plus') || e.target.classList.contains('btn-minus'))) {
+                // đợi 1 tick cho input cập nhật
+                setTimeout(updateSelectedSummary, 0);
+            }
+        });
+
+        // Chặn submit nếu chưa chọn
+
+        $form.addEventListener('submit', (e) => {
+            const hasAny = document.querySelector('.select-item:checked');
+            if (!hasAny) {
+                e.preventDefault();
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Chưa chọn sản phẩm',
+                        text: 'Vui lòng tick chọn ít nhất 1 sản phẩm để tiến hành đặt hàng.'
+                    });
+                } else {
+                    alert('Vui lòng chọn ít nhất 1 sản phẩm.');
+                }
+            }
+        });
+
+
+        // Khởi tạo
+        updateSelectedSummary();
     });
 </script>
 

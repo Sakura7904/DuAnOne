@@ -8,6 +8,25 @@ class CartModel
         $this->db = new Database();
     }
 
+    public function getCartItemsByIds($cartId, $cartItemIds)
+    {
+        if (empty($cartItemIds)) return [];
+
+        $placeholders = implode(',', array_fill(0, count($cartItemIds), '?'));
+        $sql = "SELECT * FROM cartitems WHERE cart_id = ? AND id IN ($placeholders)";
+        $stmt = $this->db->pdo->prepare($sql);
+
+        $i = 1;
+        $stmt->bindValue($i++, $cartId, PDO::PARAM_INT);
+        foreach ($cartItemIds as $id) {
+            $stmt->bindValue($i++, $id, PDO::PARAM_INT);
+        }
+
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
     /**
      * Lấy giỏ hàng của user theo user_id
      */
