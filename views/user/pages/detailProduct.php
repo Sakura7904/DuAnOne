@@ -1,3 +1,4 @@
+
 <section class="bread-crumb margin-bottom-10">
     <div class="container">
         <div class="headCategory hidden-xs hidden-sm"
@@ -372,7 +373,7 @@
 
 <div class="product-comments">
     <h3 style="font-size:18px;font-weight:600;margin-bottom:10px;">
-        Bình luận (<?= (int)($cmt_total ?? 0) ?>)
+      Bình luận (<?= (int)($totalComments ?? 0) ?>)
     </h3>
 
     <?php if (!empty($_SESSION['msg'])): ?>
