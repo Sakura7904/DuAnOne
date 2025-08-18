@@ -33,6 +33,7 @@ include "controllers/user/OrderController.php";
 include "controllers/user/PurchaseController.php";
 include "controllers/user/ProductByCategoryController.php";
 include "controllers/user/WishlishController.php";
+include "controllers/user/CommentClientController.php";
 
 $admin = $_GET['admin'] ?? "";
 $user = $_GET['user'] ?? "";
@@ -190,7 +191,11 @@ if (!empty($user) || (empty($admin) && empty($user))) {
         'clearWishlist'      => (new WishlistController())->clear(),  
         'countWishlist'      => (new WishlistController())->count(),  
 
-
+         // ===== Comment =====
+        'addComment'    => (new CommentClientController())->add(),
+        'updateComment' => (new CommentClientController())->update(),
+        'deleteComment' => (new CommentClientController())->delete(),
+        
         default => die("Không tìm thấy file nào như thế cả!!!"),
     };
 }

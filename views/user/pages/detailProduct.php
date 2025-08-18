@@ -1,3 +1,4 @@
+
 <section class="bread-crumb margin-bottom-10">
     <div class="container">
         <div class="headCategory hidden-xs hidden-sm"
@@ -367,45 +368,163 @@
                                     </li>
                                 </ul>
                             </div>
-                        </div>
+                        </div>                        
                         <?php $meId = (int)($_SESSION['user_id'] ?? 0); ?>
 
-                        <div class="product-comments">
-                            <h3 style="font-size:18px;font-weight:600;margin-bottom:10px;">
-                                Bình luận (<?= (int)($totalComments ?? 0) ?>)
-                            </h3>
+<div class="product-comments">
+    <h3 style="font-size:18px;font-weight:600;margin-bottom:10px;">
+      Bình luận (<?= (int)($totalComments ?? 0) ?>)
+    </h3>
 
-                            <?php if (!empty($_SESSION['msg'])): ?>
-                                <div class="<?= (($_SESSION['msg_type'] ?? '') === 'success') ? 'alert-success' : 'alert-error' ?>"
-                                    style="padding:8px 10px;border:1px solid #eee;border-radius:6px;margin-bottom:10px;">
-                                    <?= htmlspecialchars($_SESSION['msg']) ?>
-                                </div>
-                                <?php unset($_SESSION['msg'], $_SESSION['msg_type']); ?>
-                            <?php endif; ?>
+    <?php if (!empty($_SESSION['msg'])): ?>
+        <div class="<?= (($_SESSION['msg_type'] ?? '') === 'success') ? 'alert-success' : 'alert-error' ?>"
+             style="padding:8px 10px;border:1px solid #eee;border-radius:6px;margin-bottom:10px;">
+            <?= htmlspecialchars($_SESSION['msg']) ?>
+        </div>
+        <?php unset($_SESSION['msg'], $_SESSION['msg_type']); ?>
+    <?php endif; ?>
 
-                            <!-- THÊM bình luận -->
-                            <div style="border:1px solid #eee;padding:12px;border-radius:8px;margin-bottom:14px;">
-                                <?php if ($meId > 0): ?>
-                                    <form method="post" action="index.php?user=addComment">
-                                        <input type="hidden" name="product_id" value="<?= (int)$product['id'] ?>">
-                                        <input type="hidden" name="cmt_page" value="<?= (int)($cmt_page ?? 1) ?>">
-                                        <textarea name="content" rows="3" placeholder="Viết bình luận..."
-                                            style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;"></textarea>
-                                        <div style="text-align:right;margin-top:8px;">
-                                            <button type="submit" style="padding:8px 12px;border:none;border-radius:6px;background:#111;color:#fff;">
-                                                Đăng bình luận
-                                            </button>
-                                        </div>
-                                    </form>
-                                <?php else: ?>
-                                    <div>Bạn cần <a href="index.php?user=loginForm">đăng nhập</a> để bình luận.</div>
-                                <?php endif; ?>
+    <!-- THÊM bình luận -->
+    <div style="border:1px solid #eee;padding:12px;border-radius:8px;margin-bottom:14px;">
+        <?php if ($meId > 0): ?>
+            <form method="post" action="index.php?user=addComment">
+                <input type="hidden" name="product_id" value="<?= (int)$product['id'] ?>">
+                <input type="hidden" name="cmt_page" value="<?= (int)($cmt_page ?? 1) ?>">
+                <textarea name="content" rows="3" placeholder="Viết bình luận..."
+                          style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;"></textarea>
+                <div style="text-align:right;margin-top:8px;">
+                    <button type="submit" style="padding:8px 12px;border:none;border-radius:6px;background:#111;color:#fff;">
+                        Đăng bình luận
+                    </button>
+                </div>
+            </form>
+        <?php else: ?>
+            <div>Bạn cần <a href="index.php?user=loginForm">đăng nhập</a> để bình luận.</div>
+        <?php endif; ?>
+    </div>
+
+    <!-- DANH SÁCH bình luận -->
+    <ul style="list-style:none;padding:0;margin:0;">
+        <?php if (!empty($comments)): ?>
+            <?php foreach ($comments as $c): ?>
+                <?php
+                    $cid     = (int)$c['id'];
+                    $isOwner = ((int)$c['user_id'] === $meId);
+                    $name    = $c['full_name'] ?? 'Người dùng';
+                    $initial = mb_strtoupper(mb_substr($name, 0, 1, 'UTF-8'));
+                ?>
+                <li style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid #f0f0f0;">
+                    <div style="min-width:36px;height:36px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-weight:600;">
+                        <?= htmlspecialchars($initial) ?>
+                    </div>
+
+                    <div style="flex:1;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-weight:600;"><?= htmlspecialchars($name) ?></span>
+                                <span style="color:#aaa;">•</span>
+                                <time style="color:#888;font-size:13px;">
+                                    <?= date('H:i d/m/Y', strtotime($c['created_at'] ?? 'now')) ?>
+                                </time>
                             </div>
 
-                            <!-- DANH SÁCH bình luận -->
-                            <ul style="list-style:none;padding:0;margin:0;">
-                                <?php if (!empty($comments)): ?>
-                                    <?php foreach ($comments as $c): ?>
+                            <?php if ($isOwner): ?>
+                            <div style="display:flex;gap:8px;">
+                                <button type="button" class="btn-edit" data-target="#edit-<?= $cid ?>"
+                                        style="padding:4px 8px;border:1px solid #ddd;background:#fff;border-radius:6px;cursor:pointer;">
+                                    Sửa
+                                </button>
+                                <form method="post" action="index.php?user=deleteComment" onsubmit="return confirm('Xóa bình luận này?');">
+                                    <input type="hidden" name="product_id" value="<?= (int)$product['id'] ?>">
+                                    <input type="hidden" name="comment_id" value="<?= $cid ?>">
+                                    <input type="hidden" name="cmt_page" value="<?= (int)($cmt_page ?? 1) ?>">
+                                    <button type="submit"
+                                            style="padding:4px 8px;border:1px solid #f66;color:#c00;background:#fff;border-radius:6px;cursor:pointer;">
+                                        Xóa
+                                    </button>
+                                </form>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Nội dung -->
+                        <div id="view-<?= $cid ?>" style="margin-top:6px;line-height:1.6;">
+                            <?= nl2br(htmlspecialchars($c['content'] ?? '')) ?>
+                        </div>
+
+                        <!-- Form SỬA (ẩn) -->
+                        <?php if ($isOwner): ?>
+                        <form id="edit-<?= $cid ?>" method="post" action="index.php?user=updateComment"
+                              style="display:none;margin-top:8px;">
+                            <input type="hidden" name="product_id" value="<?= (int)$product['id'] ?>">
+                            <input type="hidden" name="comment_id" value="<?= $cid ?>">
+                            <input type="hidden" name="cmt_page" value="<?= (int)($cmt_page ?? 1) ?>">
+                            <textarea name="content" rows="3"
+                                      style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;"><?= htmlspecialchars($c['content'] ?? '') ?></textarea>
+                            <div style="margin-top:6px;display:flex;gap:8px;justify-content:flex-end;">
+                                <button type="button" class="btn-cancel" data-target="#edit-<?= $cid ?>"
+                                        style="padding:6px 10px;border:1px solid #ddd;background:#fff;border-radius:6px;cursor:pointer;">
+                                    Hủy
+                                </button>
+                                <button type="submit"
+                                        style="padding:6px 12px;border:none;border-radius:6px;background:#111;color:#fff;">
+                                    Lưu
+                                </button>
+                            </div>
+                        </form>
+                        <?php endif; ?>
+                    </div>
+                </li>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <li style="padding:8px 0;color:#666;">Chưa có bình luận nào. Hãy là người đầu tiên!</li>
+        <?php endif; ?>
+    </ul>
+
+    <!-- PHÂN TRANG -->
+    <?php if (($cmt_totalPages ?? 1) > 1): ?>
+        <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+            <?php if (($cmt_page ?? 1) > 1): ?>
+                <a href="index.php?user=detailProduct&id=<?= (int)$product['id'] ?>&cmt_page=<?= (int)$cmt_page - 1 ?>"
+                   style="padding:6px 10px;border:1px solid #ddd;border-radius:6px;text-decoration:none;">← Trước</a>
+            <?php endif; ?>
+
+            <?php for ($i = 1; $i <= (int)$cmt_totalPages; $i++): ?>
+                <?php if ($i == (int)$cmt_page): ?>
+                    <span style="padding:6px 10px;border-radius:6px;background:#111;color:#fff;"><?= $i ?></span>
+                <?php else: ?>
+                    <a href="index.php?user=detailProduct&id=<?= (int)$product['id'] ?>&cmt_page=<?= $i ?>"
+                       style="padding:6px 10px;border:1px solid #ddd;border-radius:6px;text-decoration:none;"><?= $i ?></a>
+                <?php endif; ?>
+            <?php endfor; ?>
+
+            <?php if ((int)$cmt_page < (int)$cmt_totalPages): ?>
+                <a href="index.php?user=detailProduct&id=<?= (int)$product['id'] ?>&cmt_page=<?= (int)$cmt_page + 1 ?>"
+                   style="padding:6px 10px;border:1px solid #ddd;border-radius:6px;text-decoration:none;">Sau →</a>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+</div>
+
+<script>
+// Toggle form sửa
+document.querySelectorAll('.btn-edit').forEach(btn => {
+    btn.addEventListener('click', function () {
+        const sel = this.getAttribute('data-target');
+        const form = document.querySelector(sel);
+        if (!form) return;
+        form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+    });
+});
+document.querySelectorAll('.btn-cancel').forEach(btn => {
+    btn.addEventListener('click', function () {
+        const sel = this.getAttribute('data-target');
+        const form = document.querySelector(sel);
+        if (form) form.style.display = 'none';
+    });
+});
+</script>
+
                         <!--                        <a href="javascript:void(0);" class="starbap-write-rev-link">Chấm điểm và viết đánh giá sản phẩm</a>-->
                     </div>
                 </div>
