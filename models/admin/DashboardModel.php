@@ -31,7 +31,107 @@ class DashboardModel
 
 
     /* ===================== Thống kê cho biểu đồ ===================== */
+    public function getTopSellingProducts(string $fromDate, string $toDate, int $limit = 5): array
+    {
+        // Khoảng ngày inclusive: [from 00:00:00, to 23:59:59]
+        $from = $fromDate . (strlen($fromDate) === 10 ? ' 00:00:00' : '');
+        $to   = $toDate   . (strlen($toDate)   === 10 ? ' 23:59:59' : '');
 
+        $sql = "
+        /* 1) Tổng hợp doanh số THEO SẢN PHẨM, chỉ từ orderitems.status = 'completed' */
+        WITH sales AS (
+            SELECT
+                p.id                         AS product_id,
+                p.name                       AS name,
+                c.name                       AS category_name,
+                COALESCE(p.image_thumbnail, MIN(pv.image_url))          AS thumb_url,
+                MIN(COALESCE(pv.sale_price, pv.price))                  AS min_price,
+                COUNT(DISTINCT pv.id)                                    AS variant_count,
+                SUM(oi.quantity)                                         AS sold_qty,
+                SUM(oi.quantity * oi.price)                              AS sold_revenue
+            FROM orders o
+            JOIN orderitems oi   ON oi.order_id = o.id
+            JOIN productvariants pv ON pv.id  = oi.variant_id
+            JOIN products p      ON p.id      = pv.product_id
+            LEFT JOIN categories c ON c.id    = p.category_id
+            WHERE o.created_at >= :from
+              AND o.created_at <= :to
+              AND LOWER(TRIM(oi.status)) = 'completed'
+              /* Nếu bạn muốn CHỈ các đơn hoàn toàn completed, bật block dưới:
+              AND NOT EXISTS (
+                SELECT 1 FROM orderitems oi2
+                WHERE oi2.order_id = o.id AND LOWER(TRIM(oi2.status)) <> 'completed'
+              )
+              */
+            GROUP BY p.id, p.name, c.name, p.image_thumbnail
+        )
+
+        /* 2) Gom màu & size RIÊNG, tránh nhân dòng */
+        , colors AS (
+            SELECT pv.product_id, GROUP_CONCAT(DISTINCT av.value) AS colors
+            FROM productvariants pv
+            JOIN productvariantvalues v ON v.variant_id = pv.id
+            JOIN attributevalues av     ON av.id = v.value_id
+            WHERE av.attribute_id = 1
+            GROUP BY pv.product_id
+        ), sizes AS (
+            SELECT pv.product_id, GROUP_CONCAT(DISTINCT av.value) AS sizes
+            FROM productvariants pv
+            JOIN productvariantvalues v ON v.variant_id = pv.id
+            JOIN attributevalues av     ON av.id = v.value_id
+            WHERE av.attribute_id = 2
+            GROUP BY pv.product_id
+        )
+
+        SELECT
+            s.product_id AS id,
+            s.name, s.category_name, s.thumb_url,
+            s.min_price, s.variant_count,
+            s.sold_qty, s.sold_revenue,
+            colors.colors, sizes.sizes
+        FROM sales s
+        LEFT JOIN colors ON colors.product_id = s.product_id
+        LEFT JOIN sizes  ON sizes.product_id  = s.product_id
+        WHERE s.sold_qty > 0
+        ORDER BY s.sold_qty DESC, s.sold_revenue DESC
+        LIMIT :lim
+    ";
+
+        $stm = $this->db->pdo->prepare($sql);
+        $stm->bindValue(':from', $from);
+        $stm->bindValue(':to',   $to);
+        $stm->bindValue(':lim',  (int)$limit, \PDO::PARAM_INT);
+        $stm->execute();
+        $rows = $stm->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+
+        // Chuẩn hoá cho view hiện tại
+        $fmtVND = fn($n) => number_format((float)$n, 0, ',', '.') . 'đ';
+        $out = [];
+        foreach ($rows as $r) {
+            $out[] = [
+                'id'                   => (int)$r['id'],
+                'name'                 => $r['name'],
+                'category_name'        => $r['category_name'] ?: 'Chưa phân loại',
+                'thumbnail_display'    => $r['thumb_url'] ?: './assets/admin/assets/images/placeholder.png',
+                'price_display'        => $fmtVND($r['min_price']),
+                'variant_count'        => (int)$r['variant_count'],
+
+                // ĐÃ BÁN & DOANH THU: chỉ từ item completed
+                'sold_qty'             => (int)$r['sold_qty'],
+                'sold_qty_display'     => number_format((int)$r['sold_qty'], 0, ',', '.'),
+                'sold_revenue'         => (float)$r['sold_revenue'],
+                'sold_revenue_display' => $fmtVND($r['sold_revenue']),
+
+                // Cột QTY hiện tại của view -> mình vẫn set = số đã bán để bạn khỏi sửa HTML
+                'total_quantity'       => (int)$r['sold_qty'],
+
+                // Màu/size để render
+                'color_list'           => array_values(array_filter(array_map('trim', explode(',', (string)$r['colors'])))),
+                'size_list'            => array_values(array_filter(array_map('trim', explode(',', (string)$r['sizes'])))),
+            ];
+        }
+        return $out;
+    }
     /**
      * Doanh thu theo ngày (sum oi.quantity * oi.price), chỉ tính đơn đã thanh toán.
      * Trả về: ['labels'=>[Y-m-d...], 'data'=>[revenue...]]

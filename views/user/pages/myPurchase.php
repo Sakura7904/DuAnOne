@@ -49,9 +49,6 @@ function tabUrl($key)
                         <a class="tab <?= ($activeTab === 'all' ? 'active' : '') ?>"
                             href="?user=purchase&status=all">Tất cả</a>
 
-                        <a class="tab <?= ($activeTab === 'pending' ? 'active' : '') ?>"
-                            href="?user=purchase&status=pending">Chờ thanh toán</a>
-
                         <a class="tab <?= ($activeTab === 'processing' ? 'active' : '') ?>"
                             href="?user=purchase&status=processing">Đang xử lý</a>
 

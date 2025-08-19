@@ -29,11 +29,13 @@ class DashboardController
         $charts = [];
         $charts['revenueByDay'] = $this->model->getRevenueSeries($from, $to);
 
+        $topProducts = $this->model->getTopSellingProducts($from, $to, 5);
         $content = getContentPath('', 'dashboard');
         view('admin/master', [
             'content'      => $content,
             'recentOrders' => $recentOrders,
             'kpis'         => $kpis,
+            'products'  => $topProducts,
             'charts'  => $charts,
             'topCustomers' => $topCustomers,
             'from'         => $from,

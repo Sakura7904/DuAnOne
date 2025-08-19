@@ -322,6 +322,102 @@ $vnStatusDotClass = function ($s) {
             </tbody>
         </table>
     </div>
+
+    <div class="rounded-2xl border border-neutral bg-neutral-bg dark:border-dark-neutral-border dark:bg-dark-neutral-bg overflow-scroll scrollbar-hide p-[25px] mb-[33px]">
+        <div class="flex items-center justify-between pb-4 border-neutral border-b mb-5 dark:border-dark-neutral-border">
+            <p class="text-subtitle-semibold font-semibold text-gray-1100 dark:text-gray-dark-1100">Top sản phẩm bán chạy</p>
+        </div>
+        <table class="w-full min-w-[900px]">
+            <tr>
+                <th class="border-b border-neutral pb-[17px] dark:border-dark-neutral-border">
+                    <div class="flex items-center gap-x-[10px]"><span class="text-xs font-semibold text-gray-500 dark:text-gray-dark-500">Image</span><img src="./assets/admin/assets/images/icons/icon-arrow-up-down.svg" alt="arrow up down icon"></div>
+                </th>
+                <th class="border-b border-neutral pb-[17px] dark:border-dark-neutral-border">
+                    <div class="flex items-center gap-x-[10px]"><span class="text-xs font-semibold text-gray-500 dark:text-gray-dark-500">Name</span><img src="./assets/admin/assets/images/icons/icon-arrow-up-down.svg" alt="arrow up down icon"></div>
+                </th>
+                <th class="border-b border-neutral pb-[17px] dark:border-dark-neutral-border">
+                    <div class="flex items-center gap-x-[10px]"><span class="text-xs font-semibold text-gray-500 dark:text-gray-dark-500">Category</span><img src="./assets/admin/assets/images/icons/icon-arrow-up-down.svg" alt="arrow up down icon"></div>
+                </th>
+                <th class="border-b border-neutral pb-[17px] dark:border-dark-neutral-border">
+                    <div class="flex items-center gap-x-[10px]"><span class="text-xs font-semibold text-gray-500 dark:text-gray-dark-500">QTY</span><img src="./assets/admin/assets/images/icons/icon-arrow-up-down.svg" alt="arrow up down icon"></div>
+                </th>
+                <th class="border-b border-neutral pb-[17px] dark:border-dark-neutral-border">
+                    <div class="flex items-center gap-x-[10px]"><span class="text-xs font-semibold text-gray-500 dark:text-gray-dark-500">Đã bán</span><img src="./assets/admin/assets/images/icons/icon-arrow-up-down.svg" alt="arrow up down icon"></div>
+                </th>
+                <th class="border-b border-neutral pb-[17px] dark:border-dark-neutral-border">
+                    <div class="flex text-center justify-center gap-x-[10px]"><span class="text-xs font-semibold text-gray-500 dark:text-gray-dark-500">Tổng doanh thu</span><img src="./assets/admin/assets/images/icons/icon-arrow-up-down.svg" alt="arrow up down icon"></div>
+                </th>
+            </tr>
+            <?php foreach ($products as $product): ?>
+                <tr>
+                    <td class="border-b border-neutral py-[26px] dark:border-dark-neutral-border">
+                        <img class="img-thumbnail product-thumbnail border border-neutral rounded-lg dark:border-dark-neutral-border w-[50px]"
+                            src="<?= $product['thumbnail_display'] ?>">
+                    </td>
+                    <td class="border-b border-neutral py-[26px] dark:border-dark-neutral-border">
+                        <div class="flex flex-col gap-y-1 max-w-[250px]">
+                            <p class="text-sm leading-4 text-gray-1100 font-semibold dark:text-gray-dark-1100"><?= $product['name'] ?></p>
+                            <?php if ($product['variant_count'] > 0): ?>
+                                <p class="text-xs text-gray-500 dark:text-gray-dark-500">Có <?= $product['variant_count'] ?> biến thể</p>
+                            <?php endif; ?>
+
+                            <?php if ($product['variant_count'] == 0): ?>
+                                <p class="text-xs text-gray-500 dark:text-gray-dark-500">Chưa có biến thể cho sản phẩm này</p>
+                            <?php endif; ?>
+
+                            <p class="text-xs text-gray-500 dark:text-gray-dark-500">
+                                <?php if (!empty($product['description'])): ?>
+                                    <small class="text-muted d-block mt-1">
+                                        <?= htmlspecialchars(substr($product['description'], 0, 60)) ?>
+                                        <?= strlen($product['description']) > 60 ? '...' : '' ?>
+                                    </small>
+                                <?php endif; ?>
+                            </p>
+                        </div>
+                    </td>
+                    <td class="border-b border-neutral py-[26px] dark:border-dark-neutral-border">
+                        <p class="text-sm leading-4 text-gray-500 dark:text-gray-dark-500"><?= $product['category_name'] ?? 'Chưa phân loại' ?></p>
+                    </td>
+                    <td class="border-b border-neutral py-[26px] dark:border-dark-neutral-border">
+                        <?php
+                        $stockClass = 'badge-danger';
+                        $stockText = 'Hết hàng';
+
+                        if ($product['total_quantity'] > 50) {
+                            $stockClass = 'badge-success';
+                            $stockText = 'Còn nhiều';
+                        } elseif ($product['total_quantity'] > 10) {
+                            $stockClass = 'badge-warning';
+                            $stockText = 'Còn ít';
+                        } elseif ($product['total_quantity'] > 0) {
+                            $stockClass = 'badge-danger';
+                            $stockText = 'Sắp hết';
+                        }
+                        ?>
+                        <div>
+                            <span class="text-sm leading-4 text-gray-1100 font-semibold dark:text-gray-dark-1100 badge <?= $stockClass ?> badge-lg">
+                                <?= $product['total_quantity'] ?>
+                            </span>
+                            <br>
+                            <small class="<?= str_replace('badge-', 'text-', $stockClass) ?>">
+                                <?= $stockText ?>
+                            </small>
+                        </div>
+                    </td>
+                    <td class="border-b border-neutral py-[26px] dark:border-dark-neutral-border">
+                        <p class="text-sm leading-4 text-gray-1100 font-semibold dark:text-gray-dark-1100">
+                            <?= $product['sold_qty_display'] ?? number_format((int)($product['sold_qty'] ?? $product['total_quantity'] ?? 0), 0, ',', '.') ?>
+                        </p>
+                    </td>
+                    <td class="border-b border-neutral py-[26px] dark:border-dark-neutral-border">
+                        <p class="text-sm text-center leading-4 text-gray-1100 font-semibold dark:text-gray-dark-1100">
+                            <?= $product['sold_revenue_display'] ?? (number_format((float)($product['sold_revenue'] ?? 0), 0, ',', '.') . 'đ') ?>
+                        </p>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
@@ -388,3 +484,49 @@ $vnStatusDotClass = function ($s) {
         });
     })();
 </script>
+
+<style>
+    .product-thumbnail {
+        border-radius: 8px;
+        transition: transform 0.2s;
+    }
+
+    .product-thumbnail:hover {
+        transform: scale(1.1);
+    }
+
+    .badge-outline-primary {
+        color: #007bff;
+        border: 1px solid #007bff;
+        background-color: transparent;
+    }
+
+    .badge-lg {
+        font-size: 1rem;
+        padding: 0.5em 0.75em;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .btn-group-vertical .btn {
+        margin-bottom: 2px;
+    }
+
+    .badge {
+        font-size: 0.75em;
+    }
+
+    .text-success {
+        color: #28a745 !important;
+    }
+
+    .text-warning {
+        color: #ffc107 !important;
+    }
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+</style>
