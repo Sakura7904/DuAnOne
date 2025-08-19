@@ -1,6 +1,3 @@
-<div class="bg-gray-100 flex rounded-xl w-full m-0 py-[14px] px-[18px] xl:w-[360px] dark:bg-gray-dark-100 lg:max-w-[250px] xl:max-w-[360px] lg:mr-[47px] lg:ml-6 order-last lg:order-first"><img src="./assets/admin/assets/images/icons/icon-search-normal.svg" alt="seacrh icon">
-    <input class="input w-full bg-transparent outline-none pl-2 h-5 text-gray-300 focus:!outline-none placeholder:text-gray-300 dark:placeholder:text-gray-dark-300 placeholder:font-semibold" type="text" placeholder="Search"><img src="./assets/admin/assets/images/icons/icon-microphone-2.svg" alt="microphone icon">
-</div>
 <div class="dropdown">
     <a href="?user=home">
         <label class="cursor-pointer dropdown-label flex items-center justify-between w-[142px]" tabindex="0">

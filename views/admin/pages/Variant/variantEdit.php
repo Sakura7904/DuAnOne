@@ -107,7 +107,7 @@ $cancelHref  = '?admin=list_variant' . ($pid ? '&product_id=' . urlencode($pid) 
                     <input name="price" id="price"
                         value="<?= h($old['price'] ?? $variant['price'] ?? '') ?>"
                         class="input bg-transparent text-sm leading-4 text-gray-400 h-fit min-h-fit py-4 focus:outline-none pl-[13px] dark:text-gray-dark-400 placeholder:text-inherit"
-                        type="number" step="0.01" placeholder="Nhập giá bán">
+                        type="number" placeholder="Nhập giá bán">
                 </div>
                 <?php if (!empty($errors['price'])): ?>
                     <p class="text-[13px] text-[#E23738] mb-12"><?= h($errors['price']) ?></p>
@@ -119,7 +119,7 @@ $cancelHref  = '?admin=list_variant' . ($pid ? '&product_id=' . urlencode($pid) 
                     <input name="sale_price" id="sale_price"
                         value="<?= h($old['sale_price'] ?? $variant['sale_price'] ?? '') ?>"
                         class="input bg-transparent text-sm leading-4 text-gray-400 h-fit min-h-fit py-4 focus:outline-none pl-[13px] dark:text-gray-dark-400 placeholder:text-inherit"
-                        type="number" step="0.01" placeholder="Nhập giá khuyến mãi">
+                        type="number" placeholder="Nhập giá khuyến mãi">
                 </div>
                 <?php if (!empty($errors['sale_price'])): ?>
                     <p class="text-[13px] text-[#E23738] mb-12"><?= h($errors['sale_price']) ?></p>

@@ -120,7 +120,7 @@
                                                     <tr>
                                                         <td colspan="6" class="text-center" style="padding: 50px;">
                                                             <p>Giỏ hàng của bạn đang trống</p>
-                                                            <a href="?user=shop" class="btn-large btn-buy">Tiếp tục mua sắm</a>
+                                                            <a href="?user=productsByCategory&category_id=1" class="btn-large btn-buy">Tiếp tục mua sắm</a>
                                                         </td>
                                                     </tr>
                                                 <?php endif; ?>
@@ -162,7 +162,7 @@
                                                 <button type="submit" class="btn-large btn-checkout" id="btn-buy-selected" style="width: 100%;">
                                                     Mua sản phẩm đã chọn
                                                 </button>
-                                                <a class="btn-large btn-buy" title="Mua thêm sản phẩm" href="?user=shop">Mua thêm sản phẩm</a>
+                                                <a class="btn-large btn-buy" title="Mua thêm sản phẩm" href="?user=productsByCategory&category_id=1">Mua thêm sản phẩm</a>
                                             </div>
                                         <?php endif; ?>
 

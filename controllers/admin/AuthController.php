@@ -3,9 +3,9 @@ include_once "models/admin/AuthModel.php";
 class AuthController
 {
 
-     public function loginForm()
+    public function loginForm()
     {
-       include "views/admin/pages/auth/login.php";
+        include "views/admin/pages/auth/login.php";
     }
     public function login()
     {
@@ -15,13 +15,17 @@ class AuthController
 
             $authModel = new AuthModel();
             $user = $authModel->findByEmail($email);
-           if ($user && $user['email'] === $email && $user['password_hash'] === $password) {
-                if (session_status() === PHP_SESSION_NONE) session_start();
+            // $password là mật khẩu người dùng nhập vào (plain text)
+            // $user['password_hash'] là giá trị đã lưu trong DB bằng password_hash(...)
 
-                $_SESSION['user_id'] = $user['id'];
+            if ($user && password_verify($password, $user['password_hash'])) {
+                if (session_status() === PHP_SESSION_NONE) session_start();
+                session_regenerate_id(true); // chống session fixation
+
+                $_SESSION['user_id']   = $user['id'];
                 $_SESSION['user_role'] = $user['role'];
                 $_SESSION['user_name'] = $user['full_name'];
-                $_SESSION['email'] = $user['email'];
+                $_SESSION['email']     = $user['email'];
 
                 if ($user['role'] === 'admin') {
                     header("Location: index.php?admin=dashboard");
@@ -38,7 +42,8 @@ class AuthController
     }
 
 
-    public function logout() {
+    public function logout()
+    {
         session_unset();
         session_destroy();
         header("Location: ?admin=loginForm");
